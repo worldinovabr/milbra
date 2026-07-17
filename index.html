@@ -604,7 +604,7 @@
 
         const GRUPOS_PADRAO = { 
             "AUTOMÁTICAS": ["MC-01","MC-01","M-01", "M-02", "M-03", "M-04", "M-05", "M-06"],
-            "Máquinas de 8": ["8.1", "8.7", "8.9", "8.10", "8.12,", "8.13"], 
+            "Máquinas de 8": ["8.1", "8.7", "8.9", "8.10", "8.12", "8.13"], 
             "Máquinas de 15": ["15.1", "15.2", "15.3", "15.4", "15.5", "15.6", "15.7", "15.8", "15.9", "15.10", "15.11", "15.12"], 
             "Máquinas de 25": ["25.3", "25.5"], 
             "Máquinas de 40": ["40.4"],
@@ -613,85 +613,85 @@
             "Solda Ponto": []
         };
 
-        const DB_NOME = "PCPMilbraDB";
-        const DB_VERSAO = 12;
-        let db;
+        const FIREBASE_SDK_URL = 'https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js';
+        const FIRESTORE_SDK_URL = 'https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js';
+        const ANALYTICS_SDK_URL = 'https://www.gstatic.com/firebasejs/12.1.0/firebase-analytics.js';
+        let firestore;
+        let firebaseApi;
 
-        function inicializarBanco() {
-            return new Promise((resolve, reject) => {
-                const requisicao = indexedDB.open(DB_NOME, DB_VERSAO);
-                
-                requisicao.onupgradeneeded = (e) => {
-                    db = e.target.result;
-                    if (db.objectStoreNames.contains('grupos')) db.deleteObjectStore('grupos');
-                    if (db.objectStoreNames.contains('itensBanco')) db.deleteObjectStore('itensBanco');
-                    if (db.objectStoreNames.contains('programacoes')) db.deleteObjectStore('programacoes');
-                    
-                    db.createObjectStore('grupos', { keyPath: 'nome' });
-                    db.createObjectStore('itensBanco', { keyPath: 'codigo' });
-                    db.createObjectStore('programacoes', { keyPath: 'id', autoIncrement: true });
-                };
+        async function inicializarBanco() {
+            const [{ initializeApp }, firestoreModulo] = await Promise.all([
+                import(FIREBASE_SDK_URL),
+                import(FIRESTORE_SDK_URL)
+            ]);
 
-                requisicao.onsuccess = async (e) => {
-                    db = e.target.result;
-                    await carregarGruposPadrao();
-                    resolve(db);
-                };
-                requisicao.onerror = (e) => reject(e);
-            });
+            firebaseApi = firestoreModulo;
+
+            const resposta = await fetch('./firebase-config.json', { cache: 'no-store' });
+            if (!resposta.ok) throw new Error('NÃ£o foi possÃ­vel carregar firebase-config.json');
+
+            const firebaseConfig = await resposta.json();
+            const app = initializeApp(firebaseConfig);
+            firestore = firebaseApi.getFirestore(app);
+
+            if (firebaseConfig.measurementId && location.protocol === 'https:') {
+                import(ANALYTICS_SDK_URL)
+                    .then(({ getAnalytics }) => getAnalytics(app))
+                    .catch(() => {});
+            }
+
+            await carregarGruposPadrao();
+        }
+
+        function docId(valor) {
+            return encodeURIComponent(String(valor));
+        }
+
+        function colecao(nome) {
+            return firebaseApi.collection(firestore, nome);
+        }
+
+        function documento(nomeColecao, id) {
+            return firebaseApi.doc(firestore, nomeColecao, docId(id));
         }
 
         async function carregarGruposPadrao() {
-            const tx = db.transaction('grupos', 'readwrite');
-            for (const [nome, maqs] of Object.entries(GRUPOS_PADRAO)) {
-                tx.objectStore('grupos').put({ nome, maquinas: maqs });
-            }
-            return new Promise(res => tx.oncomplete = res);
+            await Promise.all(Object.entries(GRUPOS_PADRAO).map(([nome, maqs]) =>
+                firebaseApi.setDoc(documento('grupos', nome), { nome, maquinas: maqs }, { merge: true })
+            ));
         }
 
         async function salvarGrupo(nome, maquinas) {
-            const tx = db.transaction('grupos', 'readwrite');
-            tx.objectStore('grupos').put({nome, maquinas});
-            return new Promise(res => tx.oncomplete = res);
+            await firebaseApi.setDoc(documento('grupos', nome), { nome, maquinas });
         }
         async function excluirGrupo(nome) {
-            const tx = db.transaction('grupos', 'readwrite');
-            tx.objectStore('grupos').delete(nome);
-            return new Promise(res => tx.oncomplete = res);
+            await firebaseApi.deleteDoc(documento('grupos', nome));
         }
         async function buscarTodosGrupos() {
-            const tx = db.transaction('grupos', 'readonly');
-            const req = tx.objectStore('grupos').getAll();
-            return new Promise(res => req.onsuccess = () => {
-                const g = {}; 
-                req.result.forEach(i => { g[i.nome] = i.maquinas; });
-                res(g);
+            const snapshot = await firebaseApi.getDocs(colecao('grupos'));
+            const g = {};
+            snapshot.forEach(doc => {
+                const item = doc.data();
+                g[item.nome] = item.maquinas || [];
             });
+            return g;
         }
         async function salvarItem(item) {
-            const tx = db.transaction('itensBanco', 'readwrite');
-            tx.objectStore('itensBanco').put(item);
-            return new Promise(res => tx.oncomplete = res);
+            await firebaseApi.setDoc(documento('itensBanco', item.codigo), item);
         }
         async function buscarItens() {
-            const tx = db.transaction('itensBanco', 'readonly');
-            const req = tx.objectStore('itensBanco').getAll();
-            return new Promise(res => req.onsuccess = () => res(req.result));
+            const snapshot = await firebaseApi.getDocs(colecao('itensBanco'));
+            return snapshot.docs.map(doc => doc.data());
         }
         async function salvarProg(prog) {
-            const tx = db.transaction('programacoes', 'readwrite');
-            tx.objectStore('programacoes').put(prog);
-            return new Promise(res => tx.oncomplete = res);
+            await firebaseApi.setDoc(documento('programacoes', prog.id), prog);
         }
         async function excluirProg(id) {
-            const tx = db.transaction('programacoes', 'readwrite');
-            tx.objectStore('programacoes').delete(id);
-            return new Promise(res => tx.oncomplete = res);
+            await firebaseApi.deleteDoc(documento('programacoes', id));
         }
         async function buscarProgs() {
-            const tx = db.transaction('programacoes', 'readonly');
-            const req = tx.objectStore('programacoes').getAll();
-            return new Promise(res => req.onsuccess = () => res(req.result));
+            const snapshot = await firebaseApi.getDocs(colecao('programacoes'));
+            return snapshot.docs.map(doc => doc.data());
         }
 
         const ORDEM_STATUS = { "Em máquina": 1, "Próximo": 2, "Planejado": 3, "Produzido": 4 };
