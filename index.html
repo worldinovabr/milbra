@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0A3D62">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="PCP Milbra">
+    <title>PCP - Milbra Artefatos Metálicos</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --cor-principal: #0A3D62;
+            --cor-principal-claro: #165B94;
+            --cor-principal-escuro: #072A45;
+            --fundo-cinza: #F5F7FA;
+            --branco: #FFFFFF;
+            --texto-escuro: #2C3E50;
+            --texto-claro: #718096;
+            --cor-em-maquina: #27AE60;
+            --cor-proximo: #F39C12;
+            --cor-produzido: #3498DB;
+            --cor-planejado: #95A5A6;
+            --borda: #E2E8F0;
+            --sombra: 0 2px 12px rgba(10, 61, 98, 0.1);
+            --raio: 8px;
+            --largura-menu: 250px;
+            --largura-menu-min: 70px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--fundo-cinza);
+            color: var(--texto-escuro);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .menu-lateral {
+            width: var(--largura-menu);
+            min-width: var(--largura-menu);
+            background: var(--cor-principal);
+            color: var(--branco);
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            z-index: 999;
+            transition: all 0.3s ease;
+        }
+        .menu-lateral.minimizado {
+            width: var(--largura-menu-min);
+            min-width: var(--largura-menu-min);
+        }
+        .menu-lateral.fechado { transform: translateX(-100%); }
+
+        .cabecalho-menu {
+            padding: 20px 15px;
+            background: rgba(0,0,0,0.1);
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+            position: relative;
+        }
+        .logo-menu { font-size: 1.2rem; font-weight: bold; margin-bottom: 5px; white-space: nowrap; }
+        .subtitulo-menu { font-size: 0.75rem; opacity: 0.8; font-weight: 300; white-space: nowrap; }
+        .menu-lateral.minimizado .logo-menu,
+        .menu-lateral.minimizado .subtitulo-menu { display: none; }
+
+        .btn-minimizar {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .btn-minimizar:hover { background: rgba(255,255,255,0.2); }
+        .menu-lateral.minimizado .btn-minimizar { right: 19px; transform: rotate(180deg); }
+
+        .menu-item {
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background 0.2s;
+            border-left: 3px solid transparent;
+            white-space: nowrap;
+        }
+        .menu-lateral.minimizado .menu-item {
+            padding: 14px 10px;
+            justify-content: center;
+        }
+        .menu-item.ativo { background: var(--cor-principal-escuro); border-left-color: var(--branco); font-weight: 500; }
+        .menu-item:hover { background: var(--cor-principal-escuro); }
+        .menu-item .icone { font-size: 1.1rem; flex-shrink: 0; width: 20px; text-align: center; }
+        .menu-lateral.minimizado .menu-item span:not(.icone) { display: none; }
+
+        .menu-rodape {
+            margin-top: auto;
+            padding: 15px 20px;
+            font-size: 0.7rem;
+            opacity: 0.7;
+            border-top: 1px solid rgba(255,255,255,0.15);
+            text-align: center;
+            white-space: nowrap;
+        }
+        .menu-lateral.minimizado .menu-rodape { display: none; }
+
+        .btn-menu-mobile {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1000;
+            background: var(--cor-principal);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            font-size: 1.2rem;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--sombra);
+            cursor: pointer;
+        }
+
+        .area-principal {
+            flex: 1;
+            margin-left: var(--largura-menu);
+            padding: 30px 25px;
+            width: 100%;
+            transition: margin-left 0.3s ease;
+        }
+        .menu-lateral.minimizado ~ .area-principal {
+            margin-left: var(--largura-menu-min);
+        }
+
+        .cabecalho-pagina {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--borda);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .cabecalho-pagina h1 { font-size: 2rem; font-weight: 700; color: var(--cor-principal); margin-bottom: 5px; }
+        .cabecalho-pagina p { color: var(--texto-claro); font-size: 1rem; }
+
+        .legenda-status { display: flex; gap: 15px; flex-wrap: wrap; font-size: 0.9rem; margin-bottom: 20px; }
+        .legenda-item { 
+            display: flex; align-items: center; gap: 6px; padding: 5px 10px;
+            border-radius: 20px; cursor: pointer; transition: all 0.2s; border: 2px solid transparent;
+        }
+        .legenda-item:hover { background: rgba(0,0,0,0.05); }
+        .legenda-item.ativo { 
+            background: rgba(10, 61, 98, 0.1); 
+            border-color: var(--cor-principal);
+            font-weight: 500;
+        }
+        .bolinha { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+        .bolinha.em-maquina { background: var(--cor-em-maquina); }
+        .bolinha.proximo { background: var(--cor-proximo); }
+        .bolinha.produzido { background: var(--cor-produzido); }
+        .bolinha.planejado { background: var(--cor-planejado); }
+
+        /* ÁREA DO GRÁFICO - COMPACTA E RESPONSIVA */
+        .area-grafico-maquinas {
+            background: linear-gradient(to bottom, #2b100c, #1a0705);
+            padding: 15px 12px 25px;
+            border-radius: var(--raio);
+            box-shadow: var(--sombra);
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            max-width: 100%;
+        }
+        .area-grafico-maquinas::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(255,60,30,0.12) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .area-grafico-maquinas h3 {
+            color: var(--branco);
+            margin-bottom: 12px;
+            font-size: 1rem;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        #graficoMaquinas {
+            width: 100% !important;
+            height: 220px !important;
+            max-height: 240px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .painel-controles {
+            background: var(--branco);
+            padding: 20px;
+            border-radius: var(--raio);
+            box-shadow: var(--sombra);
+            margin-bottom: 25px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: flex-end;
+        }
+
+        .campo-filtro { display: flex; flex-direction: column; gap: 5px; min-width: 160px; flex: 1; }
+        .campo-filtro label { font-size: 0.8rem; font-weight: 500; color: var(--texto-claro); }
+        input, select, textarea {
+            padding: 10px 14px;
+            border: 1px solid var(--borda);
+            border-radius: var(--raio);
+            font-size: 0.9rem;
+            background: var(--branco);
+            width: 100%;
+            transition: border-color 0.2s;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--cor-principal);
+            box-shadow: 0 0 0 3px rgba(10, 61, 98, 0.1);
+        }
+
+        button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: var(--raio);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        .btn-primario { background: var(--cor-principal); color: var(--branco); }
+        .btn-primario:hover { background: var(--cor-principal-escuro); }
+        .btn-sucesso { background: var(--cor-em-maquina); color: var(--branco); }
+        .btn-sucesso:hover { background: #219653; }
+        .btn-perigo { background: #E74C3C; color: var(--branco); }
+        .btn-perigo:hover { background: #C0392B; }
+        .btn-pequeno { padding: 6px 10px; font-size: 0.8rem; }
+
+        /* Cores de fundo para o select de status */
+        .select-status.em-maquina {
+            background-color: rgba(39, 174, 96, 0.2);
+            color: #1e8449;
+            font-weight: 500;
+        }
+        .select-status.proximo {
+            background-color: rgba(243, 156, 18, 0.2);
+            color: #d68910;
+            font-weight: 500;
+        }
+        .select-status.produzido {
+            background-color: rgba(52, 152, 219, 0.2);
+            color: #2471a3;
+            font-weight: 500;
+        }
+        .select-status.planejado {
+            background-color: rgba(149, 165, 166, 0.2);
+            color: #707b7c;
+            font-weight: 500;
+        }
+
+        /* Botão de situação da máquina */
+        .btn-situacao {
+            width: 28px;
+            height: 28px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            margin-left: 4px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            transition: transform 0.2s;
+        }
+        .btn-situacao:hover {
+            transform: scale(1.15);
+        }
+        .situacao-trabalhando { background: #27AE60; color: white; }
+        .situacao-manutencao { background: #E74C3C; color: white; }
+        .situacao-sem-operador { background: #F39C12; color: white; }
+
+        /* Ajuste dos botões de ação */
+        .btn-acao {
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            border-radius: 50%;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 3px;
+        }
+
+        .fundo-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1001;
+            padding: 15px;
+        }
+        .fundo-modal.aberto { display: flex; }
+        .modal {
+            background: var(--branco);
+            border-radius: var(--raio);
+            box-shadow: var(--sombra);
+            width: 100%;
+            max-width: 550px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 25px;
+            border-top: 4px solid var(--cor-principal);
+        }
+        .cabecalho-modal {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--borda);
+        }
+        .cabecalho-modal h3 { font-size: 1.2rem; color: var(--cor-principal); }
+        .btn-fechar { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--texto-claro); padding: 0; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; }
+        .btn-fechar:hover { color: var(--texto-escuro); }
+
+        .destaque-grupo { background: rgba(10, 61, 98, 0.05); padding: 12px; border-radius: var(--raio); margin-bottom: 20px; font-size: 0.9rem; font-weight: 500; color: var(--cor-principal); }
+        .grupo-campos-modal { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .campo-modal { display: flex; flex-direction: column; gap: 5px; }
+        .campo-modal.linha-cheia { grid-column: 1 / -1; }
+        .campo-modal label { font-size: 0.8rem; font-weight: 500; }
+        .botoes-modal { display: flex; gap: 12px; justify-content: flex-end; margin-top: 25px; flex-wrap: wrap; }
+
+        .tabela-producao { width: 100%; background: var(--branco); border-radius: var(--raio); box-shadow: var(--sombra); overflow: hidden; border-collapse: collapse; font-size: 0.85rem; }
+        .tabela-producao th { background: var(--cor-principal); color: var(--branco); padding: 10px 8px; text-align: left; font-weight: 500; position: sticky; top: 0; }
+        .tabela-producao td { padding: 9px 8px; border-bottom: 1px solid var(--borda); vertical-align: middle; }
+        .linha-em-maquina { background: rgba(39, 174, 96, 0.08) !important; border-left: 4px solid var(--cor-em-maquina); }
+        .linha-proximo { background: rgba(243, 156, 18, 0.08) !important; border-left: 4px solid var(--cor-proximo); }
+        .linha-produzido { background: rgba(52, 152, 219, 0.08) !important; border-left: 4px solid var(--cor-produzido); opacity: 0.8; }
+        .linha-planejado { background: var(--branco); border-left: 4px solid var(--cor-planejado); }
+        .select-status { width: 100%; padding: 5px; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--borda); }
+
+        .sem-dados { text-align: center; padding: 60px 20px; color: var(--texto-claro); font-style: italic; background: var(--branco); border-radius: var(--raio); box-shadow: var(--sombra); font-size: 1.1rem; }
+        .oculto { display: none !important; }
+
+        .bloco-aba-config { background: var(--branco); border-radius: var(--raio); padding: 20px; box-shadow: var(--sombra); margin-bottom: 20px; }
+        .cabecalho-aba-config { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+        .input-nome-aba { font-size: 1.1rem; font-weight: 600; border: none; border-bottom: 2px solid var(--borda); border-radius: 0; padding: 5px; width: 100%; max-width: 320px; color: var(--cor-principal); }
+        .lista-maquinas-aba { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
+        .item-maquina-aba { display: flex; align-items: center; gap: 10px; padding: 10px; background: var(--fundo-cinza); border-radius: var(--raio); flex-wrap: wrap; }
+
+        .botoes-backup { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; justify-content: center; }
+
+        @media (max-width: 768px) {
+            .btn-menu-mobile { display: flex; }
+            .menu-lateral { transform: translateX(-100%); width: var(--largura-menu); min-width: var(--largura-menu); }
+            .menu-lateral.aberto { transform: translateX(0); }
+            .area-principal { margin-left: 0; padding: 20px 15px; padding-top: 70px; }
+            .painel-controles { flex-direction: column; align-items: stretch; }
+            .campo-filtro { min-width: 100%; }
+            button { width: 100%; justify-content: center; }
+            .tabela-producao { display: block; overflow-x: auto; }
+            .grupo-campos-modal { grid-template-columns: 1fr; }
+            .area-grafico-maquinas { padding: 12px 10px 20px; }
+            #graficoMaquinas { height: 200px !important; }
+        }
+    </style>
+</head>
+<body>
+    <button class="btn-menu-mobile" onclick="abrirFecharMenu()">☰</button>
+
+    <nav class="menu-lateral" id="menu-lateral">
+        <div class="cabecalho-menu">
+            <button class="btn-minimizar" onclick="alternarMinimizarMenu()" title="Minimizar/Expandir menu">◀</button>
+            <div class="logo-menu">MILBRA</div>
+            <div class="subtitulo-menu">PCP - Produção</div>
+        </div>
+
+        <div class="menu-item ativo" onclick="carregarAba('todas')">
+            <span class="icone">🏠</span><span>Todas as Máquinas</span>
+        </div>
+
+        <div id="lista-abas-menu"></div>
+
+        <div class="menu-item" onclick="abrirConfiguracoes()">
+            <span class="icone">⚙️</span><span>Configurações</span>
+        </div>
+        <div class="menu-rodape">© Milbra - Artefatos Metálicos</div>
+    </nav>
+
+    <main class="area-principal">
+        <div class="cabecalho-pagina">
+            <div>
+                <h1 id="titulo-aba">Todas as Máquinas</h1>
+                <p id="subtitulo-aba">Visualização geral de todas as programações</p>
+            </div>
+        </div>
+
+        <div class="legenda-status">
+            <div class="legenda-item" onclick="filtrarPorLegenda('Em máquina')">
+                <span class="bolinha em-maquina"></span> Em máquina
+            </div>
+            <div class="legenda-item" onclick="filtrarPorLegenda('Próximo')">
+                <span class="bolinha proximo"></span> Próximo
+            </div>
+            <div class="legenda-item" onclick="filtrarPorLegenda('Produzido')">
+                <span class="bolinha produzido"></span> Produzido
+            </div>
+            <div class="legenda-item" onclick="filtrarPorLegenda('Planejado')">
+                <span class="bolinha planejado"></span> Planejado
+            </div>
+        </div>
+
+        <div id="area-dados">
+            <div class="area-grafico-maquinas">
+                <h3>📊 Volume por Máquina</h3>
+                <canvas id="graficoMaquinas"></canvas>
+            </div>
+
+            <div class="painel-controles">
+                <button class="btn-sucesso" onclick="abrirModalProgramacao()">+ Nova Programação</button>
+                <div class="campo-filtro">
+                    <label>Código / Item</label>
+                    <input type="text" id="filtro-codigo" placeholder="Filtrar..." oninput="aplicarFiltros()">
+                </div>
+                <div class="campo-filtro">
+                    <label>Status</label>
+                    <select id="filtro-status" onchange="aplicarFiltros()">
+                        <option value="">Todos</option>
+                        <option value="Em máquina">Em máquina</option>
+                        <option value="Próximo">Próximo</option>
+                        <option value="Produzido">Produzido</option>
+                        <option value="Planejado">Planejado</option>
+                    </select>
+                </div>
+                <div class="campo-filtro">
+                    <label>Máquina</label>
+                    <select id="filtro-maquina" onchange="aplicarFiltros()">
+                        <option value="">Todas</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="conteudo-tabela"></div>
+        </div>
+
+        <div id="area-configuracoes" class="oculto">
+            <div class="painel-controles">
+                <button class="btn-primario" onclick="voltarDados()">← Voltar</button>
+                <button class="btn-sucesso" onclick="adicionarNovaAba()">+ Novo Grupo</button>
+            </div>
+
+            <div class="botoes-backup">
+                <button class="btn-sucesso" onclick="exportarBackupCompleto()">💾 Exportar Backup</button>
+            </div>
+
+            <div id="conteudo-config"></div>
+        </div>
+    </main>
+
+    <div class="fundo-modal" id="modal-programacao">
+        <div class="modal">
+            <div class="cabecalho-modal">
+                <h3>Nova Programação</h3>
+                <button class="btn-fechar" onclick="fecharModalProgramacao()">&times;</button>
+            </div>
+            <div class="destaque-grupo">Grupo: <strong id="grupo-selecionado-modal">—</strong></div>
+            
+            <div class="grupo-campos-modal">
+                <div class="campo-modal linha-cheia">
+                    <label>Código do Item *</label>
+                    <input type="text" id="codigo-item" placeholder="Digite o código" list="lista-codigos" oninput="preencherDadosItem()">
+                    <datalist id="lista-codigos"></datalist>
+                </div>
+
+                <div class="campo-modal linha-cheia">
+                    <label>Nome do Item *</label>
+                    <input type="text" id="nome-item" placeholder="Digite o nome do item">
+                </div>
+
+                <div class="campo-modal">
+                    <label>Cliente *</label>
+                    <input type="text" id="cliente-item" placeholder="Digite o cliente" list="lista-clientes">
+                    <datalist id="lista-clientes"></datalist>
+                </div>
+
+                <div class="campo-modal">
+                    <label>Máquina *</label>
+                    <input type="text" id="maquina-programacao" placeholder="Digite a máquina" list="lista-maquinas">
+                    <datalist id="lista-maquinas"></datalist>
+                </div>
+
+                <div class="campo-modal">
+                    <label>Data Entrega *</label>
+                    <input type="date" id="data-entrega">
+                </div>
+
+                <div class="campo-modal">
+                    <label>Quantidade Pedida *</label>
+                    <input type="number" id="qtd-pedida" min="1" placeholder="Ex: 100">
+                </div>
+
+                <div class="campo-modal">
+                    <label>Status Inicial</label>
+                    <select id="status-inicial">
+                        <option value="Planejado">Planejado</option>
+                        <option value="Próximo">Próximo</option>
+                        <option value="Em máquina">Em máquina</option>
+                    </select>
+                </div>
+
+                <div class="campo-modal linha-cheia">
+                    <label>Observação</label>
+                    <textarea id="observacao-item" rows="2" placeholder="Observações adicionais"></textarea>
+                </div>
+            </div>
+
+            <div class="botoes-modal">
+                <button class="btn-primario" onclick="fecharModalProgramacao()">Cancelar</button>
+                <button class="btn-sucesso" onclick="salvarProgramacao()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let graficoMaquinas = null;
+
+        function abrirFecharMenu() { 
+            const menu = document.getElementById('menu-lateral');
+            menu.classList.toggle('aberto');
+            menu.classList.toggle('fechado');
+        }
+
+        function alternarMinimizarMenu() {
+            const menu = document.getElementById('menu-lateral');
+            menu.classList.toggle('minimizado');
+            localStorage.setItem('menuMinimizado', menu.classList.contains('minimizado'));
+        }
+
+        function filtrarPorLegenda(statusClicado) {
+            const selectFiltro = document.getElementById('filtro-status');
+            const itensLegenda = document.querySelectorAll('.legenda-item');
+            
+            if (selectFiltro.value === statusClicado) {
+                selectFiltro.value = '';
+                itensLegenda.forEach(i => i.classList.remove('ativo'));
+            } else {
+                selectFiltro.value = statusClicado;
+                itensLegenda.forEach(i => i.classList.remove('ativo'));
+                event.currentTarget.classList.add('ativo');
+            }
+            aplicarFiltros();
+        }
+
+        const ICONES_GRUPOS = {
+            "AUTOMÁTICAS": "⚙️", "Máquinas de 8": "🔧", "Máquinas de 15": "🔩",
+            "Máquinas de 25": "📦", "Máquinas de 40": "🛠️", "Máquinas de 45": "⚙️",
+            "Máquinas de 60": "🏭", "Solda Ponto": "🔥"
+        };
+
+        const GRUPOS_PADRAO = { 
+            "AUTOMÁTICAS": ["MC-01","MC-01","M-01", "M-02", "M-03", "M-04", "M-05", "M-06"],
+            "Máquinas de 8": ["8.1", "8.7", "8.9", "8.10", "8.12,", "8.13"], 
+            "Máquinas de 15": ["15.1", "15.2", "15.3", "15.4", "15.5", "15.6", "15.7", "15.8", "15.9", "15.10", "15.11", "15.12"], 
+            "Máquinas de 25": ["25.3", "25.5"], 
+            "Máquinas de 40": ["40.4"],
+            "Máquinas de 45": ["45.1"], 
+            "Máquinas de 60": ["60.1"], 
+            "Solda Ponto": []
+        };
+
+        const DB_NOME = "PCPMilbraDB";
+        const DB_VERSAO = 12;
+        let db;
+
+        function inicializarBanco() {
+            return new Promise((resolve, reject) => {
+                const requisicao = indexedDB.open(DB_NOME, DB_VERSAO);
+                
+                requisicao.onupgradeneeded = (e) => {
+                    db = e.target.result;
+                    if (db.objectStoreNames.contains('grupos')) db.deleteObjectStore('grupos');
+                    if (db.objectStoreNames.contains('itensBanco')) db.deleteObjectStore('itensBanco');
+                    if (db.objectStoreNames.contains('programacoes')) db.deleteObjectStore('programacoes');
+                    
+                    db.createObjectStore('grupos', { keyPath: 'nome' });
+                    db.createObjectStore('itensBanco', { keyPath: 'codigo' });
+                    db.createObjectStore('programacoes', { keyPath: 'id', autoIncrement: true });
+                };
+
+                requisicao.onsuccess = async (e) => {
+                    db = e.target.result;
+                    await carregarGruposPadrao();
+                    resolve(db);
+                };
+                requisicao.onerror = (e) => reject(e);
+            });
+        }
+
+        async function carregarGruposPadrao() {
+            const tx = db.transaction('grupos', 'readwrite');
+            for (const [nome, maqs] of Object.entries(GRUPOS_PADRAO)) {
+                tx.objectStore('grupos').put({ nome, maquinas: maqs });
+            }
+            return new Promise(res => tx.oncomplete = res);
+        }
+
+        async function salvarGrupo(nome, maquinas) {
+            const tx = db.transaction('grupos', 'readwrite');
+            tx.objectStore('grupos').put({nome, maquinas});
+            return new Promise(res => tx.oncomplete = res);
+        }
+        async function excluirGrupo(nome) {
+            const tx = db.transaction('grupos', 'readwrite');
+            tx.objectStore('grupos').delete(nome);
+            return new Promise(res => tx.oncomplete = res);
+        }
+        async function buscarTodosGrupos() {
+            const tx = db.transaction('grupos', 'readonly');
+            const req = tx.objectStore('grupos').getAll();
+            return new Promise(res => req.onsuccess = () => {
+                const g = {}; 
+                req.result.forEach(i => { g[i.nome] = i.maquinas; });
+                res(g);
+            });
+        }
+        async function salvarItem(item) {
+            const tx = db.transaction('itensBanco', 'readwrite');
+            tx.objectStore('itensBanco').put(item);
+            return new Promise(res => tx.oncomplete = res);
+        }
+        async function buscarItens() {
+            const tx = db.transaction('itensBanco', 'readonly');
+            const req = tx.objectStore('itensBanco').getAll();
+            return new Promise(res => req.onsuccess = () => res(req.result));
+        }
+        async function salvarProg(prog) {
+            const tx = db.transaction('programacoes', 'readwrite');
+            tx.objectStore('programacoes').put(prog);
+            return new Promise(res => tx.oncomplete = res);
+        }
+        async function excluirProg(id) {
+            const tx = db.transaction('programacoes', 'readwrite');
+            tx.objectStore('programacoes').delete(id);
+            return new Promise(res => tx.oncomplete = res);
+        }
+        async function buscarProgs() {
+            const tx = db.transaction('programacoes', 'readonly');
+            const req = tx.objectStore('programacoes').getAll();
+            return new Promise(res => req.onsuccess = () => res(req.result));
+        }
+
+        const ORDEM_STATUS = { "Em máquina": 1, "Próximo": 2, "Planejado": 3, "Produzido": 4 };
+        const CORES_STATUS = {
+            "Planejado": 'rgba(149, 165, 166, 0.8)',
+            "Próximo": 'rgba(243, 156, 18, 0.85)',
+            "Em máquina": 'rgba(39, 174, 96, 0.9)',
+            "Produzido": 'rgba(52, 152, 219, 0.8)'
+        };
+        let ABAS_GRUPOS = {}, BANCO_ITENS = [], PROGRAMACOES = [], abaAtual = 'todas';
+        let idEdicaoAtual = null;
+
+        async function iniciarSistema() {
+            if (localStorage.getItem('menuMinimizado') === 'true') {
+                document.getElementById('menu-lateral').classList.add('minimizado');
+            }
+
+            await inicializarBanco();
+            ABAS_GRUPOS = await buscarTodosGrupos();
+            BANCO_ITENS = await buscarItens();
+            PROGRAMACOES = await buscarProgs();
+
+            atualizarMenuAbas();
+            atualizarSelectMaquinas();
+            atualizarGraficoMaquinas();
+            carregarTabela();
+        }
+
+        function atualizarGraficoMaquinas() {
+            let dados = [...PROGRAMACOES];
+            
+            if (abaAtual !== 'todas') {
+                dados = dados.filter(p => p.grupo === abaAtual);
+            }
+            const filtroCod = document.getElementById('filtro-codigo').value.toLowerCase();
+            const filtroStatus = document.getElementById('filtro-status').value;
+            const filtroMaq = document.getElementById('filtro-maquina').value;
+
+            if (filtroCod) {
+                dados = dados.filter(p => 
+                    (p.codigo || '').toLowerCase().includes(filtroCod) || 
+                    (p.nome || '').toLowerCase().includes(filtroCod)
+                );
+            }
+            if (filtroStatus) {
+                dados = dados.filter(p => p.status === filtroStatus);
+            }
+            if (filtroMaq) {
+                dados = dados.filter(p => p.maquina === filtroMaq);
+            }
+
+            const contagemPorMaq = {};
+            dados.forEach(p => {
+                if (!contagemPorMaq[p.maquina]) {
+                    contagemPorMaq[p.maquina] = { total: 0, status: {} };
+                }
+                contagemPorMaq[p.maquina].total += Number(p.qtdPedida) || 1;
+                contagemPorMaq[p.maquina].status[p.status] = (contagemPorMaq[p.maquina].status[p.status] || 0) + (Number(p.qtdPedida) || 1);
+            });
+
+            const maquinas = Object.keys(contagemPorMaq).sort();
+            const ctx = document.getElementById('graficoMaquinas').getContext('2d');
+            
+            if (graficoMaquinas) graficoMaquinas.destroy();
+
+            let corBase = 'rgba(255, 80, 50, 0.9)';
+            if (filtroStatus) corBase = CORES_STATUS[filtroStatus];
+
+            graficoMaquinas = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: maquinas,
+                    datasets: [{
+                        label: 'Volume Total',
+                        data: maquinas.map(m => contagemPorMaq[m].total),
+                        backgroundColor: maquinas.map(m => {
+                            if (!filtroStatus) {
+                                const sts = contagemPorMaq[m].status;
+                                if (sts['Em máquina']) return CORES_STATUS['Em máquina'];
+                                if (sts['Próximo']) return CORES_STATUS['Próximo'];
+                                if (sts['Produzido']) return CORES_STATUS['Produzido'];
+                                return CORES_STATUS['Planejado'];
+                            }
+                            return corBase;
+                        }),
+                        borderColor: 'rgba(255, 255, 255, 0.15)',
+                        borderWidth: 1,
+                        borderRadius: 4,
+                        barPercentage: 0.7,
+                        categoryPercentage: 0.8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    layout: {
+                        padding: { top: 5, right: 10, bottom: 5, left: 5 }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.85)',
+                            titleColor: '#fff',
+                            bodyColor: '#fff',
+                            padding: 8,
+                            borderRadius: 6,
+                            titleFont: { size: 11 },
+                            bodyFont: { size: 10 },
+                            callbacks: {
+                                label: function(ctx) {
+                                    const maq = maquinas[ctx.dataIndex];
+                                    const info = contagemPorMaq[maq];
+                                    const linhas = [`Total: ${info.total}`];
+                                    Object.entries(info.status).forEach(([s, q]) => linhas.push(`${s}: ${q}`));
+                                    return linhas;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { 
+                                color: 'rgba(255,255,255,0.65)', 
+                                font: { size: 9 },
+                                maxRotation: 45,
+                                minRotation: 0
+                            }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255,255,255,0.08)', lineWidth: 0.5 },
+                            ticks: { 
+                                color: 'rgba(255,255,255,0.65)', 
+                                font: { size: 9 },
+                                maxTicksLimit: 5
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function atualizarMenuAbas() {
+            const container = document.getElementById('lista-abas-menu');
+            container.innerHTML = '';
+
+            Object.keys(GRUPOS_PADRAO).forEach(nome => {
+                const item = document.createElement('div');
+                item.className = 'menu-item';
+                item.onclick = () => carregarAba(nome);
+                const icone = ICONES_GRUPOS[nome] || '📄';
+                item.innerHTML = `<span class="icone">${icone}</span><span>${nome}</span>`;
+                container.appendChild(item);
+            });
+
+            Object.keys(ABAS_GRUPOS).forEach(nome => {
+                if (!GRUPOS_PADRAO[nome]) {
+                    const item = document.createElement('div');
+                    item.className = 'menu-item';
+                    item.onclick = () => carregarAba(nome);
+                    const icone = ICONES_GRUPOS[nome] || '📄';
+                    item.innerHTML = `<span class="icone">${icone}</span><span>${nome}</span>`;
+                    container.appendChild(item);
+                }
+            });
+        }
+
+        function atualizarSelectMaquinas() {
+            const filtro = document.getElementById('filtro-maquina');
+            const todas = Object.values(ABAS_GRUPOS).flat().sort();
+            filtro.innerHTML = '<option value="">Todas</option>' + todas.map(m => `<option value="${m}">${m}</option>`).join('');
+        }
+
+        function carregarAba(nome) {
+            abaAtual = nome;
+            document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('ativo'));
+            event.target.closest('.menu-item')?.classList.add('ativo');
+
+            document.getElementById('titulo-aba').textContent = nome === 'todas' ? 'Todas as Máquinas' : `Grupo: ${nome}`;
+            document.getElementById('subtitulo-aba').textContent = nome === 'todas' ? 'Visualização geral' : `Itens do grupo ${nome}`;
+            document.getElementById('area-dados').classList.remove('oculto');
+            document.getElementById('area-configuracoes').classList.add('oculto');
+            atualizarGraficoMaquinas();
+            carregarTabela();
+        }
+        function voltarDados() { carregarAba(abaAtual); }
+        function abrirConfiguracoes() {
+            document.getElementById('area-dados').classList.add('oculto');
+            document.getElementById('area-configuracoes').classList.remove('oculto');
+            renderizarConfig();
+        }
+        function renderizarConfig() {
+            const container = document.getElementById('conteudo-config');
+            container.innerHTML = '';
+            const gruposOrdem = Object.keys(GRUPOS_PADRAO).concat(Object.keys(ABAS_GRUPOS).filter(n => !GRUPOS_PADRAO[n]));
+            gruposOrdem.forEach(nome => {
+                const maqs = ABAS_GRUPOS[nome] || [];
+                const bloco = document.createElement('div');
+                bloco.className = 'bloco-aba-config';
+                const ehPadrao = GRUPOS_PADRAO[nome] !== undefined;
+                bloco.innerHTML = `
+                    <div class="cabecalho-aba-config">
+                        <input type="text" class="input-nome-aba" value="${nome}" ${ehPadrao ? 'readonly' : ''}>
+                        ${!ehPadrao ? `<button class="btn-perigo btn-pequeno" onclick="excluirGrupoConf('${nome}')">Excluir</button>` : ''}
+                    </div>
+                    <div class="lista-maquinas-aba" id="maq-${nome}"></div>
+                    <button class="btn-primario btn-pequeno" onclick="adicionarMaq('${nome}')">+ Adicionar Máquina</button>
+                `;
+                container.appendChild(bloco);
+                const lista = document.getElementById(`maq-${nome}`);
+                maqs.forEach((m, i) => {
+                    const item = document.createElement('div');
+                    item.className = 'item-maquina-aba';
+                    item.innerHTML = `
+                        <input type="text" value="${m}" onchange="alterarMaq('${nome}', ${i}, this.value)">
+                        <button class="btn-perigo btn-pequeno" onclick="removerMaq('${nome}', ${i})">Excluir</button>
+                    `;
+                    lista.appendChild(item);
+                });
+            });
+        }
+        async function adicionarNovaAba() {
+            const nome = prompt("Nome do novo grupo:");
+            if (!nome || ABAS_GRUPOS[nome]) return alert("Nome inválido ou já existe!");
+            ABAS_GRUPOS[nome] = [];
+            await salvarGrupo(nome, []);
+            atualizarMenuAbas();
+            renderizarConfig();
+        }
+        async function excluirGrupoConf(nome) {
+            if (GRUPOS_PADRAO[nome]) return alert("Esse grupo padrão não pode ser excluído!");
+            if (!confirm(`Excluir grupo "${nome}"?`)) return;
+            delete ABAS_GRUPOS[nome];
+            await excluirGrupo(nome);
+            atualizarMenuAbas();
+            renderizarConfig();
+        }
+        async function adicionarMaq(grupo) {
+            const nome = prompt("Nome da máquina:");
+            if (!nome) return;
+            ABAS_GRUPOS[grupo].push(nome);
+            await salvarGrupo(grupo, ABAS_GRUPOS[grupo]);
+            atualizarSelectMaquinas();
+            renderizarConfig();
+        }
+        async function alterarMaq(grupo, idx, novo) {
+            if (!novo) return alert("Nome inválido!");
+            ABAS_GRUPOS[grupo][idx] = novo;
+            await salvarGrupo(grupo, ABAS_GRUPOS[grupo]);
+            atualizarSelectMaquinas();
+        }
+        async function removerMaq(grupo, idx) {
+            if (!confirm("Remover máquina?")) return;
+            ABAS_GRUPOS[grupo].splice(idx,1);
+            await salvarGrupo(grupo, ABAS_GRUPOS[grupo]);
+            atualizarSelectMaquinas();
+        }
+
+        function abrirModalProgramacao() {
+            idEdicaoAtual = null;
+            document.querySelector('#modal-programacao h3').textContent = 'Nova Programação';
+            document.getElementById('modal-programacao').classList.add('aberto');
+            document.getElementById('grupo-selecionado-modal').textContent = abaAtual === 'todas' ? 'Automático' : abaAtual;
+            
+            const campos = ['codigo-item', 'nome-item', 'cliente-item', 'maquina-programacao', 'data-entrega', 'qtd-pedida', 'status-inicial', 'observacao-item'];
+            campos.forEach(id => document.getElementById(id).value = '');
+
+            atualizarSugestoes();
+        }
+
+        function editarProgramacao(id) {
+            const prog = PROGRAMACOES.find(item => item.id === id);
+            if (!prog) return;
+
+            idEdicaoAtual = id;
+            document.querySelector('#modal-programacao h3').textContent = 'Editar Programação';
+            document.getElementById('modal-programacao').classList.add('aberto');
+            document.getElementById('grupo-selecionado-modal').textContent = prog.grupo || '—';
+            
+            document.getElementById('codigo-item').value = prog.codigo || '';
+            document.getElementById('nome-item').value = prog.nome || '';
+            document.getElementById('cliente-item').value = prog.cliente || '';
+            document.getElementById('maquina-programacao').value = prog.maquina || '';
+            document.getElementById('data-entrega').value = prog.dataEntrega || '';
+            document.getElementById('qtd-pedida').value = prog.qtdPedida || '';
+            document.getElementById('status-inicial').value = prog.status || 'Planejado';
+            document.getElementById('observacao-item').value = prog.observacao || '';
+
+            atualizarSugestoes();
+        }
+
+                function fecharModalProgramacao() {
+            document.getElementById('modal-programacao').classList.remove('aberto');
+            idEdicaoAtual = null;
+            document.querySelector('#modal-programacao h3').textContent = 'Nova Programação';
+        }
+
+        function atualizarSugestoes() {
+            const listaCod = document.getElementById('lista-codigos');
+            const listaCli = document.getElementById('lista-clientes');
+            const listaMaq = document.getElementById('lista-maquinas');
+
+            listaCod.innerHTML = BANCO_ITENS.map(i => `<option value="${i.codigo}">`).join('');
+            listaCli.innerHTML = [...new Set(PROGRAMACOES.map(p => p.cliente).filter(Boolean))].map(c => `<option value="${c}">`).join('');
+            listaMaq.innerHTML = Object.values(ABAS_GRUPOS).flat().map(m => `<option value="${m}">`).join('');
+        }
+
+        function preencherDadosItem() {
+            const cod = document.getElementById('codigo-item').value.trim();
+            if (!cod) return;
+
+            const item = BANCO_ITENS.find(i => String(i.codigo).trim() === cod);
+            if (item) {
+                document.getElementById('nome-item').value = item.nome || '';
+                document.getElementById('cliente-item').value = item.cliente || '';
+            }
+        }
+
+        async function salvarProgramacao() {
+            const cod = document.getElementById('codigo-item').value.trim();
+            const nome = document.getElementById('nome-item').value.trim();
+            const cli = document.getElementById('cliente-item').value.trim();
+            let maq = document.getElementById('maquina-programacao').value.trim();
+            const dt = document.getElementById('data-entrega').value;
+            const qtd = document.getElementById('qtd-pedida').value;
+
+            if (!nome || !cli || !maq || !dt || !qtd) return alert("Preencha todos os campos obrigatórios!");
+            if (!cod) return alert("Informe o código do item!");
+
+            let grupo = Object.entries(ABAS_GRUPOS).find(([g, m]) => m.includes(maq))?.[0];
+            if (!grupo) {
+                grupo = abaAtual !== 'todas' ? abaAtual : "Máquinas de 8";
+                if (!ABAS_GRUPOS[grupo]) ABAS_GRUPOS[grupo] = [];
+                ABAS_GRUPOS[grupo].push(maq);
+                await salvarGrupo(grupo, ABAS_GRUPOS[grupo]);
+                atualizarSelectMaquinas();
+                atualizarMenuAbas();
+            }
+
+            if (idEdicaoAtual) {
+                const prog = PROGRAMACOES.find(item => item.id === idEdicaoAtual);
+                prog.codigo = cod;
+                prog.nome = nome;
+                prog.cliente = cli;
+                prog.maquina = maq;
+                prog.grupo = grupo;
+                prog.dataEntrega = dt;
+                prog.qtdPedida = Number(qtd);
+                prog.status = document.getElementById('status-inicial').value || 'Planejado';
+                prog.observacao = document.getElementById('observacao-item').value.trim();
+                
+                await salvarProg(prog);
+                alert("✅ Atualizado com sucesso!");
+            } else {
+                const prog = {
+                    id: Date.now(),
+                    codigo: cod,
+                    nome: nome,
+                    cliente: cli,
+                    maquina: maq,
+                    grupo: grupo,
+                    dataEntrega: dt,
+                    qtdPedida: Number(qtd),
+                    status: document.getElementById('status-inicial').value || 'Planejado',
+                    observacao: document.getElementById('observacao-item').value.trim(),
+                    situacaoMaquina: 'trabalhando' // Valor padrão
+                };
+                await salvarProg(prog);
+                alert("✅ Cadastrado com sucesso!");
+            }
+
+            const itemExistente = BANCO_ITENS.find(item => String(item.codigo).trim() === cod);
+            if (!itemExistente) {
+                await salvarItem({ codigo: cod, nome: nome, cliente: cli });
+                BANCO_ITENS.push({ codigo: cod, nome: nome, cliente: cli });
+            } else {
+                if (itemExistente.nome !== nome || itemExistente.cliente !== cli) {
+                    itemExistente.nome = nome;
+                    itemExistente.cliente = cli;
+                    await salvarItem(itemExistente);
+                }
+            }
+
+            PROGRAMACOES = await buscarProgs();
+            fecharModalProgramacao();
+            atualizarGraficoMaquinas();
+            carregarTabela();
+        }
+
+        async function alterarStatus(id, novo) {
+            const p = PROGRAMACOES.find(i => i.id === id);
+            if (!p) return;
+            p.status = novo;
+            await salvarProg(p);
+            atualizarGraficoMaquinas();
+            carregarTabela();
+        }
+
+        // Função para alterar situação da máquina
+        async function alterarSituacaoMaq(id) {
+            const p = PROGRAMACOES.find(i => i.id === id);
+            if (!p) return;
+
+            const situacoes = [
+                { valor: 'trabalhando', texto: '🟢 Máquina trabalhando' },
+                { valor: 'manutencao', texto: '🔴 Parada para manutenção' },
+                { valor: 'sem-operador', texto: '🟠 Falta de operador' }
+            ];
+
+            const lista = situacoes.map((s, i) => `${i+1}. ${s.texto}`).join('\n');
+            const escolha = prompt(`Escolha a situação da máquina:\n\n${lista}\n\nDigite o número da opção:`);
+            
+            const idx = Number(escolha) - 1;
+            if (idx < 0 || idx >= situacoes.length) return alert("Opção inválida!");
+
+            p.situacaoMaquina = situacoes[idx].valor;
+            await salvarProg(p);
+            carregarTabela();
+        }
+
+        // Função de exclusão com confirmação reforçada
+        async function excluirItem(id) {
+            const confirmacao = confirm("⚠️ ATENÇÃO!\n\nTem certeza que deseja excluir esta programação?\nEssa ação NÃO poderá ser desfeita!");
+            if (!confirmacao) return;
+            
+            await excluirProg(id);
+            PROGRAMACOES = await buscarProgs();
+            atualizarGraficoMaquinas();
+            carregarTabela();
+        }
+
+        function aplicarFiltros() {
+            atualizarGraficoMaquinas();
+            carregarTabela();
+        }
+
+        function carregarTabela() {
+            let dados = [...PROGRAMACOES];
+            if (abaAtual !== 'todas') {
+                dados = dados.filter(p => p.grupo === abaAtual);
+            }
+
+            const filtroCod = document.getElementById('filtro-codigo').value.toLowerCase();
+            const filtroStatus = document.getElementById('filtro-status').value;
+            const filtroMaq = document.getElementById('filtro-maquina').value;
+
+            if (filtroCod) {
+                dados = dados.filter(p => 
+                    (p.codigo || '').toLowerCase().includes(filtroCod) || 
+                    (p.nome || '').toLowerCase().includes(filtroCod)
+                );
+            }
+            if (filtroStatus) {
+                dados = dados.filter(p => p.status === filtroStatus);
+            }
+            if (filtroMaq) {
+                dados = dados.filter(p => p.maquina === filtroMaq);
+            }
+
+            dados.sort((a, b) => ORDEM_STATUS[a.status] - ORDEM_STATUS[b.status]);
+
+            const container = document.getElementById('conteudo-tabela');
+
+            if (dados.length === 0) {
+                container.innerHTML = `<div class="sem-dados">Nenhuma programação encontrada. Comece inserindo novos itens!</div>`;
+                return;
+            }
+
+            container.innerHTML = `
+                <table class="tabela-producao">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Código</th>
+                            <th>Item</th>
+                            <th>Cliente</th>
+                            <th>Máquina</th>
+                            <th>Entrega</th>
+                            <th>Qtd</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${dados.map(p => {
+                            const classeStatus = (p.status || 'Planejado').replace(' ', '-').toLowerCase();
+                            const situacao = p.situacaoMaquina || 'trabalhando';
+                            let classeSituacao = 'situacao-trabalhando';
+                            let iconeSituacao = '⚡';
+                            let textoSituacao = '🟢 Máquina trabalhando';
+                            
+                            if (situacao === 'manutencao') {
+                                classeSituacao = 'situacao-manutencao';
+                                iconeSituacao = '🔧';
+                                textoSituacao = '🔴 Parada para manutenção';
+                            }
+                            if (situacao === 'sem-operador') {
+                                classeSituacao = 'situacao-sem-operador';
+                                iconeSituacao = '👤';
+                                textoSituacao = '🟠 Falta de operador';
+                            }
+
+                            return `
+                            <tr class="linha-${classeStatus}">
+                                <td>
+                                    <select class="select-status ${classeStatus}" onchange="alterarStatus(${p.id}, this.value)">
+                                        <option value="Planejado" ${(p.status || 'Planejado') === 'Planejado' ? 'selected' : ''}>Planejado</option>
+                                        <option value="Próximo" ${(p.status || 'Planejado') === 'Próximo' ? 'selected' : ''}>Próximo</option>
+                                        <option value="Em máquina" ${(p.status || 'Planejado') === 'Em máquina' ? 'selected' : ''}>Em máquina</option>
+                                        <option value="Produzido" ${(p.status || 'Planejado') === 'Produzido' ? 'selected' : ''}>Produzido</option>
+                                    </select>
+                                </td>
+                                <td>${p.codigo || '-'}</td>
+                                <td>${p.nome || '-'}</td>
+                                <td>${p.cliente || '-'}</td>
+                                <td>${p.maquina || '-'}</td>
+                                <td>${p.dataEntrega ? new Date(p.dataEntrega).toLocaleDateString('pt-BR') : '-'}</td>
+                                <td>${p.qtdPedida || 0}</td>
+                                <td>
+                                    <button class="btn-primario btn-acao" onclick="editarProgramacao(${p.id})" title="Editar programação">✏️</button>
+                                    <button class="btn-perigo btn-acao" onclick="excluirItem(${p.id})" title="Excluir programação">🗑️</button>
+                                    <button class="btn-situacao ${classeSituacao}" onclick="alterarSituacaoMaq(${p.id})" title="${textoSituacao}">${iconeSituacao}</button>
+                                </td>
+                            </tr>
+                        `}).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        async function alterarSituacaoMaq(id) {
+            const p = PROGRAMACOES.find(i => i.id === id);
+            if (!p) return;
+
+            const situacoes = [
+                { valor: 'trabalhando', texto: '🟢 Máquina trabalhando' },
+                { valor: 'manutencao', texto: '🔴 Parada para manutenção' },
+                { valor: 'sem-operador', texto: '🟠 Falta de operador' }
+            ];
+
+            const lista = situacoes.map((s, i) => `${i+1}. ${s.texto}`).join('\n');
+            const escolha = prompt(`Escolha a situação da máquina:\n\n${lista}\n\nDigite o número da opção:`);
+            
+            const idx = Number(escolha) - 1;
+            if (idx < 0 || idx >= situacoes.length) return alert("Opção inválida!");
+
+            p.situacaoMaquina = situacoes[idx].valor;
+            await salvarProg(p);
+            carregarTabela();
+        }
+
+        async function excluirItem(id) {
+            const confirmacao = confirm("⚠️ ATENÇÃO!\n\nTem certeza que deseja excluir esta programação?\nEssa ação NÃO poderá ser desfeita!");
+            if (!confirmacao) return;
+            
+            await excluirProg(id);
+            PROGRAMACOES = await buscarProgs();
+            atualizarGraficoMaquinas();
+            carregarTabela();
+        }
+
+        async function exportarBackupCompleto() {
+            const dados = {
+                dataExportacao: new Date().toLocaleString('pt-BR'),
+                grupos: ABAS_GRUPOS,
+                itens: BANCO_ITENS,
+                programacoes: PROGRAMACOES
+            };
+
+            const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `backup-pcp-${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            alert("✅ Backup exportado com sucesso! Guarde esse arquivo em local seguro.");
+        }
+
+        document.addEventListener('DOMContentLoaded', iniciarSistema);
+    </script>
+</body>
+</html>

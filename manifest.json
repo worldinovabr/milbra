@@ -1,0 +1,10 @@
+{
+    "name": "PCP Milbra - Produção",
+    "short_name": "PCP Milbra",
+    "description": "Sistema de Programação e Controle de Produção Milbra",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "background_color": "#F5F7FA",
+    "theme_color": "#0A3D62",
+    "orientation": "portrait-primary"
+}
