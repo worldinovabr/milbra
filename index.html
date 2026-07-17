@@ -7,6 +7,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="PCP Milbra">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" href="./icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="./icon.svg">
     <title>PCP - Milbra Artefatos Metálicos</title>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -604,13 +607,13 @@
 
         const GRUPOS_PADRAO = { 
             "AUTOMÁTICAS": ["MC-01","MC-01","M-01", "M-02", "M-03", "M-04", "M-05", "M-06"],
-            "Máquinas de 8": ["8.1", "8.7", "8.9", "8.10", "8.12,", "8.13"], 
+            "Máquinas de 8": ["8.4", "8.7", "8.9", "8.10", "8.11", "8.12", "8.13", "8.14", "8.15"], 
             "Máquinas de 15": ["15.1", "15.2", "15.3", "15.4", "15.5", "15.6", "15.7", "15.8", "15.9", "15.10", "15.11", "15.12"], 
             "Máquinas de 25": ["25.3", "25.5"], 
             "Máquinas de 40": ["40.4"],
             "Máquinas de 45": ["45.1"], 
             "Máquinas de 60": ["60.1"], 
-            "Solda Ponto": []
+            "Solda Ponto": ["SP-1", "SP-2", "SP-3", "SP-4", "SP-5", "SP-6", "SP-7"]
         };
 
         const FIREBASE_SDK_URL = 'https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js';
@@ -1273,6 +1276,12 @@
             a.click();
             URL.revokeObjectURL(url);
             alert("✅ Backup exportado com sucesso! Guarde esse arquivo em local seguro.");
+        }
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').catch(() => {});
+            });
         }
 
         document.addEventListener('DOMContentLoaded', iniciarSistema);
