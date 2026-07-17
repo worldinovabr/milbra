@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pcp-milbra-v3';
+const CACHE_NAME = 'pcp-milbra-v4';
 const APP_SHELL = [
     './',
     './index.html',
