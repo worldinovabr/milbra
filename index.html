@@ -1030,6 +1030,7 @@
         }
 
         async function salvarProgramacao() {
+            try {
             const cod = document.getElementById('codigo-item').value.trim();
             const nome = document.getElementById('nome-item').value.trim();
             const cli = document.getElementById('cliente-item').value.trim();
@@ -1063,7 +1064,6 @@
                 prog.observacao = document.getElementById('observacao-item').value.trim();
                 
                 await salvarProg(prog);
-                alert("✅ Atualizado com sucesso!");
             } else {
                 const prog = {
                     id: Date.now(),
@@ -1079,7 +1079,6 @@
                     situacaoMaquina: 'trabalhando' // Valor padrão
                 };
                 await salvarProg(prog);
-                alert("✅ Cadastrado com sucesso!");
             }
 
             const itemExistente = BANCO_ITENS.find(item => String(item.codigo).trim() === cod);
@@ -1098,6 +1097,11 @@
             fecharModalProgramacao();
             atualizarGraficoMaquinas();
             carregarTabela();
+            alert(idEdicaoAtual ? "✅ Atualizado com sucesso!" : "✅ Cadastrado com sucesso!");
+            } catch (erro) {
+                console.error('Erro ao salvar no Firebase:', erro);
+                alert(`NÃ£o foi possÃ­vel salvar no Firebase.\n\n${erro.code || ''} ${erro.message || erro}`);
+            }
         }
 
         async function alterarStatus(id, novo) {
