@@ -418,7 +418,7 @@
 
     <nav class="menu-lateral" id="menu-lateral">
         <div class="cabecalho-menu">
-            <button class="btn-minimizar" onclick="alternarMinimizarMenu()" title="Minimizar/Expandir menu">◀</button>
+            <button class="btn-minimizar" onclick="alternarMinimizarMenu()" title="Minimizar/Expandir menu">🔛</button>
             <div class="logo-menu">MILBRA</div>
             <div class="subtitulo-menu">PCP - Produção</div>
         </div>
@@ -716,15 +716,26 @@
                 document.getElementById('menu-lateral').classList.add('minimizado');
             }
 
-            await inicializarBanco();
-            ABAS_GRUPOS = await buscarTodosGrupos();
-            BANCO_ITENS = await buscarItens();
-            PROGRAMACOES = await buscarProgs();
-
+            ABAS_GRUPOS = { ...GRUPOS_PADRAO };
             atualizarMenuAbas();
             atualizarSelectMaquinas();
             atualizarGraficoMaquinas();
             carregarTabela();
+
+            try {
+                await inicializarBanco();
+                ABAS_GRUPOS = { ...GRUPOS_PADRAO, ...await buscarTodosGrupos() };
+                BANCO_ITENS = await buscarItens();
+                PROGRAMACOES = await buscarProgs();
+
+                atualizarMenuAbas();
+                atualizarSelectMaquinas();
+                atualizarGraficoMaquinas();
+                carregarTabela();
+            } catch (erro) {
+                console.error('Erro ao carregar dados do Firebase:', erro);
+                alert('NÃ£o foi possÃ­vel conectar ao Firebase agora. As categorias padrÃ£o foram carregadas, mas o salvamento online pode estar indisponÃ­vel.');
+            }
         }
 
         function atualizarGraficoMaquinas() {
