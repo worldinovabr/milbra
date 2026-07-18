@@ -176,22 +176,41 @@
         .cabecalho-pagina h1 { font-size: 2rem; font-weight: 700; color: var(--cor-principal); margin-bottom: 5px; }
         .cabecalho-pagina p { color: var(--texto-claro); font-size: 1rem; }
 
-        .legenda-status { display: flex; gap: 15px; flex-wrap: wrap; font-size: 0.9rem; margin-bottom: 20px; }
+        .legenda-status { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.9rem; margin-bottom: 20px; }
         .legenda-item { 
-            display: flex; align-items: center; gap: 6px; padding: 5px 10px;
-            border-radius: 20px; cursor: pointer; transition: all 0.2s; border: 2px solid transparent;
-        }
-        .legenda-item:hover { background: rgba(0,0,0,0.05); }
-        .legenda-item.ativo { 
-            background: rgba(10, 61, 98, 0.1); 
-            border-color: var(--cor-principal);
+            --legenda-cor: var(--cor-principal);
+            --legenda-gradiente: linear-gradient(135deg, var(--cor-principal), var(--cor-principal-escuro));
+            display: flex; align-items: center; gap: 8px; padding: 8px 14px;
+            border-radius: 999px; cursor: pointer; transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, color 0.18s ease;
+            border: 1px solid rgba(10, 61, 98, 0.12);
+            background: rgba(255, 255, 255, 0.82);
+            color: var(--texto);
+            box-shadow: 0 4px 12px rgba(10, 61, 98, 0.08);
             font-weight: 500;
+            user-select: none;
         }
-        .bolinha { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+        .legenda-item.em-maquina { --legenda-cor: var(--cor-em-maquina); --legenda-gradiente: linear-gradient(135deg, #2ecc71, #1e8449); }
+        .legenda-item.proximo { --legenda-cor: var(--cor-proximo); --legenda-gradiente: linear-gradient(135deg, #f6b93b, #d68910); }
+        .legenda-item.produzido { --legenda-cor: var(--cor-produzido); --legenda-gradiente: linear-gradient(135deg, #5dade2, #2471a3); }
+        .legenda-item.planejado { --legenda-cor: var(--cor-planejado); --legenda-gradiente: linear-gradient(135deg, #b2bec3, #636e72); }
+        .legenda-item:hover {
+            transform: translateY(-2px);
+            border-color: color-mix(in srgb, var(--legenda-cor) 45%, transparent);
+            box-shadow: 0 8px 18px rgba(10, 61, 98, 0.14);
+        }
+        .legenda-item.ativo { 
+            background: var(--legenda-gradiente);
+            border-color: transparent;
+            color: var(--branco);
+            box-shadow: 0 10px 22px color-mix(in srgb, var(--legenda-cor) 34%, transparent);
+        }
+        .legenda-item.ativo:hover { transform: translateY(-2px) scale(1.02); }
+        .bolinha { width: 12px; height: 12px; border-radius: 50%; display: inline-block; box-shadow: 0 0 0 3px color-mix(in srgb, var(--legenda-cor) 18%, transparent); }
         .bolinha.em-maquina { background: var(--cor-em-maquina); }
         .bolinha.proximo { background: var(--cor-proximo); }
         .bolinha.produzido { background: var(--cor-produzido); }
         .bolinha.planejado { background: var(--cor-planejado); }
+        .legenda-item.ativo .bolinha { background: var(--branco); box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.22); }
 
         /* ÁREA DO GRÁFICO - COMPACTA E RESPONSIVA */
         .area-grafico-maquinas {
@@ -322,9 +341,33 @@
         .btn-situacao:hover {
             transform: scale(1.15);
         }
-        .situacao-trabalhando { background: #27AE60; color: white; }
+        .situacao-trabalhando {
+            background: #27AE60;
+            color: white;
+            animation: pulso-maquina 1.35s ease-in-out infinite;
+            box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.55);
+        }
+        .situacao-trabalhando:hover {
+            animation-play-state: paused;
+            box-shadow: 0 0 0 7px rgba(39, 174, 96, 0.18);
+        }
         .situacao-manutencao { background: #E74C3C; color: white; }
         .situacao-sem-operador { background: #F39C12; color: white; }
+
+        @keyframes pulso-maquina {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.55);
+            }
+            70% {
+                transform: scale(1.08);
+                box-shadow: 0 0 0 9px rgba(39, 174, 96, 0);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(39, 174, 96, 0);
+            }
+        }
 
         /* Ajuste dos botões de ação */
         .btn-acao {
@@ -379,22 +422,26 @@
         .botoes-modal { display: flex; gap: 12px; justify-content: flex-end; margin-top: 25px; flex-wrap: wrap; }
 
         #conteudo-tabela { width: 100%; overflow-x: auto; border-radius: var(--raio); box-shadow: var(--sombra); -webkit-overflow-scrolling: touch; }
-        .tabela-producao { width: 100%; min-width: 860px; background: var(--branco); border-radius: var(--raio); overflow: hidden; border-collapse: collapse; table-layout: fixed; font-size: 0.85rem; }
-        .tabela-producao th { background: var(--cor-principal); color: var(--branco); padding: 10px 8px; text-align: left; font-weight: 500; position: sticky; top: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .tabela-producao td { padding: 9px 8px; border-bottom: 1px solid var(--borda); vertical-align: middle; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .tabela-producao th:nth-child(1), .tabela-producao td:nth-child(1) { width: 125px; }
-        .tabela-producao th:nth-child(2), .tabela-producao td:nth-child(2) { width: 90px; }
-        .tabela-producao th:nth-child(3), .tabela-producao td:nth-child(3) { width: 150px; }
-        .tabela-producao th:nth-child(4), .tabela-producao td:nth-child(4) { width: 120px; }
-        .tabela-producao th:nth-child(5), .tabela-producao td:nth-child(5) { width: 110px; }
-        .tabela-producao th:nth-child(6), .tabela-producao td:nth-child(6) { width: 105px; }
-        .tabela-producao th:nth-child(7), .tabela-producao td:nth-child(7) { width: 80px; }
-        .tabela-producao th:nth-child(8), .tabela-producao td:nth-child(8) { width: 125px; }
+        .tabela-producao { width: max-content; min-width: 100%; background: var(--branco); border-radius: var(--raio); overflow: hidden; border-collapse: collapse; table-layout: auto; font-size: 0.85rem; }
+        .tabela-producao th { background: var(--cor-principal); color: var(--branco); padding: 10px 8px; text-align: left; font-weight: 500; position: sticky; top: 0; white-space: nowrap; }
+        .tabela-producao td { padding: 9px 8px; border-bottom: 1px solid var(--borda); vertical-align: middle; white-space: nowrap; }
+        .tabela-producao th:nth-child(1), .tabela-producao td:nth-child(1) { min-width: 125px; }
+        .tabela-producao th:nth-child(2), .tabela-producao td:nth-child(2) { min-width: 95px; }
+        .tabela-producao th:nth-child(3), .tabela-producao td:nth-child(3) { min-width: 125px; }
+        .tabela-producao th:nth-child(4), .tabela-producao td:nth-child(4) { min-width: 90px; }
+        .tabela-producao th:nth-child(5), .tabela-producao td:nth-child(5) { min-width: 200px; }
+        .tabela-producao th:nth-child(6), .tabela-producao td:nth-child(6) { min-width: 140px; }
+        .tabela-producao th:nth-child(7), .tabela-producao td:nth-child(7) { min-width: 120px; }
+        .tabela-producao th:nth-child(8), .tabela-producao td:nth-child(8) { min-width: 105px; }
+        .tabela-producao th:nth-child(9), .tabela-producao td:nth-child(9) { min-width: 70px; }
+        .tabela-producao th:nth-child(10), .tabela-producao td:nth-child(10) { min-width: 130px; }
+        .tabela-producao th:nth-child(11), .tabela-producao td:nth-child(11) { min-width: 125px; }
         .linha-em-maquina { background: rgba(39, 174, 96, 0.08) !important; border-left: 4px solid var(--cor-em-maquina); }
         .linha-proximo { background: rgba(243, 156, 18, 0.08) !important; border-left: 4px solid var(--cor-proximo); }
         .linha-produzido { background: rgba(52, 152, 219, 0.08) !important; border-left: 4px solid var(--cor-produzido); opacity: 0.8; }
         .linha-planejado { background: var(--branco); border-left: 4px solid var(--cor-planejado); }
         .select-status { width: 100%; min-width: 105px; padding: 5px; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--borda); }
+        .input-qtd-executada { width: 100%; min-width: 90px; padding: 6px; font-size: 0.8rem; border: 1px solid var(--borda); border-radius: 4px; }
 
         .sem-dados { text-align: center; padding: 60px 20px; color: var(--texto-claro); font-style: italic; background: var(--branco); border-radius: var(--raio); box-shadow: var(--sombra); font-size: 1.1rem; }
         .oculto { display: none !important; }
@@ -409,6 +456,7 @@
 
         @media (max-width: 768px) {
             .btn-menu-mobile { display: flex; }
+            .btn-minimizar { display: none; }
             .menu-lateral { transform: translateX(-100%); width: var(--largura-menu); min-width: var(--largura-menu); }
             .menu-lateral.aberto { transform: translateX(0); }
             .area-principal { margin-left: 0; padding: 20px 15px; padding-top: 70px; }
@@ -416,7 +464,7 @@
             .campo-filtro { min-width: 100%; }
             button { width: 100%; justify-content: center; }
             #conteudo-tabela { margin-left: -2px; margin-right: -2px; }
-            .tabela-producao { min-width: 820px; font-size: 0.82rem; }
+            .tabela-producao { min-width: 100%; font-size: 0.82rem; }
             .tabela-producao th,
             .tabela-producao td { padding: 9px 7px; }
             .grupo-campos-modal { grid-template-columns: 1fr; }
@@ -456,16 +504,16 @@
         </div>
 
         <div class="legenda-status">
-            <div class="legenda-item" onclick="filtrarPorLegenda('Em máquina')">
+            <div class="legenda-item em-maquina" onclick="filtrarPorLegenda('Em máquina')">
                 <span class="bolinha em-maquina"></span> Em máquina
             </div>
-            <div class="legenda-item" onclick="filtrarPorLegenda('Próximo')">
+            <div class="legenda-item proximo" onclick="filtrarPorLegenda('Próximo')">
                 <span class="bolinha proximo"></span> Próximo
             </div>
-            <div class="legenda-item" onclick="filtrarPorLegenda('Produzido')">
+            <div class="legenda-item produzido" onclick="filtrarPorLegenda('Produzido')">
                 <span class="bolinha produzido"></span> Produzido
             </div>
-            <div class="legenda-item" onclick="filtrarPorLegenda('Planejado')">
+            <div class="legenda-item planejado" onclick="filtrarPorLegenda('Planejado')">
                 <span class="bolinha planejado"></span> Planejado
             </div>
         </div>
@@ -491,6 +539,10 @@
                         <option value="Produzido">Produzido</option>
                         <option value="Planejado">Planejado</option>
                     </select>
+                </div>
+                <div class="campo-filtro">
+                    <label>Data Entrega</label>
+                    <input type="date" id="filtro-data" onchange="aplicarFiltros()">
                 </div>
                 <div class="campo-filtro">
                     <label>Máquina</label>
@@ -533,6 +585,11 @@
                 </div>
 
                 <div class="campo-modal linha-cheia">
+                    <label>Código do Subproduto</label>
+                    <input type="text" id="codigo-subproduto" placeholder="Digite o código do subproduto, se houver">
+                </div>
+
+                <div class="campo-modal linha-cheia">
                     <label>Nome do Item *</label>
                     <input type="text" id="nome-item" placeholder="Digite o nome do item">
                 </div>
@@ -541,6 +598,11 @@
                     <label>Cliente *</label>
                     <input type="text" id="cliente-item" placeholder="Digite o cliente" list="lista-clientes">
                     <datalist id="lista-clientes"></datalist>
+                </div>
+
+                <div class="campo-modal">
+                    <label>Ordem de Produção (OP)</label>
+                    <input type="text" id="op-programacao" placeholder="Digite o número da OP">
                 </div>
 
                 <div class="campo-modal">
@@ -758,6 +820,7 @@
             }
             const filtroCod = document.getElementById('filtro-codigo').value.toLowerCase();
             const filtroStatus = document.getElementById('filtro-status').value;
+            const filtroData = document.getElementById('filtro-data').value;
             const filtroMaq = document.getElementById('filtro-maquina').value;
 
             if (filtroCod) {
@@ -769,6 +832,9 @@
             if (filtroStatus) {
                 dados = dados.filter(p => p.status === filtroStatus);
             }
+            if (filtroData) {
+                dados = dados.filter(p => p.dataEntrega === filtroData);
+            }
             if (filtroMaq) {
                 dados = dados.filter(p => p.maquina === filtroMaq);
             }
@@ -776,10 +842,12 @@
             const contagemPorMaq = {};
             dados.forEach(p => {
                 if (!contagemPorMaq[p.maquina]) {
-                    contagemPorMaq[p.maquina] = { total: 0, status: {} };
+                    contagemPorMaq[p.maquina] = { total: 0, status: {}, codigos: new Set(), subprodutos: new Set() };
                 }
                 contagemPorMaq[p.maquina].total += Number(p.qtdPedida) || 1;
                 contagemPorMaq[p.maquina].status[p.status] = (contagemPorMaq[p.maquina].status[p.status] || 0) + (Number(p.qtdPedida) || 1);
+                if (p.codigo) contagemPorMaq[p.maquina].codigos.add(p.codigo);
+                if (p.codigoSubproduto) contagemPorMaq[p.maquina].subprodutos.add(p.codigoSubproduto);
             });
 
             const maquinas = Object.keys(contagemPorMaq).sort();
@@ -834,7 +902,22 @@
                                 label: function(ctx) {
                                     const maq = maquinas[ctx.dataIndex];
                                     const info = contagemPorMaq[maq];
-                                    const linhas = [`Total: ${info.total}`];
+                                    const codigos = [...info.codigos];
+                                    const subprodutos = [...info.subprodutos];
+                                    const linhas = [];
+                                    if (codigos.length === 1) {
+                                        linhas.push(`Código item: ${codigos[0]}`);
+                                    }
+                                    if (codigos.length > 1) {
+                                        linhas.push(`Códigos itens: ${codigos.join(', ')}`);
+                                    }
+                                    if (subprodutos.length === 1) {
+                                        linhas.push(`Subproduto: ${subprodutos[0]}`);
+                                    }
+                                    if (subprodutos.length > 1) {
+                                        linhas.push(`Subprodutos: ${subprodutos.join(', ')}`);
+                                    }
+                                    linhas.push(`Total: ${info.total}`);
                                     Object.entries(info.status).forEach(([s, q]) => linhas.push(`${s}: ${q}`));
                                     return linhas;
                                 }
@@ -987,7 +1070,7 @@
             document.getElementById('modal-programacao').classList.add('aberto');
             document.getElementById('grupo-selecionado-modal').textContent = abaAtual === 'todas' ? 'Automático' : abaAtual;
             
-            const campos = ['codigo-item', 'nome-item', 'cliente-item', 'maquina-programacao', 'data-entrega', 'qtd-pedida', 'status-inicial', 'observacao-item'];
+            const campos = ['codigo-item', 'codigo-subproduto', 'nome-item', 'cliente-item', 'op-programacao', 'maquina-programacao', 'data-entrega', 'qtd-pedida', 'status-inicial', 'observacao-item'];
             campos.forEach(id => document.getElementById(id).value = '');
 
             atualizarSugestoes();
@@ -1003,8 +1086,10 @@
             document.getElementById('grupo-selecionado-modal').textContent = prog.grupo || '—';
             
             document.getElementById('codigo-item').value = prog.codigo || '';
+            document.getElementById('codigo-subproduto').value = prog.codigoSubproduto || '';
             document.getElementById('nome-item').value = prog.nome || '';
             document.getElementById('cliente-item').value = prog.cliente || '';
+            document.getElementById('op-programacao').value = prog.op || '';
             document.getElementById('maquina-programacao').value = prog.maquina || '';
             document.getElementById('data-entrega').value = prog.dataEntrega || '';
             document.getElementById('qtd-pedida').value = prog.qtdPedida || '';
@@ -1044,8 +1129,10 @@
         async function salvarProgramacao() {
             try {
             const cod = document.getElementById('codigo-item').value.trim();
+            const codSubproduto = document.getElementById('codigo-subproduto').value.trim();
             const nome = document.getElementById('nome-item').value.trim();
             const cli = document.getElementById('cliente-item').value.trim();
+            const op = document.getElementById('op-programacao').value.trim();
             let maq = document.getElementById('maquina-programacao').value.trim();
             const dt = document.getElementById('data-entrega').value;
             const qtd = document.getElementById('qtd-pedida').value;
@@ -1066,8 +1153,10 @@
             if (idEdicaoAtual) {
                 const prog = PROGRAMACOES.find(item => item.id === idEdicaoAtual);
                 prog.codigo = cod;
+                prog.codigoSubproduto = codSubproduto;
                 prog.nome = nome;
                 prog.cliente = cli;
+                prog.op = op;
                 prog.maquina = maq;
                 prog.grupo = grupo;
                 prog.dataEntrega = dt;
@@ -1080,8 +1169,10 @@
                 const prog = {
                     id: Date.now(),
                     codigo: cod,
+                    codigoSubproduto: codSubproduto,
                     nome: nome,
                     cliente: cli,
+                    op: op,
                     maquina: maq,
                     grupo: grupo,
                     dataEntrega: dt,
@@ -1123,6 +1214,15 @@
             await salvarProg(p);
             atualizarGraficoMaquinas();
             carregarTabela();
+        }
+
+        async function alterarQtdExecutada(id, valor) {
+            const p = PROGRAMACOES.find(i => i.id === id);
+            if (!p) return;
+
+            const quantidade = Number(valor);
+            p.qtdExecutada = valor === '' || Number.isNaN(quantidade) ? 0 : quantidade;
+            await salvarProg(p);
         }
 
         // Função para alterar situação da máquina
@@ -1171,6 +1271,7 @@
 
             const filtroCod = document.getElementById('filtro-codigo').value.toLowerCase();
             const filtroStatus = document.getElementById('filtro-status').value;
+            const filtroData = document.getElementById('filtro-data').value;
             const filtroMaq = document.getElementById('filtro-maquina').value;
 
             if (filtroCod) {
@@ -1181,6 +1282,9 @@
             }
             if (filtroStatus) {
                 dados = dados.filter(p => p.status === filtroStatus);
+            }
+            if (filtroData) {
+                dados = dados.filter(p => p.dataEntrega === filtroData);
             }
             if (filtroMaq) {
                 dados = dados.filter(p => p.maquina === filtroMaq);
@@ -1201,11 +1305,14 @@
                         <tr>
                             <th>Status</th>
                             <th>Código</th>
+                            <th>Subproduto</th>
+                            <th>OP</th>
                             <th>Item</th>
                             <th>Cliente</th>
                             <th>Máquina</th>
                             <th>Entrega</th>
                             <th>Qtd</th>
+                            <th>Qtd Executada</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
@@ -1239,11 +1346,23 @@
                                     </select>
                                 </td>
                                 <td>${p.codigo || '-'}</td>
+                                <td>${p.codigoSubproduto || '-'}</td>
+                                <td>${p.op || '-'}</td>
                                 <td>${p.nome || '-'}</td>
                                 <td>${p.cliente || '-'}</td>
                                 <td>${p.maquina || '-'}</td>
                                 <td>${p.dataEntrega ? new Date(p.dataEntrega).toLocaleDateString('pt-BR') : '-'}</td>
                                 <td>${p.qtdPedida || 0}</td>
+                                <td>
+                                    <input
+                                        class="input-qtd-executada"
+                                        type="number"
+                                        min="0"
+                                        value="${p.qtdExecutada || ''}"
+                                        placeholder="0"
+                                        onchange="alterarQtdExecutada(${p.id}, this.value)"
+                                    >
+                                </td>
                                 <td>
                                     <button class="btn-primario btn-acao" onclick="editarProgramacao(${p.id})" title="Editar programação">✏️</button>
                                     <button class="btn-perigo btn-acao" onclick="excluirItem(${p.id})" title="Excluir programação">🗑️</button>
