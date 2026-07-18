@@ -459,7 +459,39 @@
             .btn-minimizar { display: none; }
             .menu-lateral { transform: translateX(-100%); width: var(--largura-menu); min-width: var(--largura-menu); }
             .menu-lateral.aberto { transform: translateX(0); }
-            .area-principal { margin-left: 0; padding: 20px 15px; padding-top: 70px; }
+            .area-principal { margin-left: 0; padding: 18px 14px; padding-top: 68px; }
+            .cabecalho-pagina {
+                display: block;
+                margin-bottom: 18px;
+                padding-bottom: 14px;
+                border-bottom-color: rgba(10, 61, 98, 0.12);
+            }
+            .cabecalho-pagina h1 {
+                font-size: clamp(1.75rem, 9vw, 2.45rem);
+                line-height: 1.05;
+                margin-bottom: 8px;
+                max-width: none;
+                white-space: nowrap;
+            }
+            .cabecalho-pagina p {
+                font-size: clamp(0.72rem, 4.8vw, 1rem);
+                line-height: 1.42;
+                max-width: none;
+                white-space: nowrap;
+            }
+            .legenda-status {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+                margin-bottom: 18px;
+            }
+            .legenda-item {
+                justify-content: flex-start;
+                min-height: 48px;
+                padding: 10px 14px;
+                font-size: 0.95rem;
+                box-shadow: 0 6px 16px rgba(10, 61, 98, 0.09);
+            }
             .painel-controles { flex-direction: column; align-items: stretch; }
             .campo-filtro { min-width: 100%; }
             button { width: 100%; justify-content: center; }
@@ -676,7 +708,7 @@
         const ICONES_GRUPOS = {
             "AUTOMÁTICAS": "⚙️", "Máquinas de 8": "🔧", "Máquinas de 15": "🔩",
             "Máquinas de 25": "📦", "Máquinas de 40": "🛠️", "Máquinas de 45": "⚙️",
-            "Máquinas de 60": "🏭", "Solda Ponto": "🔥"
+            "Máquinas de 60": "🏭", "Solda Ponto": "🔥", "Máquinas de Dobra": "📐"
         };
 
         const GRUPOS_PADRAO = { 
@@ -687,7 +719,8 @@
             "Máquinas de 40": ["40.4"],
             "Máquinas de 45": ["45.1"], 
             "Máquinas de 60": ["60.1"], 
-            "Solda Ponto": ["SP-1", "SP-2", "SP-3", "SP-4", "SP-5", "SP-6", "SP-7"]
+            "Solda Ponto": ["SP-1", "SP-2", "SP-3", "SP-4", "SP-5", "SP-6", "SP-7"],
+            "Máquinas de Dobra": ["PH-16", "PH-20.1", "PH-20.2", "PH-25.1", "PH-25.2", "PH-40.1", "PH-40.2", "PH-45.1", "PH-45.2", "PH-50.1", "PH-50.2", "PH-60.1", "PH-60.2"]
         };
 
         const FIREBASE_SDK_URL = 'https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js';
@@ -984,7 +1017,7 @@
             document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('ativo'));
             event.target.closest('.menu-item')?.classList.add('ativo');
 
-            document.getElementById('titulo-aba').textContent = nome === 'todas' ? 'Todas as Máquinas' : `Grupo: ${nome}`;
+            document.getElementById('titulo-aba').textContent = nome === 'todas' ? 'Todas as Máquinas' : nome;
             document.getElementById('subtitulo-aba').textContent = nome === 'todas' ? 'Visualização geral' : `Itens do grupo ${nome}`;
             document.getElementById('area-dados').classList.remove('oculto');
             document.getElementById('area-configuracoes').classList.add('oculto');
