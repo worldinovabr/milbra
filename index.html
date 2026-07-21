@@ -10,6 +10,9 @@
     <link rel="manifest" href="./manifest.json">
     <link rel="icon" href="./icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="./icon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <title>PCP - Milbra Artefatos Metálicos</title>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -23,22 +26,53 @@
             --branco: #FFFFFF;
             --texto-escuro: #2C3E50;
             --texto-claro: #718096;
+            --texto: #2C3E50;
+            --superficie: #FFFFFF;
+            --superficie-elevada: #FFFFFF;
             --cor-em-maquina: #27AE60;
             --cor-proximo: #F39C12;
             --cor-produzido: #3498DB;
             --cor-planejado: #95A5A6;
             --borda: #E2E8F0;
-            --sombra: 0 2px 12px rgba(10, 61, 98, 0.1);
+            --sombra: 0 1px 2px rgba(10, 61, 98, 0.08);
             --raio: 8px;
             --largura-menu: 250px;
             --largura-menu-min: 70px;
+        }
+
+        body.tema-escuro {
+            --cor-principal: #F97316;
+            --cor-principal-claro: #FDBA74;
+            --cor-principal-escuro: #7C2D12;
+            --fundo-cinza: #0F1720;
+            --branco: #FFFFFF;
+            --texto-escuro: #F4F7FB;
+            --texto-claro: #A9B7C7;
+            --texto: #F4F7FB;
+            --superficie: #16212D;
+            --superficie-elevada: #1D2A38;
+            --borda: #2B3A4A;
+            --sombra: 0 1px 2px rgba(0, 0, 0, 0.28);
+        }
+        body.tema-escuro .menu-lateral {
+            background: #0B1220;
+        }
+        body.tema-escuro .menu-item.ativo,
+        body.tema-escuro .menu-item:hover {
+            background: #16212D;
+        }
+        body.tema-escuro .cabecalho-pagina h1 {
+            background: linear-gradient(135deg, #FDBA74 0%, #F97316 48%, #EA580C 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-family: 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -47,6 +81,7 @@
             color: var(--texto-escuro);
             display: flex;
             min-height: 100vh;
+            transition: background-color 0.25s ease, color 0.25s ease;
         }
 
         .menu-lateral {
@@ -77,8 +112,8 @@
             border-bottom: 1px solid rgba(255,255,255,0.15);
             position: relative;
         }
-        .logo-menu { font-size: 1.2rem; font-weight: bold; margin-bottom: 5px; white-space: nowrap; }
-        .subtitulo-menu { font-size: 0.75rem; opacity: 0.8; font-weight: 300; white-space: nowrap; }
+        .logo-menu { font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; white-space: nowrap; }
+        .subtitulo-menu { font-size: 0.75rem; opacity: 0.8; font-weight: 400; white-space: nowrap; }
         .menu-lateral.minimizado .logo-menu,
         .menu-lateral.minimizado .subtitulo-menu { display: none; }
 
@@ -117,9 +152,22 @@
             padding: 14px 10px;
             justify-content: center;
         }
-        .menu-item.ativo { background: var(--cor-principal-escuro); border-left-color: var(--branco); font-weight: 500; }
+        .menu-item.ativo { background: var(--cor-principal-escuro); border-left-color: var(--branco); font-weight: 600; }
         .menu-item:hover { background: var(--cor-principal-escuro); }
-        .menu-item .icone { font-size: 1.1rem; flex-shrink: 0; width: 20px; text-align: center; }
+        .menu-item .icone { flex-shrink: 0; width: 20px; height: 20px; color: rgba(255, 255, 255, 0.72); display: inline-flex; align-items: center; justify-content: center; }
+        .menu-item .icone svg { width: 18px; height: 18px; stroke-width: 1.75; }
+        .icone-dashboard { color: #60A5FA; }
+        .icone-config { color: #A78BFA; }
+        .icone-automaticas { color: #22D3EE; }
+        .icone-maq-8 { color: #34D399; }
+        .icone-maq-15 { color: #FBBF24; }
+        .icone-maq-25 { color: #FB923C; }
+        .icone-maq-40 { color: #F87171; }
+        .icone-maq-45 { color: #C084FC; }
+        .icone-maq-60 { color: #F472B6; }
+        .icone-solda { color: #FACC15; }
+        .icone-dobra { color: #2DD4BF; }
+        .icone-generico { color: #CBD5E1; }
         .menu-lateral.minimizado .menu-item span:not(.icone) { display: none; }
 
         .menu-rodape {
@@ -175,18 +223,54 @@
         }
         .cabecalho-pagina h1 { font-size: 2rem; font-weight: 700; color: var(--cor-principal); margin-bottom: 5px; }
         .cabecalho-pagina p { color: var(--texto-claro); font-size: 1rem; }
+        .toggle-tema {
+            width: 76px;
+            height: 38px;
+            padding: 3px;
+            border-radius: 999px;
+            border: 1px solid var(--borda);
+            background: var(--superficie-elevada);
+            color: var(--texto-escuro);
+            box-shadow: var(--sombra);
+            justify-content: space-between;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .toggle-tema::before {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            left: 4px;
+            top: 3px;
+            border-radius: 50%;
+            background: var(--cor-principal);
+            transition: transform 0.25s ease;
+            z-index: 0;
+        }
+        body.tema-escuro .toggle-tema::before { transform: translateX(36px); }
+        .toggle-tema span {
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+            font-size: 1rem;
+        }
 
         .legenda-status { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.9rem; margin-bottom: 20px; }
         .legenda-item { 
             --legenda-cor: var(--cor-principal);
             --legenda-gradiente: linear-gradient(135deg, var(--cor-principal), var(--cor-principal-escuro));
             display: flex; align-items: center; gap: 8px; padding: 8px 14px;
-            border-radius: 999px; cursor: pointer; transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, color 0.18s ease;
-            border: 1px solid rgba(10, 61, 98, 0.12);
-            background: rgba(255, 255, 255, 0.82);
+            border-radius: 999px; cursor: pointer; transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+            border: 1px solid var(--borda);
+            background: var(--superficie-elevada);
             color: var(--texto);
-            box-shadow: 0 4px 12px rgba(10, 61, 98, 0.08);
-            font-weight: 500;
+            box-shadow: none;
+            font-weight: 400;
             user-select: none;
         }
         .legenda-item.em-maquina { --legenda-cor: var(--cor-em-maquina); --legenda-gradiente: linear-gradient(135deg, #2ecc71, #1e8449); }
@@ -196,13 +280,11 @@
         .legenda-item:hover {
             transform: translateY(-2px);
             border-color: color-mix(in srgb, var(--legenda-cor) 45%, transparent);
-            box-shadow: 0 8px 18px rgba(10, 61, 98, 0.14);
         }
         .legenda-item.ativo { 
             background: var(--legenda-gradiente);
             border-color: transparent;
             color: var(--branco);
-            box-shadow: 0 10px 22px color-mix(in srgb, var(--legenda-cor) 34%, transparent);
         }
         .legenda-item.ativo:hover { transform: translateY(-2px) scale(1.02); }
         .bolinha { width: 12px; height: 12px; border-radius: 50%; display: inline-block; box-shadow: 0 0 0 3px color-mix(in srgb, var(--legenda-cor) 18%, transparent); }
@@ -214,10 +296,13 @@
 
         /* ÁREA DO GRÁFICO - COMPACTA E RESPONSIVA */
         .area-grafico-maquinas {
-            background: linear-gradient(to bottom, #2b100c, #1a0705);
-            padding: 15px 12px 25px;
-            border-radius: var(--raio);
-            box-shadow: var(--sombra);
+            background:
+                linear-gradient(180deg, rgba(10, 61, 98, 0.94), rgba(7, 42, 69, 0.98)),
+                radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.08), transparent 38%);
+            padding: 18px 16px 24px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            box-shadow: 0 1px 2px rgba(7, 42, 69, 0.2);
             margin-bottom: 20px;
             position: relative;
             overflow: hidden;
@@ -230,13 +315,17 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: radial-gradient(circle at center, rgba(255,60,30,0.12) 0%, transparent 60%);
+            background:
+                linear-gradient(90deg, rgba(255, 255, 255, 0.05), transparent 32%, rgba(255, 255, 255, 0.04)),
+                radial-gradient(circle at 88% 18%, rgba(255,255,255,0.09) 0%, transparent 36%);
             pointer-events: none;
         }
         .area-grafico-maquinas h3 {
             color: var(--branco);
-            margin-bottom: 12px;
+            margin-bottom: 14px;
             font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0;
             position: relative;
             z-index: 1;
             display: flex;
@@ -249,13 +338,15 @@
             max-height: 240px;
             position: relative;
             z-index: 1;
+            filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.18));
         }
 
         .painel-controles {
-            background: var(--branco);
-            padding: 20px;
+            background: var(--superficie);
+            padding: 18px;
             border-radius: var(--raio);
             box-shadow: var(--sombra);
+            border: 1px solid var(--borda);
             margin-bottom: 25px;
             display: flex;
             flex-wrap: wrap;
@@ -263,16 +354,18 @@
             align-items: flex-end;
         }
 
-        .campo-filtro { display: flex; flex-direction: column; gap: 5px; min-width: 160px; flex: 1; }
-        .campo-filtro label { font-size: 0.8rem; font-weight: 500; color: var(--texto-claro); }
+        .campo-filtro { display: flex; flex-direction: column; gap: 7px; min-width: 170px; flex: 1; }
+        .campo-filtro label { font-size: 0.8rem; font-weight: 600; color: var(--texto-claro); }
         input, select, textarea {
-            padding: 10px 14px;
+            padding: 12px 14px;
             border: 1px solid var(--borda);
             border-radius: var(--raio);
             font-size: 0.9rem;
-            background: var(--branco);
+            line-height: 1.35;
+            background: var(--superficie-elevada);
+            color: var(--texto-escuro);
             width: 100%;
-            transition: border-color 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
         }
         input:focus, select:focus, textarea:focus {
             outline: none;
@@ -295,8 +388,8 @@
         }
         .btn-primario { background: var(--cor-principal); color: var(--branco); }
         .btn-primario:hover { background: var(--cor-principal-escuro); }
-        .btn-sucesso { background: var(--cor-em-maquina); color: var(--branco); }
-        .btn-sucesso:hover { background: #219653; }
+        .btn-sucesso { background: var(--cor-em-maquina); color: var(--branco); border: 1px solid rgba(255, 255, 255, 0.18); box-shadow: none; }
+        .btn-sucesso:hover { background: #219653; border-color: rgba(255, 255, 255, 0.28); }
         .btn-perigo { background: #E74C3C; color: var(--branco); }
         .btn-perigo:hover { background: #C0392B; }
         .btn-pequeno { padding: 6px 10px; font-size: 0.8rem; }
@@ -305,22 +398,22 @@
         .select-status.em-maquina {
             background-color: rgba(39, 174, 96, 0.2);
             color: #1e8449;
-            font-weight: 500;
+            font-weight: 600;
         }
         .select-status.proximo {
             background-color: rgba(243, 156, 18, 0.2);
             color: #d68910;
-            font-weight: 500;
+            font-weight: 600;
         }
         .select-status.produzido {
             background-color: rgba(52, 152, 219, 0.2);
             color: #2471a3;
-            font-weight: 500;
+            font-weight: 600;
         }
         .select-status.planejado {
             background-color: rgba(149, 165, 166, 0.2);
             color: #707b7c;
-            font-weight: 500;
+            font-weight: 600;
         }
 
         /* Botão de situação da máquina */
@@ -340,21 +433,34 @@
         }
         .btn-situacao:hover {
             transform: scale(1.15);
+            animation-play-state: paused;
         }
         .situacao-trabalhando {
             background: #27AE60;
             color: white;
-            animation: pulso-maquina 1.35s ease-in-out infinite;
+            animation: pulso-trabalhando 1.8s ease-in-out infinite;
             box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.55);
         }
-        .situacao-trabalhando:hover {
-            animation-play-state: paused;
-            box-shadow: 0 0 0 7px rgba(39, 174, 96, 0.18);
+        .situacao-manutencao {
+            background: #E74C3C;
+            color: white;
+            animation: pulso-manutencao 0.8s ease-in-out infinite;
+            box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.65);
         }
-        .situacao-manutencao { background: #E74C3C; color: white; }
-        .situacao-sem-operador { background: #F39C12; color: white; }
+        .situacao-sem-operador {
+            background: #F39C12;
+            color: white;
+            animation: pulso-sem-operador 1.1s ease-in-out infinite;
+            box-shadow: 0 0 0 0 rgba(243, 156, 18, 0.6);
+        }
+        .situacao-falta-componente {
+            background: #8E44AD;
+            color: white;
+            animation: pulso-falta-componente 0.95s ease-in-out infinite;
+            box-shadow: 0 0 0 0 rgba(142, 68, 173, 0.65);
+        }
 
-        @keyframes pulso-maquina {
+        @keyframes pulso-trabalhando {
             0% {
                 transform: scale(1);
                 box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.55);
@@ -368,6 +474,21 @@
                 box-shadow: 0 0 0 0 rgba(39, 174, 96, 0);
             }
         }
+        @keyframes pulso-sem-operador {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(243, 156, 18, 0.6); }
+            55% { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(243, 156, 18, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(243, 156, 18, 0); }
+        }
+        @keyframes pulso-falta-componente {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(142, 68, 173, 0.65); }
+            45% { transform: scale(1.12); box-shadow: 0 0 0 9px rgba(142, 68, 173, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(142, 68, 173, 0); }
+        }
+        @keyframes pulso-manutencao {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.65); }
+            40% { transform: scale(1.14); box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+        }
 
         /* Ajuste dos botões de ação */
         .btn-acao {
@@ -380,6 +501,13 @@
             align-items: center;
             justify-content: center;
             margin-right: 3px;
+        }
+        .btn-editar {
+            background: #334155;
+            color: #FFFFFF;
+        }
+        .btn-editar:hover {
+            background: #1E293B;
         }
 
         .fundo-modal {
@@ -397,7 +525,7 @@
         }
         .fundo-modal.aberto { display: flex; }
         .modal {
-            background: var(--branco);
+            background: var(--superficie);
             border-radius: var(--raio);
             box-shadow: var(--sombra);
             width: 100%;
@@ -407,6 +535,62 @@
             padding: 25px;
             border-top: 4px solid var(--cor-principal);
         }
+        .modal-situacao {
+            max-width: 430px;
+        }
+        .lista-situacoes-modal {
+            display: grid;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .opcao-situacao {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid var(--borda);
+            border-radius: 8px;
+            background: var(--superficie-elevada);
+            color: var(--texto-escuro);
+            display: grid;
+            grid-template-columns: 34px 1fr;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+        }
+        .opcao-situacao:hover {
+            border-color: var(--cor-principal);
+            background: color-mix(in srgb, var(--cor-principal) 12%, var(--superficie-elevada));
+            transform: translateY(-1px);
+        }
+        .opcao-situacao.ativo {
+            border-color: var(--cor-principal);
+            background: color-mix(in srgb, var(--cor-principal) 18%, var(--superficie-elevada));
+        }
+        .opcao-situacao-icone {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+        }
+        .opcao-situacao strong {
+            display: block;
+            font-size: 0.92rem;
+            font-weight: 600;
+        }
+        .opcao-situacao small {
+            display: block;
+            margin-top: 2px;
+            color: var(--texto-claro);
+            font-size: 0.78rem;
+            font-weight: 400;
+        }
+        .opcao-situacao.trabalhando .opcao-situacao-icone { background: #27AE60; }
+        .opcao-situacao.manutencao .opcao-situacao-icone { background: #E74C3C; }
+        .opcao-situacao.sem-operador .opcao-situacao-icone { background: #F39C12; }
+        .opcao-situacao.falta-componente .opcao-situacao-icone { background: #8E44AD; }
         .cabecalho-modal {
             display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--borda);
         }
@@ -414,16 +598,16 @@
         .btn-fechar { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--texto-claro); padding: 0; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; }
         .btn-fechar:hover { color: var(--texto-escuro); }
 
-        .destaque-grupo { background: rgba(10, 61, 98, 0.05); padding: 12px; border-radius: var(--raio); margin-bottom: 20px; font-size: 0.9rem; font-weight: 500; color: var(--cor-principal); }
+        .destaque-grupo { background: rgba(10, 61, 98, 0.05); padding: 12px; border-radius: var(--raio); margin-bottom: 20px; font-size: 0.9rem; font-weight: 600; color: var(--cor-principal); }
         .grupo-campos-modal { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
         .campo-modal { display: flex; flex-direction: column; gap: 5px; }
         .campo-modal.linha-cheia { grid-column: 1 / -1; }
-        .campo-modal label { font-size: 0.8rem; font-weight: 500; }
+        .campo-modal label { font-size: 0.8rem; font-weight: 600; }
         .botoes-modal { display: flex; gap: 12px; justify-content: flex-end; margin-top: 25px; flex-wrap: wrap; }
 
         #conteudo-tabela { width: 100%; overflow-x: auto; border-radius: var(--raio); box-shadow: var(--sombra); -webkit-overflow-scrolling: touch; }
-        .tabela-producao { width: max-content; min-width: 100%; background: var(--branco); border-radius: var(--raio); overflow: hidden; border-collapse: collapse; table-layout: auto; font-size: 0.85rem; }
-        .tabela-producao th { background: var(--cor-principal); color: var(--branco); padding: 10px 8px; text-align: left; font-weight: 500; position: sticky; top: 0; white-space: nowrap; }
+        .tabela-producao { width: max-content; min-width: 100%; background: var(--superficie); border-radius: var(--raio); overflow: hidden; border-collapse: collapse; table-layout: auto; font-size: 0.85rem; }
+        .tabela-producao th { background: var(--cor-principal); color: var(--branco); padding: 10px 8px; text-align: left; font-weight: 600; position: sticky; top: 0; white-space: nowrap; }
         .tabela-producao td { padding: 9px 8px; border-bottom: 1px solid var(--borda); vertical-align: middle; white-space: nowrap; }
         .tabela-producao th:nth-child(1), .tabela-producao td:nth-child(1) { min-width: 125px; }
         .tabela-producao th:nth-child(2), .tabela-producao td:nth-child(2) { min-width: 95px; }
@@ -439,14 +623,14 @@
         .linha-em-maquina { background: rgba(39, 174, 96, 0.08) !important; border-left: 4px solid var(--cor-em-maquina); }
         .linha-proximo { background: rgba(243, 156, 18, 0.08) !important; border-left: 4px solid var(--cor-proximo); }
         .linha-produzido { background: rgba(52, 152, 219, 0.08) !important; border-left: 4px solid var(--cor-produzido); opacity: 0.8; }
-        .linha-planejado { background: var(--branco); border-left: 4px solid var(--cor-planejado); }
+        .linha-planejado { background: var(--superficie); border-left: 4px solid var(--cor-planejado); }
         .select-status { width: 100%; min-width: 105px; padding: 5px; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--borda); }
         .input-qtd-executada { width: 100%; min-width: 90px; padding: 6px; font-size: 0.8rem; border: 1px solid var(--borda); border-radius: 4px; }
 
-        .sem-dados { text-align: center; padding: 60px 20px; color: var(--texto-claro); font-style: italic; background: var(--branco); border-radius: var(--raio); box-shadow: var(--sombra); font-size: 1.1rem; }
+        .sem-dados { text-align: center; padding: 60px 20px; color: var(--texto-claro); font-style: italic; background: var(--superficie); border-radius: var(--raio); box-shadow: var(--sombra); font-size: 1.1rem; }
         .oculto { display: none !important; }
 
-        .bloco-aba-config { background: var(--branco); border-radius: var(--raio); padding: 20px; box-shadow: var(--sombra); margin-bottom: 20px; }
+        .bloco-aba-config { background: var(--superficie); border-radius: var(--raio); padding: 20px; box-shadow: var(--sombra); margin-bottom: 20px; }
         .cabecalho-aba-config { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
         .input-nome-aba { font-size: 1.1rem; font-weight: 600; border: none; border-bottom: 2px solid var(--borda); border-radius: 0; padding: 5px; width: 100%; max-width: 320px; color: var(--cor-principal); }
         .lista-maquinas-aba { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
@@ -490,7 +674,7 @@
                 min-height: 48px;
                 padding: 10px 14px;
                 font-size: 0.95rem;
-                box-shadow: 0 6px 16px rgba(10, 61, 98, 0.09);
+                box-shadow: none;
             }
             .painel-controles { flex-direction: column; align-items: stretch; }
             .campo-filtro { min-width: 100%; }
@@ -516,13 +700,13 @@
         </div>
 
         <div class="menu-item ativo" onclick="carregarAba('todas')">
-            <span class="icone">🏠</span><span>Todas as Máquinas</span>
+            <span class="icone" id="icone-todas-maquinas"></span><span>Todas as Máquinas</span>
         </div>
 
         <div id="lista-abas-menu"></div>
 
         <div class="menu-item" onclick="abrirConfiguracoes()">
-            <span class="icone">⚙️</span><span>Configurações</span>
+            <span class="icone" id="icone-configuracoes"></span><span>Configurações</span>
         </div>
         <div class="menu-rodape">© Milbra - Artefatos Metálicos</div>
     </nav>
@@ -533,6 +717,10 @@
                 <h1 id="titulo-aba">Todas as Máquinas</h1>
                 <p id="subtitulo-aba">Visualização geral de todas as programações</p>
             </div>
+            <button class="toggle-tema" id="toggle-tema" onclick="alternarTema()" title="Alternar tema claro/escuro" aria-label="Alternar tema claro/escuro">
+                <span>☀️</span>
+                <span>🌙</span>
+            </button>
         </div>
 
         <div class="legenda-status">
@@ -675,8 +863,22 @@
         </div>
     </div>
 
+    <div class="fundo-modal" id="modal-situacao">
+        <div class="modal modal-situacao">
+            <div class="cabecalho-modal">
+                <h3>Situação da máquina</h3>
+                <button class="btn-fechar" onclick="fecharModalSituacao()">&times;</button>
+            </div>
+            <div class="lista-situacoes-modal" id="lista-situacoes-modal"></div>
+            <div class="botoes-modal">
+                <button class="btn-primario" onclick="fecharModalSituacao()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let graficoMaquinas = null;
+        let idSituacaoAtual = null;
 
         function abrirFecharMenu() { 
             const menu = document.getElementById('menu-lateral');
@@ -688,6 +890,33 @@
             const menu = document.getElementById('menu-lateral');
             menu.classList.toggle('minimizado');
             localStorage.setItem('menuMinimizado', menu.classList.contains('minimizado'));
+        }
+
+        function obterTemaInicial() {
+            const temaSalvo = localStorage.getItem('temaInterface');
+            if (temaSalvo === 'claro' || temaSalvo === 'escuro') return temaSalvo;
+            return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'escuro' : 'claro';
+        }
+
+        function aplicarTema(tema) {
+            const escuro = tema === 'escuro';
+            document.body.classList.toggle('tema-escuro', escuro);
+            document.documentElement.style.colorScheme = escuro ? 'dark' : 'light';
+            document.querySelector('meta[name="theme-color"]')?.setAttribute('content', escuro ? '#0F1720' : '#0A3D62');
+
+            const toggle = document.getElementById('toggle-tema');
+            if (toggle) {
+                toggle.setAttribute('aria-pressed', String(escuro));
+                toggle.title = escuro ? 'Alternar para modo claro' : 'Alternar para modo escuro';
+                toggle.setAttribute('aria-label', toggle.title);
+            }
+        }
+
+        function alternarTema() {
+            const proximoTema = document.body.classList.contains('tema-escuro') ? 'claro' : 'escuro';
+            localStorage.setItem('temaInterface', proximoTema);
+            aplicarTema(proximoTema);
+            if (graficoMaquinas) atualizarGraficoMaquinas();
         }
 
         function filtrarPorLegenda(statusClicado) {
@@ -705,11 +934,49 @@
             aplicarFiltros();
         }
 
-        const ICONES_GRUPOS = {
-            "AUTOMÁTICAS": "⚙️", "Máquinas de 8": "🔧", "Máquinas de 15": "🔩",
-            "Máquinas de 25": "📦", "Máquinas de 40": "🛠️", "Máquinas de 45": "⚙️",
-            "Máquinas de 60": "🏭", "Solda Ponto": "🔥", "Máquinas de Dobra": "📐"
+        const ICONES_LUCIDE = {
+            layoutDashboard: '<rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect>',
+            settings: '<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.51a2 2 0 0 1 1-1.72l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle>',
+            cpu: '<rect width="16" height="16" x="4" y="4" rx="2"></rect><rect width="6" height="6" x="9" y="9" rx="1"></rect><path d="M15 2v2"></path><path d="M15 20v2"></path><path d="M2 15h2"></path><path d="M2 9h2"></path><path d="M20 15h2"></path><path d="M20 9h2"></path><path d="M9 2v2"></path><path d="M9 20v2"></path>',
+            wrench: '<path d="M14.7 6.3a4 4 0 0 0-5 5L3 18a2.1 2.1 0 0 0 3 3l6.7-6.7a4 4 0 0 0 5-5l-2.6 2.6-2.4-2.4 2-3.2z"></path>',
+            zap: '<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46L12 10h8a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46L12 14z"></path>',
+            foldHorizontal: '<path d="M2 12h6"></path><path d="M16 12h6"></path><path d="M12 2v2"></path><path d="M12 8v2"></path><path d="M12 14v2"></path><path d="M12 20v2"></path><path d="m19 15 3-3-3-3"></path><path d="m5 9-3 3 3 3"></path>'
         };
+
+        function iconeLucide(nome) {
+            return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONES_LUCIDE[nome] || ICONES_LUCIDE.wrench}</svg>`;
+        }
+
+        const ICONES_GRUPOS = {
+            "AUTOMÁTICAS": iconeLucide('cpu'),
+            "Máquinas de 8": iconeLucide('wrench'),
+            "Máquinas de 15": iconeLucide('wrench'),
+            "Máquinas de 25": iconeLucide('wrench'),
+            "Máquinas de 40": iconeLucide('wrench'),
+            "Máquinas de 45": iconeLucide('wrench'),
+            "Máquinas de 60": iconeLucide('wrench'),
+            "Solda Ponto": iconeLucide('zap'),
+            "Máquinas de Dobra": iconeLucide('foldHorizontal')
+        };
+
+        const CLASSES_ICONES_GRUPOS = {
+            "AUTOMÁTICAS": "icone-automaticas",
+            "Máquinas de 8": "icone-maq-8",
+            "Máquinas de 15": "icone-maq-15",
+            "Máquinas de 25": "icone-maq-25",
+            "Máquinas de 40": "icone-maq-40",
+            "Máquinas de 45": "icone-maq-45",
+            "Máquinas de 60": "icone-maq-60",
+            "Solda Ponto": "icone-solda",
+            "Máquinas de Dobra": "icone-dobra"
+        };
+
+        const SITUACOES_MAQUINA = [
+            { valor: 'trabalhando', titulo: 'Máquina trabalhando', detalhe: 'Produção normal', icone: '⚡', classe: 'trabalhando' },
+            { valor: 'manutencao', titulo: 'Parada para manutenção', detalhe: 'Maior gravidade', icone: '🔧', classe: 'manutencao' },
+            { valor: 'sem-operador', titulo: 'Falta de operador', detalhe: 'Aguardando operador', icone: '👤', classe: 'sem-operador' },
+            { valor: 'falta-componente', titulo: 'Falta de componente', detalhe: 'Aguardando material', icone: '🧩', classe: 'falta-componente' }
+        ];
 
         const GRUPOS_PADRAO = { 
             "AUTOMÁTICAS": ["MC-01","MC-01","M-01", "M-02", "M-03", "M-04", "M-05", "M-06"],
@@ -819,6 +1086,12 @@
         let idEdicaoAtual = null;
 
         async function iniciarSistema() {
+            aplicarTema(obterTemaInicial());
+            document.getElementById('icone-todas-maquinas').innerHTML = iconeLucide('layoutDashboard');
+            document.getElementById('icone-todas-maquinas').classList.add('icone-dashboard');
+            document.getElementById('icone-configuracoes').innerHTML = iconeLucide('settings');
+            document.getElementById('icone-configuracoes').classList.add('icone-config');
+
             if (localStorage.getItem('menuMinimizado') === 'true') {
                 document.getElementById('menu-lateral').classList.add('minimizado');
             }
@@ -875,10 +1148,13 @@
             const contagemPorMaq = {};
             dados.forEach(p => {
                 if (!contagemPorMaq[p.maquina]) {
-                    contagemPorMaq[p.maquina] = { total: 0, status: {}, codigos: new Set(), subprodutos: new Set() };
+                    contagemPorMaq[p.maquina] = { total: 0, executada: 0, status: {}, codigos: new Set(), subprodutos: new Set() };
                 }
-                contagemPorMaq[p.maquina].total += Number(p.qtdPedida) || 1;
-                contagemPorMaq[p.maquina].status[p.status] = (contagemPorMaq[p.maquina].status[p.status] || 0) + (Number(p.qtdPedida) || 1);
+                const qtdPedida = Number(p.qtdPedida) || 1;
+                const qtdExecutada = Math.max(0, Number(p.qtdExecutada) || 0);
+                contagemPorMaq[p.maquina].total += qtdPedida;
+                contagemPorMaq[p.maquina].executada += qtdExecutada;
+                contagemPorMaq[p.maquina].status[p.status] = (contagemPorMaq[p.maquina].status[p.status] || 0) + qtdPedida;
                 if (p.codigo) contagemPorMaq[p.maquina].codigos.add(p.codigo);
                 if (p.codigoSubproduto) contagemPorMaq[p.maquina].subprodutos.add(p.codigoSubproduto);
             });
@@ -890,47 +1166,131 @@
 
             let corBase = 'rgba(255, 80, 50, 0.9)';
             if (filtroStatus) corBase = CORES_STATUS[filtroStatus];
+            const corExecutada = 'rgba(30, 136, 229, 0.95)';
+            const coresRestantes = maquinas.map(m => {
+                if (!filtroStatus) {
+                    const sts = contagemPorMaq[m].status;
+                    if (sts['Em máquina']) return CORES_STATUS['Em máquina'];
+                    if (sts['Próximo']) return CORES_STATUS['Próximo'];
+                    if (sts['Produzido']) return CORES_STATUS['Produzido'];
+                    return CORES_STATUS['Planejado'];
+                }
+                return corBase;
+            });
+            const dadosExecutados = maquinas.map(m => Math.min(contagemPorMaq[m].executada, contagemPorMaq[m].total));
+            const dadosRestantes = maquinas.map(m => Math.max(contagemPorMaq[m].total - contagemPorMaq[m].executada, 0));
+            const maiorTotalGrafico = Math.max(...maquinas.map(m => contagemPorMaq[m].total), 0);
+            const ajustarOpacidade = (cor, opacidade) => {
+                if (!cor || typeof cor !== 'string') return cor;
+                if (cor.startsWith('rgba(')) return cor.replace(/,\s*[\d.]+\)$/, `, ${opacidade})`);
+                if (cor.startsWith('rgb(')) return cor.replace('rgb(', 'rgba(').replace(')', `, ${opacidade})`);
+                return cor;
+            };
+            const criarGradienteBarra = (chart, cor) => {
+                const { ctx, chartArea } = chart;
+                if (!chartArea) return cor;
+                const gradiente = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+                gradiente.addColorStop(0, ajustarOpacidade(cor, 0.96));
+                gradiente.addColorStop(1, ajustarOpacidade(cor, 0.72));
+                return gradiente;
+            };
+            const gradienteBarraPlugin = {
+                id: 'gradienteBarra',
+                beforeDatasetsDraw(chart) {
+                    chart.data.datasets[0].backgroundColor = criarGradienteBarra(chart, corExecutada);
+                    chart.data.datasets[1].backgroundColor = coresRestantes.map(cor => criarGradienteBarra(chart, cor));
+                }
+            };
+            const rotulosBarraPlugin = {
+                id: 'rotulosBarra',
+                afterDatasetsDraw(chart) {
+                    const { ctx } = chart;
+                    ctx.save();
+                    ctx.textAlign = 'center';
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+                    ctx.shadowBlur = 4;
+                    ctx.font = '700 11px Inter, Segoe UI, Arial, sans-serif';
+
+                    chart.data.datasets.forEach((dataset, datasetIndex) => {
+                        const meta = chart.getDatasetMeta(datasetIndex);
+                        meta.data.forEach((bar, index) => {
+                            const valor = Number(dataset.data[index]) || 0;
+                            const altura = Math.abs(bar.base - bar.y);
+                            const y = (bar.y + bar.base) / 2;
+                            if (!valor || !Number.isFinite(y)) return;
+
+                            if (datasetIndex === 1) {
+                                ctx.textBaseline = 'bottom';
+                                ctx.fillText(String(Math.round(valor)), bar.x, Math.max(12, bar.y - 6));
+                                return;
+                            }
+
+                            if (altura < 16) {
+                                ctx.textBaseline = 'bottom';
+                                ctx.fillText(String(Math.round(valor)), bar.x, Math.max(12, bar.base - 4));
+                                return;
+                            }
+
+                            ctx.textBaseline = 'middle';
+                            ctx.fillText(String(Math.round(valor)), bar.x, y);
+                        });
+                    });
+                    ctx.restore();
+                }
+            };
 
             graficoMaquinas = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: maquinas,
-                    datasets: [{
-                        label: 'Volume Total',
-                        data: maquinas.map(m => contagemPorMaq[m].total),
-                        backgroundColor: maquinas.map(m => {
-                            if (!filtroStatus) {
-                                const sts = contagemPorMaq[m].status;
-                                if (sts['Em máquina']) return CORES_STATUS['Em máquina'];
-                                if (sts['Próximo']) return CORES_STATUS['Próximo'];
-                                if (sts['Produzido']) return CORES_STATUS['Produzido'];
-                                return CORES_STATUS['Planejado'];
-                            }
-                            return corBase;
-                        }),
-                        borderColor: 'rgba(255, 255, 255, 0.15)',
-                        borderWidth: 1,
-                        borderRadius: 4,
-                        barPercentage: 0.7,
-                        categoryPercentage: 0.8
-                    }]
+                    datasets: [
+                        {
+                            label: 'Qtd Executada',
+                            data: dadosExecutados,
+                            backgroundColor: corExecutada,
+                            borderColor: 'rgba(255, 255, 255, 0.32)',
+                            borderWidth: 1.2,
+                            borderRadius: { bottomLeft: 5, bottomRight: 5 },
+                            hoverBorderColor: 'rgba(255, 255, 255, 0.58)',
+                            barPercentage: 0.7,
+                            categoryPercentage: 0.8,
+                            stack: 'volume'
+                        },
+                        {
+                            label: 'Qtd Restante',
+                            data: dadosRestantes,
+                            backgroundColor: coresRestantes,
+                            borderColor: 'rgba(255, 255, 255, 0.28)',
+                            borderWidth: 1.2,
+                            borderRadius: { topLeft: 5, topRight: 5 },
+                            hoverBorderColor: 'rgba(255, 255, 255, 0.58)',
+                            barPercentage: 0.7,
+                            categoryPercentage: 0.8,
+                            stack: 'volume'
+                        }
+                    ]
                 },
+                plugins: [gradienteBarraPlugin, rotulosBarraPlugin],
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     layout: {
-                        padding: { top: 5, right: 10, bottom: 5, left: 5 }
+                        padding: { top: 22, right: 12, bottom: 4, left: 4 }
                     },
                     plugins: {
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: 'rgba(0,0,0,0.85)',
+                            backgroundColor: 'rgba(7, 22, 38, 0.94)',
                             titleColor: '#fff',
-                            bodyColor: '#fff',
-                            padding: 8,
-                            borderRadius: 6,
-                            titleFont: { size: 11 },
-                            bodyFont: { size: 10 },
+                            bodyColor: 'rgba(255,255,255,0.88)',
+                            padding: 10,
+                            borderRadius: 8,
+                            borderColor: 'rgba(255,255,255,0.14)',
+                            borderWidth: 1,
+                            displayColors: false,
+                            titleFont: { family: 'Inter', size: 11, weight: '600' },
+                            bodyFont: { family: 'Inter', size: 10, weight: '400' },
                             callbacks: {
                                 label: function(ctx) {
                                     const maq = maquinas[ctx.dataIndex];
@@ -951,6 +1311,8 @@
                                         linhas.push(`Subprodutos: ${subprodutos.join(', ')}`);
                                     }
                                     linhas.push(`Total: ${info.total}`);
+                                    linhas.push(`Executado: ${info.executada}`);
+                                    linhas.push(`Restante: ${Math.max(info.total - info.executada, 0)}`);
                                     Object.entries(info.status).forEach(([s, q]) => linhas.push(`${s}: ${q}`));
                                     return linhas;
                                 }
@@ -959,22 +1321,28 @@
                     },
                     scales: {
                         x: {
+                            stacked: true,
                             grid: { display: false },
+                            border: { display: false },
                             ticks: { 
-                                color: 'rgba(255,255,255,0.65)', 
-                                font: { size: 9 },
+                                color: 'rgba(255,255,255,0.72)', 
+                                font: { family: 'Inter', size: 9, weight: '600' },
                                 maxRotation: 45,
                                 minRotation: 0
                             }
                         },
                         y: {
-                            grid: { color: 'rgba(255,255,255,0.08)', lineWidth: 0.5 },
+                            stacked: true,
+                            border: { display: false },
+                            grid: { color: 'rgba(255,255,255,0.09)', lineWidth: 1, drawTicks: false },
                             ticks: { 
-                                color: 'rgba(255,255,255,0.65)', 
-                                font: { size: 9 },
+                                color: 'rgba(255,255,255,0.72)', 
+                                font: { family: 'Inter', size: 9, weight: '400' },
+                                padding: 8,
                                 maxTicksLimit: 5
                             },
-                            beginAtZero: true
+                            beginAtZero: true,
+                            suggestedMax: maiorTotalGrafico * 1.12
                         }
                     }
                 }
@@ -989,8 +1357,9 @@
                 const item = document.createElement('div');
                 item.className = 'menu-item';
                 item.onclick = () => carregarAba(nome);
-                const icone = ICONES_GRUPOS[nome] || '📄';
-                item.innerHTML = `<span class="icone">${icone}</span><span>${nome}</span>`;
+                const icone = ICONES_GRUPOS[nome] || iconeLucide('wrench');
+                const classeIcone = CLASSES_ICONES_GRUPOS[nome] || 'icone-generico';
+                item.innerHTML = `<span class="icone ${classeIcone}">${icone}</span><span>${nome}</span>`;
                 container.appendChild(item);
             });
 
@@ -999,8 +1368,9 @@
                     const item = document.createElement('div');
                     item.className = 'menu-item';
                     item.onclick = () => carregarAba(nome);
-                    const icone = ICONES_GRUPOS[nome] || '📄';
-                    item.innerHTML = `<span class="icone">${icone}</span><span>${nome}</span>`;
+                    const icone = ICONES_GRUPOS[nome] || iconeLucide('wrench');
+                    const classeIcone = CLASSES_ICONES_GRUPOS[nome] || 'icone-generico';
+                    item.innerHTML = `<span class="icone ${classeIcone}">${icone}</span><span>${nome}</span>`;
                     container.appendChild(item);
                 }
             });
@@ -1090,6 +1460,24 @@
             await salvarGrupo(grupo, ABAS_GRUPOS[grupo]);
             atualizarSelectMaquinas();
         }
+
+        function buscarConflitoEmMaquina(maquina, idIgnorado = null) {
+            const maquinaNormalizada = String(maquina || '').trim().toLowerCase();
+            if (!maquinaNormalizada) return null;
+
+            return PROGRAMACOES.find(p =>
+                p.id !== idIgnorado &&
+                p.status === 'Em máquina' &&
+                String(p.maquina || '').trim().toLowerCase() === maquinaNormalizada
+            );
+        }
+
+        function alertarConflitoEmMaquina(maquina, conflito) {
+            const item = conflito.nome || conflito.codigo || 'item sem nome';
+            const op = conflito.op ? `\nOP: ${conflito.op}` : '';
+            alert(`Não é possível colocar outro item em máquina.\n\nA máquina ${maquina} já está rodando:\n${item}${op}\n\nFinalize ou altere o status desse item antes de programar outro.`);
+        }
+
         async function removerMaq(grupo, idx) {
             if (!confirm("Remover máquina?")) return;
             ABAS_GRUPOS[grupo].splice(idx,1);
@@ -1172,6 +1560,7 @@
 
             if (!nome || !cli || !maq || !dt || !qtd) return alert("Preencha todos os campos obrigatórios!");
             if (!cod) return alert("Informe o código do item!");
+            const statusProgramacao = document.getElementById('status-inicial').value || 'Planejado';
 
             let grupo = Object.entries(ABAS_GRUPOS).find(([g, m]) => m.includes(maq))?.[0];
             if (!grupo) {
@@ -1181,6 +1570,11 @@
                 await salvarGrupo(grupo, ABAS_GRUPOS[grupo]);
                 atualizarSelectMaquinas();
                 atualizarMenuAbas();
+            }
+
+            if (statusProgramacao === 'Em máquina') {
+                const conflito = buscarConflitoEmMaquina(maq, idEdicaoAtual);
+                if (conflito) return alertarConflitoEmMaquina(maq, conflito);
             }
 
             if (idEdicaoAtual) {
@@ -1194,7 +1588,7 @@
                 prog.grupo = grupo;
                 prog.dataEntrega = dt;
                 prog.qtdPedida = Number(qtd);
-                prog.status = document.getElementById('status-inicial').value || 'Planejado';
+                prog.status = statusProgramacao;
                 prog.observacao = document.getElementById('observacao-item').value.trim();
                 
                 await salvarProg(prog);
@@ -1210,7 +1604,7 @@
                     grupo: grupo,
                     dataEntrega: dt,
                     qtdPedida: Number(qtd),
-                    status: document.getElementById('status-inicial').value || 'Planejado',
+                    status: statusProgramacao,
                     observacao: document.getElementById('observacao-item').value.trim(),
                     situacaoMaquina: 'trabalhando' // Valor padrão
                 };
@@ -1243,6 +1637,14 @@
         async function alterarStatus(id, novo) {
             const p = PROGRAMACOES.find(i => i.id === id);
             if (!p) return;
+            if (novo === 'Em máquina') {
+                const conflito = buscarConflitoEmMaquina(p.maquina, id);
+                if (conflito) {
+                    alertarConflitoEmMaquina(p.maquina, conflito);
+                    carregarTabela();
+                    return;
+                }
+            }
             p.status = novo;
             await salvarProg(p);
             atualizarGraficoMaquinas();
@@ -1256,27 +1658,43 @@
             const quantidade = Number(valor);
             p.qtdExecutada = valor === '' || Number.isNaN(quantidade) ? 0 : quantidade;
             await salvarProg(p);
+            atualizarGraficoMaquinas();
+            carregarTabela();
         }
 
-        // Função para alterar situação da máquina
-        async function alterarSituacaoMaq(id) {
+        function alterarSituacaoMaq(id) {
             const p = PROGRAMACOES.find(i => i.id === id);
             if (!p) return;
 
-            const situacoes = [
-                { valor: 'trabalhando', texto: '🟢 Máquina trabalhando' },
-                { valor: 'manutencao', texto: '🔴 Parada para manutenção' },
-                { valor: 'sem-operador', texto: '🟠 Falta de operador' }
-            ];
+            idSituacaoAtual = id;
+            const lista = document.getElementById('lista-situacoes-modal');
+            const situacaoAtual = p.situacaoMaquina || 'trabalhando';
 
-            const lista = situacoes.map((s, i) => `${i+1}. ${s.texto}`).join('\n');
-            const escolha = prompt(`Escolha a situação da máquina:\n\n${lista}\n\nDigite o número da opção:`);
-            
-            const idx = Number(escolha) - 1;
-            if (idx < 0 || idx >= situacoes.length) return alert("Opção inválida!");
+            lista.innerHTML = SITUACOES_MAQUINA.map(s => `
+                <button class="opcao-situacao ${s.classe} ${situacaoAtual === s.valor ? 'ativo' : ''}" onclick="selecionarSituacaoMaq('${s.valor}')">
+                    <span class="opcao-situacao-icone">${s.icone}</span>
+                    <span>
+                        <strong>${s.titulo}</strong>
+                        <small>${s.detalhe}</small>
+                    </span>
+                </button>
+            `).join('');
 
-            p.situacaoMaquina = situacoes[idx].valor;
+            document.getElementById('modal-situacao').classList.add('aberto');
+        }
+
+        function fecharModalSituacao() {
+            document.getElementById('modal-situacao').classList.remove('aberto');
+            idSituacaoAtual = null;
+        }
+
+        async function selecionarSituacaoMaq(valor) {
+            const p = PROGRAMACOES.find(i => i.id === idSituacaoAtual);
+            if (!p) return fecharModalSituacao();
+
+            p.situacaoMaquina = valor;
             await salvarProg(p);
+            fecharModalSituacao();
             carregarTabela();
         }
 
@@ -1367,6 +1785,11 @@
                                 iconeSituacao = '👤';
                                 textoSituacao = '🟠 Falta de operador';
                             }
+                            if (situacao === 'falta-componente') {
+                                classeSituacao = 'situacao-falta-componente';
+                                iconeSituacao = '🧩';
+                                textoSituacao = '🟣 Falta de componente';
+                            }
 
                             return `
                             <tr class="linha-${classeStatus}">
@@ -1397,7 +1820,7 @@
                                     >
                                 </td>
                                 <td>
-                                    <button class="btn-primario btn-acao" onclick="editarProgramacao(${p.id})" title="Editar programação">✏️</button>
+                                    <button class="btn-editar btn-acao" onclick="editarProgramacao(${p.id})" title="Editar programação">✏️</button>
                                     <button class="btn-perigo btn-acao" onclick="excluirItem(${p.id})" title="Excluir programação">🗑️</button>
                                     <button class="btn-situacao ${classeSituacao}" onclick="alterarSituacaoMaq(${p.id})" title="${textoSituacao}">${iconeSituacao}</button>
                                 </td>
@@ -1406,27 +1829,6 @@
                     </tbody>
                 </table>
             `;
-        }
-
-        async function alterarSituacaoMaq(id) {
-            const p = PROGRAMACOES.find(i => i.id === id);
-            if (!p) return;
-
-            const situacoes = [
-                { valor: 'trabalhando', texto: '🟢 Máquina trabalhando' },
-                { valor: 'manutencao', texto: '🔴 Parada para manutenção' },
-                { valor: 'sem-operador', texto: '🟠 Falta de operador' }
-            ];
-
-            const lista = situacoes.map((s, i) => `${i+1}. ${s.texto}`).join('\n');
-            const escolha = prompt(`Escolha a situação da máquina:\n\n${lista}\n\nDigite o número da opção:`);
-            
-            const idx = Number(escolha) - 1;
-            if (idx < 0 || idx >= situacoes.length) return alert("Opção inválida!");
-
-            p.situacaoMaquina = situacoes[idx].valor;
-            await salvarProg(p);
-            carregarTabela();
         }
 
         async function excluirItem(id) {
