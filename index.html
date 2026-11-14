@@ -731,6 +731,8 @@
         .btn-iniciar-producao { background: linear-gradient(145deg,#34d399,#059669); color: #fff; }
         .btn-finalizar-producao { background: linear-gradient(145deg,#fb7185,#dc2626); color: #fff; }
         .modal-historico { max-width: 600px; }
+        .modal-visualizar-logo { max-width: min(760px, 92vw); padding: 16px; border-top: 0; background:rgba(15,23,32,.94); }
+        .logo-ampliada { display:block; max-width:100%; max-height:78vh; margin:auto; border-radius:10px; background:#fff; object-fit:contain; }
         .resumo-producao { display: grid; gap: 8px; padding: 14px; background: var(--fundo-cinza); border-radius: 8px; margin-bottom: 14px; }
         .linha-tempo-producao { display: grid; gap: 8px; max-height: 45vh; overflow-y: auto; }
         .evento-producao { padding: 11px 13px; border-left: 3px solid var(--cor-principal); background: var(--superficie-elevada); border-radius: 5px; }
@@ -854,7 +856,7 @@
             <div class="marca-menu">
                 <div class="logo-menu-area" onclick="aoClicarAreaLogo(event)">
                     <span class="logo-menu-placeholder" id="logo-menu-placeholder" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="m21 15-5-5L5 21"></path></svg></span>
-                    <img class="logo-menu-mark" id="logo-menu-img" alt="Logo da empresa" hidden>
+                    <img class="logo-menu-mark" id="logo-menu-img" alt="Logo da empresa. Clique para ampliar." onclick="event.stopPropagation(); abrirVisualizacaoLogo()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirVisualizacaoLogo();}" role="button" tabindex="0" hidden>
                     <button class="btn-editar-logo" onclick="event.stopPropagation(); abrirSeletorLogo()" title="Adicionar ou alterar logo" aria-label="Adicionar ou alterar logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z"></path></svg></button>
                     <input class="logo-file-input" type="file" id="arquivo-logo" accept="image/png,image/jpeg,image/webp,image/svg+xml" onchange="prepararLogoCabecalho(event)" aria-label="Selecionar logo da empresa">
                 </div>
@@ -1114,6 +1116,16 @@
         </div>
     </div>
 
+    <div class="fundo-modal" id="modal-visualizar-logo" onclick="fecharVisualizacaoLogo()">
+        <div class="modal modal-visualizar-logo" role="dialog" aria-modal="true" aria-label="Visualizar logo da empresa" onclick="event.stopPropagation()">
+            <div class="cabecalho-modal">
+                <h3>Logo da empresa</h3>
+                <button class="btn-fechar" onclick="fecharVisualizacaoLogo()" aria-label="Fechar visualização">&times;</button>
+            </div>
+            <img class="logo-ampliada" id="logo-ampliada" alt="Logo da empresa ampliada">
+        </div>
+    </div>
+
     <script>
         let graficoMaquinas = null;
         let idSituacaoAtual = null;
@@ -1190,8 +1202,7 @@
             }
         }
 
-        async function comprimirLogo(arquivo) {
-            const limite = 1024 * 1024;
+        async function comprimirLogo(arquivo, limite = 1024 * 1024) {
             let imagem;
             try { imagem = await createImageBitmap(arquivo); }
             catch (erro) { throw new Error('N?o foi poss?vel abrir a imagem. Verifique se o arquivo ? v?lido.'); }
@@ -1225,7 +1236,20 @@
         function aoClicarAreaLogo(evento) {
             if (evento.target.closest('.btn-editar-logo') || evento.target.closest('.logo-file-input')) return;
             mostrarLapisLogo();
-            abrirSeletorLogo();
+            if (evento.target.closest('#logo-menu-img')) abrirVisualizacaoLogo();
+        }
+
+        function abrirVisualizacaoLogo() {
+            const logo = document.getElementById('logo-menu-img');
+            if (!logo || logo.hidden || !logo.src) return;
+            const ampliada = document.getElementById('logo-ampliada');
+            ampliada.src = logo.src;
+            document.getElementById('modal-visualizar-logo').classList.add('aberto');
+        }
+
+        function fecharVisualizacaoLogo() {
+            document.getElementById('modal-visualizar-logo').classList.remove('aberto');
+            document.getElementById('logo-ampliada').removeAttribute('src');
         }
 
         function configurarLapisLogo() {
@@ -1250,6 +1274,8 @@
         async function prepararLogoCabecalho(evento) {
             const arquivo = evento.target.files?.[0];
             if (!arquivo) return;
+            const imagemCabecalho = document.getElementById('logo-menu-img');
+            const logoAnterior = imagemCabecalho && !imagemCabecalho.hidden ? imagemCabecalho.src : null;
             const tiposAceitos = ['image/png','image/jpeg','image/webp','image/svg+xml'];
             if (!tiposAceitos.includes(arquivo.type)) { alert('Escolha uma imagem PNG, JPG, WebP ou SVG.'); evento.target.value=''; return; }
             if (arquivo.size > 10 * 1024 * 1024) { alert('A imagem original deve ter no m?ximo 10 MB.'); evento.target.value=''; return; }
@@ -1264,6 +1290,7 @@
                 if (previewConfig) { previewConfig.src = window.logoPreviewPendenteUrl; previewConfig.hidden = false; }
                 const placeholderConfig = document.getElementById('sem-logo-config');
                 if (placeholderConfig) placeholderConfig.hidden = true;
+                aplicarLogoCabecalho(window.logoPreviewPendenteUrl);
                 await enviarLogoAoBanco(logoPendente, false);
             } catch (erro) {
                 logoPendente = null;
@@ -1272,6 +1299,7 @@
                 if (previewConfig) { previewConfig.removeAttribute('src'); previewConfig.hidden = true; }
                 const placeholderConfig = document.getElementById('sem-logo-config');
                 if (placeholderConfig) placeholderConfig.hidden = false;
+                aplicarLogoCabecalho(logoAnterior && !logoAnterior.startsWith('blob:') ? logoAnterior : null);
                 evento.target.value = '';
                 alert(erro.message || 'N?o foi poss?vel salvar a imagem da logo.');
             }
@@ -1295,12 +1323,32 @@
         }
 
         async function enviarLogoAoBanco(blob, mostrarConfirmacao) {
-            if (!storage || !firebaseStorageApi || !firebaseApi || !firestore) throw new Error('Firebase Storage ainda n?o est? conectado.');
+            if (!firebaseApi || !firestore) throw new Error('Firebase ainda n?o est? conectado.');
             if (blob.size > 1024 * 1024) throw new Error('A imagem convertida excede 1 MB.');
-            const referencia = firebaseStorageApi.ref(storage,'branding/logo.webp');
-            const resultado = await firebaseStorageApi.uploadBytes(referencia,blob,{contentType:'image/webp',cacheControl:'public,max-age=300'});
-            const url = await firebaseStorageApi.getDownloadURL(resultado.ref);
-            await firebaseApi.setDoc(documento('grupos','config-logo'),{tipo:'config-logo',url,formato:'webp',tamanhoBytes:blob.size,atualizadoEm:new Date().toISOString()});
+            let url = null;
+            let blobSalvo = blob;
+            let armazenamento = 'firestore-data-url';
+            if (storage && firebaseStorageApi) {
+                try {
+                    const referencia = firebaseStorageApi.ref(storage,'branding/logo.webp');
+                    const resultado = await firebaseStorageApi.uploadBytes(referencia,blob,{contentType:'image/webp',cacheControl:'public,max-age=300'});
+                    url = await firebaseStorageApi.getDownloadURL(resultado.ref);
+                    armazenamento = 'firebase-storage';
+                } catch (erroStorage) {
+                    console.warn('Firebase Storage indisponível; salvando a logo como URL de dados no Firestore.', erroStorage);
+                }
+            }
+            if (!url) {
+                blobSalvo = blob.size <= 700 * 1024 ? blob : await comprimirLogo(blob,700 * 1024);
+                if (blobSalvo.size > 700 * 1024) throw new Error('Não foi possível reduzir a logo para salvá-la com segurança. Escolha uma imagem menor.');
+                url = await new Promise((resolve,reject) => {
+                    const leitor = new FileReader();
+                    leitor.onload = () => typeof leitor.result === 'string' ? resolve(leitor.result) : reject(new Error('Não foi possível converter a logo.'));
+                    leitor.onerror = () => reject(new Error('Não foi possível ler a imagem da logo.'));
+                    leitor.readAsDataURL(blobSalvo);
+                });
+            }
+            await firebaseApi.setDoc(documento('grupos','config-logo'),{tipo:'config-logo',url,formato:'webp',armazenamento,tamanhoBytes:blobSalvo.size,atualizadoEm:new Date().toISOString()});
             try { localStorage.removeItem('milbra-logo-cabecalho'); } catch (erro) {}
             aplicarLogoCabecalho(url);
             logoPendente = null;
@@ -2763,6 +2811,9 @@
 
         document.addEventListener('touchend', () => clearTimeout(temporizadorLegendaToque), { passive:true });
         document.addEventListener('touchcancel', () => clearTimeout(temporizadorLegendaToque), { passive:true });
+        document.addEventListener('keydown', evento => {
+            if (evento.key === 'Escape') fecharVisualizacaoLogo();
+        });
         carregarSituacoesDoNavegador();
         configurarLapisLogo();
         iniciarSistema().catch(erro => console.error('Falha ao iniciar o sistema:', erro));
