@@ -591,6 +591,11 @@
         .opcao-situacao.manutencao .opcao-situacao-icone { background: #E74C3C; }
         .opcao-situacao.sem-operador .opcao-situacao-icone { background: #F39C12; }
         .opcao-situacao.falta-componente .opcao-situacao-icone { background: #8E44AD; }
+        .acoes-situacao { display: flex; gap: 6px; }
+        .acoes-situacao button { padding: 6px 9px; font-size: .75rem; }
+        .form-situacao { display: grid; gap: 9px; margin-top: 14px; padding: 14px; border: 1px solid var(--borda); border-radius: 8px; }
+        .form-situacao[hidden] { display: none; }
+        .campos-situacao { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .cabecalho-modal {
             display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--borda);
         }
@@ -870,6 +875,20 @@
                 <button class="btn-fechar" onclick="fecharModalSituacao()">&times;</button>
             </div>
             <div class="lista-situacoes-modal" id="lista-situacoes-modal"></div>
+            <button class="btn-primario" style="margin-top:12px" onclick="prepararSituacao()">＋ Adicionar situação</button>
+            <form class="form-situacao" id="form-situacao" hidden onsubmit="salvarSituacaoPersonalizada(event)">
+                <strong id="titulo-form-situacao">Nova situação</strong>
+                <input id="situacao-titulo" placeholder="Nome da situação" maxlength="60" required>
+                <input id="situacao-detalhe" placeholder="Descrição" maxlength="80">
+                <div class="campos-situacao">
+                    <input id="situacao-icone" placeholder="Ícone (ex.: ⚙️)" maxlength="8" aria-label="Ícone">
+                    <input id="situacao-cor" type="color" value="#2563eb" aria-label="Cor">
+                </div>
+                <div class="acoes-situacao">
+                    <button type="button" class="btn-primario" onclick="cancelarEdicaoSituacao()">Cancelar</button>
+                    <button type="submit" class="btn-sucesso">Salvar situação</button>
+                </div>
+            </form>
             <div class="botoes-modal">
                 <button class="btn-primario" onclick="fecharModalSituacao()">Cancelar</button>
             </div>
@@ -971,12 +990,14 @@
             "Máquinas de Dobra": "icone-dobra"
         };
 
-        const SITUACOES_MAQUINA = [
+        let SITUACOES_MAQUINA = [
             { valor: 'trabalhando', titulo: 'Máquina trabalhando', detalhe: 'Produção normal', icone: '⚡', classe: 'trabalhando' },
             { valor: 'manutencao', titulo: 'Parada para manutenção', detalhe: 'Maior gravidade', icone: '🔧', classe: 'manutencao' },
             { valor: 'sem-operador', titulo: 'Falta de operador', detalhe: 'Aguardando operador', icone: '👤', classe: 'sem-operador' },
             { valor: 'falta-componente', titulo: 'Falta de componente', detalhe: 'Aguardando material', icone: '🧩', classe: 'falta-componente' }
         ];
+        const SITUACOES_PADRAO = SITUACOES_MAQUINA.map(s => ({ ...s }));
+        let chaveSituacaoEmEdicao = null;
 
         const GRUPOS_PADRAO = { 
             "AUTOMÁTICAS": ["MC-01","MC-01","M-01", "M-02", "M-03", "M-04", "M-05", "M-06"],
@@ -1670,17 +1691,77 @@
             const lista = document.getElementById('lista-situacoes-modal');
             const situacaoAtual = p.situacaoMaquina || 'trabalhando';
 
-            lista.innerHTML = SITUACOES_MAQUINA.map(s => `
-                <button class="opcao-situacao ${s.classe} ${situacaoAtual === s.valor ? 'ativo' : ''}" onclick="selecionarSituacaoMaq('${s.valor}')">
-                    <span class="opcao-situacao-icone">${s.icone}</span>
-                    <span>
-                        <strong>${s.titulo}</strong>
-                        <small>${s.detalhe}</small>
-                    </span>
-                </button>
-            `).join('');
+            renderizarSituacoesModal(situacaoAtual);
 
             document.getElementById('modal-situacao').classList.add('aberto');
+        }
+
+        function renderizarSituacoesModal(situacaoAtual = '') {
+            const lista = document.getElementById('lista-situacoes-modal');
+            lista.innerHTML = SITUACOES_MAQUINA.map(s => `
+                <div class="opcao-situacao ${s.classe || ''} ${situacaoAtual === s.valor ? 'ativo' : ''}" style="--situacao-cor:${s.cor || '#64748b'}">
+                    <span class="opcao-situacao-icone" style="background:${s.cor || ''}">${s.icone}</span>
+                    <span><strong>${s.titulo}</strong><small>${s.detalhe || ''}</small></span>
+                    <span class="acoes-situacao">
+                        <button type="button" class="btn-primario" onclick="selecionarSituacaoMaq('${s.valor}')">Usar</button>
+                        <button type="button" class="btn-editar" onclick="editarSituacao('${s.valor}')" aria-label="Editar ${s.titulo}">✏️</button>
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        function prepararSituacao(valor = null) {
+            chaveSituacaoEmEdicao = valor;
+            const s = SITUACOES_MAQUINA.find(item => item.valor === valor);
+            document.getElementById('titulo-form-situacao').textContent = s ? 'Editar situação' : 'Nova situação';
+            document.getElementById('situacao-titulo').value = s?.titulo || '';
+            document.getElementById('situacao-detalhe').value = s?.detalhe || '';
+            document.getElementById('situacao-icone').value = s?.icone || '⚙️';
+            document.getElementById('situacao-cor').value = s?.cor || '#2563eb';
+            document.getElementById('form-situacao').hidden = false;
+            document.getElementById('situacao-titulo').focus();
+        }
+
+        function editarSituacao(valor) { prepararSituacao(valor); }
+
+        function cancelarEdicaoSituacao() {
+            chaveSituacaoEmEdicao = null;
+            document.getElementById('form-situacao').reset();
+            document.getElementById('form-situacao').hidden = true;
+        }
+
+        function salvarSituacoesNoNavegador() {
+            try { localStorage.setItem('milbra-situacoes-maquina', JSON.stringify(SITUACOES_MAQUINA)); }
+            catch (erro) { console.warn('Não foi possível salvar as situações neste navegador.', erro); }
+        }
+
+        function carregarSituacoesDoNavegador() {
+            try {
+                const salvas = JSON.parse(localStorage.getItem('milbra-situacoes-maquina') || 'null');
+                if (Array.isArray(salvas) && salvas.length) SITUACOES_MAQUINA = salvas;
+            } catch (erro) { SITUACOES_MAQUINA = SITUACOES_PADRAO.map(s => ({ ...s })); }
+        }
+
+        function salvarSituacaoPersonalizada(event) {
+            event.preventDefault();
+            const titulo = document.getElementById('situacao-titulo').value.trim();
+            const detalhe = document.getElementById('situacao-detalhe').value.trim();
+            const icone = document.getElementById('situacao-icone').value.trim() || '⚙️';
+            const cor = document.getElementById('situacao-cor').value;
+            if (!titulo) return;
+
+            if (chaveSituacaoEmEdicao) {
+                const existente = SITUACOES_MAQUINA.find(s => s.valor === chaveSituacaoEmEdicao);
+                if (existente) Object.assign(existente, { titulo, detalhe, icone, cor });
+            } else {
+                const valor = `personalizada-${Date.now()}`;
+                SITUACOES_MAQUINA.push({ valor, titulo, detalhe, icone, cor, classe: 'personalizada' });
+            }
+            salvarSituacoesNoNavegador();
+            cancelarEdicaoSituacao();
+            const p = PROGRAMACOES.find(i => i.id === idSituacaoAtual);
+            renderizarSituacoesModal(p?.situacaoMaquina || '');
+            carregarTabela();
         }
 
         function fecharModalSituacao() {
@@ -1865,6 +1946,7 @@
             });
         }
 
+        carregarSituacoesDoNavegador();
         document.addEventListener('DOMContentLoaded', iniciarSistema);
     </script>
 </body>
