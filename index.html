@@ -87,7 +87,7 @@
         .menu-lateral {
             width: var(--largura-menu);
             min-width: var(--largura-menu);
-            background: var(--cor-principal);
+            background: linear-gradient(180deg, #102b46 0%, #0a1b2d 100%);
             color: var(--branco);
             padding: 0;
             display: flex;
@@ -98,6 +98,7 @@
             overflow-x: hidden;
             z-index: 999;
             transition: all 0.3s ease;
+            box-shadow: 12px 0 36px rgba(7, 24, 42, .16);
         }
         .menu-lateral.minimizado {
             width: var(--largura-menu-min);
@@ -106,13 +107,13 @@
         .menu-lateral.fechado { transform: translateX(-100%); }
 
         .cabecalho-menu {
-            padding: 20px 15px;
-            background: rgba(0,0,0,0.1);
+            padding: 28px 16px 22px;
+            background: radial-gradient(ellipse at top, rgba(249,115,22,.24), transparent 72%);
             text-align: center;
             border-bottom: 1px solid rgba(255,255,255,0.15);
             position: relative;
         }
-        .logo-menu { font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; white-space: nowrap; }
+        .logo-menu { font-size: 1.28rem; letter-spacing: .12em; font-weight: 800; margin-bottom: 5px; white-space: nowrap; }
         .subtitulo-menu { font-size: 0.75rem; opacity: 0.8; font-weight: 400; white-space: nowrap; }
         .menu-lateral.minimizado .logo-menu,
         .menu-lateral.minimizado .subtitulo-menu { display: none; }
@@ -138,22 +139,24 @@
         .menu-lateral.minimizado .btn-minimizar { right: 19px; transform: rotate(180deg); }
 
         .menu-item {
-            padding: 14px 20px;
+            margin: 4px 10px;
+            padding: 12px 14px;
             display: flex;
             align-items: center;
             gap: 12px;
             cursor: pointer;
             font-size: 0.85rem;
             transition: background 0.2s;
-            border-left: 3px solid transparent;
+            border: 1px solid transparent;
+            border-radius: 10px;
             white-space: nowrap;
         }
         .menu-lateral.minimizado .menu-item {
             padding: 14px 10px;
             justify-content: center;
         }
-        .menu-item.ativo { background: var(--cor-principal-escuro); border-left-color: var(--branco); font-weight: 600; }
-        .menu-item:hover { background: var(--cor-principal-escuro); }
+        .menu-item.ativo { background: linear-gradient(110deg, rgba(249,115,22,.25), rgba(249,115,22,.08)); border-color: rgba(253,186,116,.2); box-shadow: inset 3px 0 #fb923c, 0 5px 16px rgba(0,0,0,.12); font-weight: 600; }
+        .menu-item:hover { background: rgba(255,255,255,.09); border-color: rgba(255,255,255,.08); }
         .menu-item .icone { flex-shrink: 0; width: 20px; height: 20px; color: rgba(255, 255, 255, 0.72); display: inline-flex; align-items: center; justify-content: center; }
         .menu-item .icone svg { width: 18px; height: 18px; stroke-width: 1.75; }
         .icone-dashboard { color: #60A5FA; }
@@ -379,20 +382,65 @@
             border-radius: var(--raio);
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
             font-size: 0.9rem;
             display: inline-flex;
             align-items: center;
             gap: 6px;
             white-space: nowrap;
         }
-        .btn-primario { background: var(--cor-principal); color: var(--branco); }
+        button:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(15,23,42,.13); }
+        button:active { transform: translateY(0); }
+        button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid rgba(249,115,22,.3); outline-offset: 2px; }
+        .btn-primario { background: linear-gradient(135deg, var(--cor-principal), var(--cor-principal-claro)); color: var(--branco); box-shadow: 0 4px 12px rgba(10,61,98,.16); }
         .btn-primario:hover { background: var(--cor-principal-escuro); }
-        .btn-sucesso { background: var(--cor-em-maquina); color: var(--branco); border: 1px solid rgba(255, 255, 255, 0.18); box-shadow: none; }
+        .btn-sucesso { background: linear-gradient(135deg, #27AE60, #16834a); color: var(--branco); border: 1px solid rgba(255, 255, 255, 0.18); box-shadow: 0 4px 12px rgba(39,174,96,.2); }
         .btn-sucesso:hover { background: #219653; border-color: rgba(255, 255, 255, 0.28); }
         .btn-perigo { background: #E74C3C; color: var(--branco); }
         .btn-perigo:hover { background: #C0392B; }
         .btn-pequeno { padding: 6px 10px; font-size: 0.8rem; }
+        .painel-controles { box-shadow: 0 10px 30px rgba(15,23,42,.06); }
+        input, select, textarea { box-shadow: 0 1px 2px rgba(15,23,42,.03); }
+        .campo-filtro input, .campo-filtro select { min-height: 44px; }
+        .menu-relatorio { margin: 4px 10px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; color: rgba(255,255,255,.88); cursor: pointer; border: 1px solid transparent; border-radius: 10px; font-size: .85rem; }
+        .menu-relatorio:hover, .menu-relatorio.ativo { background: rgba(255,255,255,.09); border-color: rgba(255,255,255,.08); }
+        .menu-relatorio .icone { width: 20px; height: 20px; display: inline-flex; color: #fbbf24; }
+        .menu-relatorio svg { width: 18px; height: 18px; }
+        .menu-lateral.minimizado .menu-relatorio { justify-content: center; padding: 12px 10px; }
+        .menu-lateral.minimizado .menu-relatorio span:not(.icone) { display: none; }
+        .relatorio-cabecalho { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; margin-bottom:22px; }
+        .relatorio-cabecalho h2 { font-size:1.65rem; margin-bottom:5px; }
+        .relatorio-cabecalho p { color:var(--texto-claro); }
+        .relatorio-periodo { display:flex; gap:10px; align-items:end; flex-wrap:wrap; padding:16px; background:var(--superficie); border:1px solid var(--borda); border-radius:14px; box-shadow:var(--sombra); margin-bottom:18px; }
+        .relatorio-periodo .campo-filtro { flex:0 1 190px; }
+        .relatorio-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(175px,1fr)); gap:14px; margin-bottom:18px; }
+        .relatorio-card { position:relative; overflow:hidden; padding:18px; background:var(--superficie); border:1px solid var(--borda); border-radius:14px; box-shadow:0 8px 24px rgba(15,23,42,.05); }
+        .relatorio-card::after { content:''; position:absolute; width:74px; height:74px; border-radius:50%; right:-22px; top:-25px; background:color-mix(in srgb,var(--card-cor,#f97316) 13%,transparent); }
+        .relatorio-card span { display:block; color:var(--texto-claro); font-size:.8rem; font-weight:600; }
+        .relatorio-card strong { display:block; margin-top:9px; font-size:1.7rem; letter-spacing:-.04em; }
+        .relatorio-card small { display:block; margin-top:4px; color:var(--texto-claro); }
+        .relatorio-grade { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+        .relatorio-bloco { min-width:0; background:var(--superficie); border:1px solid var(--borda); border-radius:14px; padding:18px; box-shadow:0 8px 24px rgba(15,23,42,.05); }
+        .relatorio-bloco h3 { font-size:1rem; margin-bottom:14px; }
+        .relatorio-lista { display:grid; gap:9px; }
+        .relatorio-linha { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:10px 12px; border-radius:9px; background:var(--fundo-cinza); }
+        .relatorio-linha span { color:var(--texto-claro); }
+        .relatorio-tabela { width:100%; border-collapse:collapse; font-size:.84rem; }
+        .relatorio-tabela th,.relatorio-tabela td { padding:10px 8px; text-align:left; border-bottom:1px solid var(--borda); }
+        .relatorio-tabela th { color:var(--texto-claro); font-size:.74rem; text-transform:uppercase; letter-spacing:.04em; }
+        .relatorio-vazio { padding:24px; text-align:center; color:var(--texto-claro); border-radius:10px; background:var(--fundo-cinza); }
+        @media print {
+            body { display:block; background:#fff; color:#111827; }
+            .menu-lateral, .btn-menu-mobile, .cabecalho-pagina, .legenda-status, #area-dados, #area-configuracoes, .relatorio-periodo, .relatorio-cabecalho button { display:none !important; }
+            .area-principal { margin:0 !important; padding:0 !important; }
+            #area-relatorios { display:block !important; }
+            .relatorio-cards { grid-template-columns:repeat(3,1fr); }
+            .relatorio-card, .relatorio-bloco { box-shadow:none; break-inside:avoid; }
+            .relatorio-grade { grid-template-columns:1fr 1fr; }
+        }
+        .tabela-producao { box-shadow: 0 12px 34px rgba(15,23,42,.08); }
+        .tabela-producao tbody tr { transition: background .18s ease; }
+        .tabela-producao tbody tr:hover { filter: brightness(.98); }
 
         /* Cores de fundo para o select de status */
         .select-status.em-maquina {
@@ -593,6 +641,14 @@
         .opcao-situacao.falta-componente .opcao-situacao-icone { background: #8E44AD; }
         .acoes-situacao { display: flex; gap: 6px; }
         .acoes-situacao button { padding: 6px 9px; font-size: .75rem; }
+        .btn-historico { background: #334155; color: #fff; }
+        .btn-iniciar-producao { background: #27AE60; color: #fff; }
+        .btn-finalizar-producao { background: #E74C3C; color: #fff; }
+        .modal-historico { max-width: 600px; }
+        .resumo-producao { display: grid; gap: 8px; padding: 14px; background: var(--fundo-cinza); border-radius: 8px; margin-bottom: 14px; }
+        .linha-tempo-producao { display: grid; gap: 8px; max-height: 45vh; overflow-y: auto; }
+        .evento-producao { padding: 11px 13px; border-left: 3px solid var(--cor-principal); background: var(--superficie-elevada); border-radius: 5px; }
+        .evento-producao small { display: block; margin-top: 3px; color: var(--texto-claro); }
         .form-situacao { display: grid; gap: 9px; margin-top: 14px; padding: 14px; border: 1px solid var(--borda); border-radius: 8px; }
         .form-situacao[hidden] { display: none; }
         .campos-situacao { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -689,6 +745,8 @@
             .tabela-producao th,
             .tabela-producao td { padding: 9px 7px; }
             .grupo-campos-modal { grid-template-columns: 1fr; }
+            .relatorio-grade { grid-template-columns:1fr; }
+            .relatorio-periodo .campo-filtro { flex-basis:100%; }
             .area-grafico-maquinas { padding: 12px 10px 20px; }
             #graficoMaquinas { height: 200px !important; }
         }
@@ -709,6 +767,10 @@
         </div>
 
         <div id="lista-abas-menu"></div>
+
+        <div class="menu-relatorio" onclick="abrirRelatorio()" title="Relatório de produção">
+            <span class="icone" id="icone-relatorio"></span><span>Relatórios</span>
+        </div>
 
         <div class="menu-item" onclick="abrirConfiguracoes()">
             <span class="icone" id="icone-configuracoes"></span><span>Configurações</span>
@@ -792,6 +854,20 @@
 
             <div id="conteudo-config"></div>
         </div>
+
+        <section id="area-relatorios" class="oculto">
+            <div class="relatorio-cabecalho">
+                <div><h2>Relatório de produção</h2><p>Indicadores de operação, produtividade e paradas no período selecionado.</p></div>
+                <button class="btn-primario" onclick="imprimirRelatorio()">⤓ Exportar / Imprimir</button>
+            </div>
+            <div class="relatorio-periodo">
+                <div class="campo-filtro"><label>Data inicial</label><input type="date" id="relatorio-data-inicio" onchange="renderizarRelatorio()"></div>
+                <div class="campo-filtro"><label>Data final</label><input type="date" id="relatorio-data-fim" onchange="renderizarRelatorio()"></div>
+                <div class="campo-filtro"><label>Máquina</label><select id="relatorio-maquina" onchange="renderizarRelatorio()"><option value="">Todas as máquinas</option></select></div>
+                <button class="btn-primario" onclick="definirPeriodoMesAtual()">Mês atual</button>
+            </div>
+            <div id="conteudo-relatorio"></div>
+        </section>
     </main>
 
     <div class="fundo-modal" id="modal-programacao">
@@ -895,6 +971,17 @@
         </div>
     </div>
 
+    <div class="fundo-modal" id="modal-historico-producao">
+        <div class="modal modal-historico">
+            <div class="cabecalho-modal">
+                <h3>Histórico da produção</h3>
+                <button class="btn-fechar" onclick="fecharHistoricoProducao()">&times;</button>
+            </div>
+            <div id="conteudo-historico-producao"></div>
+            <div class="botoes-modal"><button class="btn-primario" onclick="fecharHistoricoProducao()">Fechar</button></div>
+        </div>
+    </div>
+
     <script>
         let graficoMaquinas = null;
         let idSituacaoAtual = null;
@@ -956,6 +1043,7 @@
         const ICONES_LUCIDE = {
             layoutDashboard: '<rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect>',
             settings: '<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.51a2 2 0 0 1 1-1.72l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle>',
+            barChart: '<path d="M3 3v18h18"></path><path d="M18 17V9"></path><path d="M13 17V5"></path><path d="M8 17v-3"></path>',
             cpu: '<rect width="16" height="16" x="4" y="4" rx="2"></rect><rect width="6" height="6" x="9" y="9" rx="1"></rect><path d="M15 2v2"></path><path d="M15 20v2"></path><path d="M2 15h2"></path><path d="M2 9h2"></path><path d="M20 15h2"></path><path d="M20 9h2"></path><path d="M9 2v2"></path><path d="M9 20v2"></path>',
             wrench: '<path d="M14.7 6.3a4 4 0 0 0-5 5L3 18a2.1 2.1 0 0 0 3 3l6.7-6.7a4 4 0 0 0 5-5l-2.6 2.6-2.4-2.4 2-3.2z"></path>',
             zap: '<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46L12 10h8a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46L12 14z"></path>',
@@ -1112,6 +1200,7 @@
             document.getElementById('icone-todas-maquinas').classList.add('icone-dashboard');
             document.getElementById('icone-configuracoes').innerHTML = iconeLucide('settings');
             document.getElementById('icone-configuracoes').classList.add('icone-config');
+            document.getElementById('icone-relatorio').innerHTML = iconeLucide('barChart');
 
             if (localStorage.getItem('menuMinimizado') === 'true') {
                 document.getElementById('menu-lateral').classList.add('minimizado');
@@ -1412,6 +1501,7 @@
             document.getElementById('subtitulo-aba').textContent = nome === 'todas' ? 'Visualização geral' : `Itens do grupo ${nome}`;
             document.getElementById('area-dados').classList.remove('oculto');
             document.getElementById('area-configuracoes').classList.add('oculto');
+            document.getElementById('area-relatorios').classList.add('oculto');
             atualizarGraficoMaquinas();
             carregarTabela();
         }
@@ -1419,8 +1509,82 @@
         function abrirConfiguracoes() {
             document.getElementById('area-dados').classList.add('oculto');
             document.getElementById('area-configuracoes').classList.remove('oculto');
+            document.getElementById('area-relatorios').classList.add('oculto');
             renderizarConfig();
         }
+
+        function abrirRelatorio() {
+            document.getElementById('area-dados').classList.add('oculto');
+            document.getElementById('area-configuracoes').classList.add('oculto');
+            document.getElementById('area-relatorios').classList.remove('oculto');
+            document.querySelectorAll('.menu-item, .menu-relatorio').forEach(i => i.classList.remove('ativo'));
+            document.querySelector('.menu-relatorio')?.classList.add('ativo');
+            document.getElementById('titulo-aba').textContent = 'Relatório de produção';
+            document.getElementById('subtitulo-aba').textContent = 'Indicadores detalhados por período e máquina';
+            const filtro = document.getElementById('relatorio-maquina');
+            const valorAtual = filtro.value;
+            filtro.innerHTML = '<option value="">Todas as máquinas</option>' + [...new Set([...Object.values(ABAS_GRUPOS).flat(), ...PROGRAMACOES.map(p => p.maquina).filter(Boolean)])].sort().map(m => `<option value="${m}">${m}</option>`).join('');
+            filtro.value = valorAtual;
+            if (!document.getElementById('relatorio-data-inicio').value) definirPeriodoMesAtual();
+            else renderizarRelatorio();
+        }
+
+        function definirPeriodoMesAtual() {
+            const agora = new Date();
+            const inicio = new Date(agora.getFullYear(), agora.getMonth(), 1);
+            document.getElementById('relatorio-data-inicio').value = `${inicio.getFullYear()}-${String(inicio.getMonth()+1).padStart(2,'0')}-01`;
+            document.getElementById('relatorio-data-fim').value = `${agora.getFullYear()}-${String(agora.getMonth()+1).padStart(2,'0')}-${String(agora.getDate()).padStart(2,'0')}`;
+            renderizarRelatorio();
+        }
+
+        function renderizarRelatorio() {
+            const inicioValor = document.getElementById('relatorio-data-inicio').value;
+            const fimValor = document.getElementById('relatorio-data-fim').value;
+            const maquina = document.getElementById('relatorio-maquina').value;
+            const inicioMs = inicioValor ? new Date(`${inicioValor}T00:00:00`).getTime() : -Infinity;
+            const fimMs = fimValor ? new Date(`${fimValor}T23:59:59.999`).getTime() : Infinity;
+            const producoes = PROGRAMACOES.filter(p => {
+                const inicio = p.producaoIniciadaEm ? new Date(p.producaoIniciadaEm).getTime() : NaN;
+                const fim = p.producaoFinalizadaEm ? new Date(p.producaoFinalizadaEm).getTime() : NaN;
+                const tocaPeriodo = (Number.isFinite(inicio) && inicio <= fimMs && (!Number.isFinite(fim) || fim >= inicioMs)) ||
+                    (Number.isFinite(fim) && fim >= inicioMs && fim <= fimMs);
+                return (!maquina || p.maquina === maquina) && tocaPeriodo;
+            });
+            const eventos = producoes.flatMap(p => (Array.isArray(p.historicoProducao) ? p.historicoProducao : []).map(e => ({ ...e, producao: p })))
+                .filter(e => { const t = new Date(e.em).getTime(); return t >= inicioMs && t <= fimMs; })
+                .sort((a,b) => new Date(b.em)-new Date(a.em));
+            const finalizadas = producoes.filter(p => p.producaoFinalizadaEm && new Date(p.producaoFinalizadaEm).getTime() >= inicioMs && new Date(p.producaoFinalizadaEm).getTime() <= fimMs);
+            const emAndamento = producoes.filter(p => p.producaoIniciadaEm && !p.producaoFinalizadaEm).length;
+            const unidades = finalizadas.reduce((total,p) => total + Number(p.qtdExecutada || 0),0);
+            const duracoes = finalizadas.map(p => (new Date(p.producaoFinalizadaEm)-new Date(p.producaoIniciadaEm))/60000).filter(n => Number.isFinite(n) && n >= 0);
+            const mediaMin = duracoes.length ? duracoes.reduce((a,b)=>a+b,0)/duracoes.length : 0;
+            const paradas = eventos.filter(e => e.tipo === 'situacao' && e.valor && e.valor !== 'trabalhando');
+            const contagemSituacoes = {};
+            eventos.filter(e=>e.tipo==='situacao').forEach(e => { const nome=e.titulo||'Situação sem nome'; contagemSituacoes[nome]=(contagemSituacoes[nome]||0)+1; });
+            const topSituacoes = Object.entries(contagemSituacoes).sort((a,b)=>b[1]-a[1]).slice(0,6);
+            const porMaquina = {};
+            finalizadas.forEach(p => { const nome=p.maquina||'Sem máquina'; porMaquina[nome]=(porMaquina[nome]||0)+Number(p.qtdExecutada||0); });
+            const periodo = inicioValor || fimValor ? `${inicioValor ? new Date(`${inicioValor}T00:00:00`).toLocaleDateString('pt-BR') : 'Início aberto'} a ${fimValor ? new Date(`${fimValor}T00:00:00`).toLocaleDateString('pt-BR') : 'Hoje'}` : 'Todo o período';
+            const tbody = eventos.slice(0,100).map(e => `<tr><td>${formatarDataHora(e.em)}</td><td>${e.producao.maquina||'—'}</td><td>${e.producao.nome||'—'}</td><td>${e.titulo||e.tipo}</td><td>${e.inspetora||'—'}</td></tr>`).join('');
+            const cardsSituacao = topSituacoes.map(([nome,total])=>`<div class="relatorio-linha"><span>${nome}</span><strong>${total}</strong></div>`).join('') || '<div class="relatorio-vazio">Sem mudanças de situação registradas neste período.</div>';
+            const cardsMaquina = Object.entries(porMaquina).sort((a,b)=>b[1]-a[1]).map(([nome,total])=>`<div class="relatorio-linha"><span>${nome}</span><strong>${total.toLocaleString('pt-BR')} un.</strong></div>`).join('') || '<div class="relatorio-vazio">Sem volumes finalizados no período.</div>';
+            document.getElementById('conteudo-relatorio').innerHTML = `
+                <p style="color:var(--texto-claro);margin:0 0 12px">Período: <strong>${periodo}</strong>${maquina ? ` · Máquina: <strong>${maquina}</strong>` : ''}</p>
+                <div class="relatorio-cards">
+                    <article class="relatorio-card" style="--card-cor:#22c55e"><span>Produções finalizadas</span><strong>${finalizadas.length}</strong><small>No intervalo selecionado</small></article>
+                    <article class="relatorio-card" style="--card-cor:#f59e0b"><span>Em andamento</span><strong>${emAndamento}</strong><small>Produções iniciadas sem finalização</small></article>
+                    <article class="relatorio-card" style="--card-cor:#3b82f6"><span>Unidades produzidas</span><strong>${unidades.toLocaleString('pt-BR')}</strong><small>Soma da quantidade executada</small></article>
+                    <article class="relatorio-card" style="--card-cor:#8b5cf6"><span>Tempo médio de ciclo</span><strong>${duracoes.length ? `${Math.floor(mediaMin/60)}h ${Math.round(mediaMin%60)}m` : '—'}</strong><small>Entre início e finalização</small></article>
+                    <article class="relatorio-card" style="--card-cor:#ef4444"><span>Eventos de parada</span><strong>${paradas.length}</strong><small>Registros de situação diferente de produção normal</small></article>
+                </div>
+                <div class="relatorio-grade">
+                    <section class="relatorio-bloco"><h3>Produção finalizada por máquina</h3><div class="relatorio-lista">${cardsMaquina}</div></section>
+                    <section class="relatorio-bloco"><h3>Situações e pontos de atenção</h3><div class="relatorio-lista">${cardsSituacao}</div><small style="display:block;margin-top:10px;color:var(--texto-claro)">O total representa eventos registrados. As paradas anteriores a esta atualização não possuem duração histórica.</small></section>
+                </div>
+                <section class="relatorio-bloco" style="margin-top:16px;overflow-x:auto"><h3>Linha do tempo detalhada</h3>${tbody ? `<table class="relatorio-tabela"><thead><tr><th>Data e hora</th><th>Máquina</th><th>Item</th><th>Evento / Situação</th><th>Inspetora</th></tr></thead><tbody>${tbody}</tbody></table>${eventos.length>100?`<p style="color:var(--texto-claro);margin-top:10px">Exibindo 100 de ${eventos.length} eventos.</p>`:''}` : '<div class="relatorio-vazio">Nenhum evento de produção registrado para o período. Inicie a produção para começar a formar o histórico.</div>'}</section>`;
+        }
+
+        function imprimirRelatorio() { window.print(); }
         function renderizarConfig() {
             const container = document.getElementById('conteudo-config');
             container.innerHTML = '';
@@ -1773,10 +1937,91 @@
             const p = PROGRAMACOES.find(i => i.id === idSituacaoAtual);
             if (!p) return fecharModalSituacao();
 
+            if (p.producaoIniciadaEm) {
+                if (!Array.isArray(p.historicoProducao)) p.historicoProducao = [];
+                const anterior = SITUACOES_MAQUINA.find(s => s.valor === p.situacaoMaquina);
+                const nova = SITUACOES_MAQUINA.find(s => s.valor === valor);
+                p.historicoProducao.push({ tipo: 'situacao', valor, titulo: nova?.titulo || valor, anterior: anterior?.titulo || p.situacaoMaquina || 'Situação desconhecida', em: new Date().toISOString() });
+            }
             p.situacaoMaquina = valor;
             await salvarProg(p);
             fecharModalSituacao();
             carregarTabela();
+        }
+
+        function formatarDataHora(valor) {
+            if (!valor) return '—';
+            const data = new Date(valor);
+            return Number.isNaN(data.getTime()) ? '—' : data.toLocaleString('pt-BR');
+        }
+
+        async function iniciarProducao(id) {
+            const p = PROGRAMACOES.find(i => i.id === id);
+            if (!p || p.producaoIniciadaEm) return;
+            const inspetora = prompt('Nome da inspetora que está iniciando a produção:');
+            if (!inspetora || !inspetora.trim()) return;
+            const agora = new Date().toISOString();
+            p.inspetoraInicio = inspetora.trim();
+            p.producaoIniciadaEm = agora;
+            p.historicoProducao = [{ tipo: 'inicio', titulo: 'Produção iniciada', inspetora: p.inspetoraInicio, em: agora }];
+            if (p.situacaoMaquina) {
+                const situacao = SITUACOES_MAQUINA.find(s => s.valor === p.situacaoMaquina);
+                p.historicoProducao.push({ tipo: 'situacao', titulo: situacao?.titulo || p.situacaoMaquina, em: agora });
+            }
+            await salvarProg(p);
+            carregarTabela();
+        }
+
+        async function finalizarProducao(id) {
+            const p = PROGRAMACOES.find(i => i.id === id);
+            if (!p || !p.producaoIniciadaEm || p.producaoFinalizadaEm) return;
+            const inspetora = prompt('Nome da inspetora que está finalizando a produção:');
+            if (!inspetora || !inspetora.trim()) return;
+            const agora = new Date().toISOString();
+            p.inspetoraFim = inspetora.trim();
+            p.producaoFinalizadaEm = agora;
+            if (!Array.isArray(p.historicoProducao)) p.historicoProducao = [];
+            p.historicoProducao.push({ tipo: 'fim', titulo: 'Produção finalizada', inspetora: p.inspetoraFim, em: agora });
+            await salvarProg(p);
+            carregarTabela();
+        }
+
+        function abrirHistoricoProducao(id) {
+            const p = PROGRAMACOES.find(i => i.id === id);
+            if (!p) return;
+            const historico = Array.isArray(p.historicoProducao) ? [...p.historicoProducao] : [];
+            if (!historico.length && p.producaoIniciadaEm) {
+                historico.push({ tipo: 'inicio', titulo: 'Produção iniciada', inspetora: p.inspetoraInicio, em: p.producaoIniciadaEm });
+                if (p.producaoFinalizadaEm) historico.push({ tipo: 'fim', titulo: 'Produção finalizada', inspetora: p.inspetoraFim, em: p.producaoFinalizadaEm });
+            }
+            historico.sort((a, b) => new Date(a.em) - new Date(b.em));
+            const inicio = p.producaoIniciadaEm ? new Date(p.producaoIniciadaEm) : null;
+            const fim = p.producaoFinalizadaEm ? new Date(p.producaoFinalizadaEm) : null;
+            const duracao = inicio ? Math.max(0, ((fim || new Date()) - inicio) / 60000) : null;
+            const eventos = historico.map((evento, indice) => {
+                const anterior = historico.slice(0, indice).reverse().find(item => item.tipo === 'situacao' && item.valor !== 'trabalhando');
+                const proximo = historico.slice(indice + 1).find(item => item.tipo === 'situacao' && item.valor === 'trabalhando' || item.tipo === 'fim');
+                const paradaMinutos = evento.tipo === 'situacao' && evento.valor !== 'trabalhando' && proximo
+                    ? Math.max(0, (new Date(proximo.em) - new Date(evento.em)) / 60000) : null;
+                const nome = evento.titulo || 'Situação da máquina';
+                const detalhe = evento.tipo === 'inicio' || evento.tipo === 'fim'
+                    ? `Inspetora: ${evento.inspetora || 'não informada'}`
+                    : `Situação: ${nome}${anterior ? ` · Anterior: ${anterior.titulo}` : ''}${paradaMinutos !== null ? ` · Parada: ${paradaMinutos.toFixed(0)} min${proximo.tipo === 'fim' ? ' (até a finalização)' : ''}` : ''}`;
+                return `<div class="evento-producao"><strong>${nome}</strong><small>${formatarDataHora(evento.em)} · ${detalhe}</small></div>`;
+            }).join('');
+            document.getElementById('conteudo-historico-producao').innerHTML = `
+                <div class="resumo-producao">
+                    <strong>${p.nome || 'Item'} · ${p.maquina || 'Máquina não informada'}</strong>
+                    <span>Início: ${formatarDataHora(p.producaoIniciadaEm)}${p.inspetoraInicio ? ` · ${p.inspetoraInicio}` : ''}</span>
+                    <span>Finalização: ${formatarDataHora(p.producaoFinalizadaEm)}${p.inspetoraFim ? ` · ${p.inspetoraFim}` : ''}</span>
+                    <span>Duração: ${duracao === null ? 'Produção ainda não iniciada' : `${Math.floor(duracao / 60)} h ${Math.floor(duracao % 60)} min${!fim ? ' (em andamento)' : ''}`}</span>
+                </div>
+                <div class="linha-tempo-producao">${eventos || '<div class="sem-dados">Nenhum início de produção registrado.</div>'}</div>`;
+            document.getElementById('modal-historico-producao').classList.add('aberto');
+        }
+
+        function fecharHistoricoProducao() {
+            document.getElementById('modal-historico-producao').classList.remove('aberto');
         }
 
         // Função de exclusão com confirmação reforçada
@@ -1904,6 +2149,9 @@
                                     <button class="btn-editar btn-acao" onclick="editarProgramacao(${p.id})" title="Editar programação">✏️</button>
                                     <button class="btn-perigo btn-acao" onclick="excluirItem(${p.id})" title="Excluir programação">🗑️</button>
                                     <button class="btn-situacao ${classeSituacao}" onclick="alterarSituacaoMaq(${p.id})" title="${textoSituacao}">${iconeSituacao}</button>
+                                    ${!p.producaoIniciadaEm ? `<button class="btn-acao btn-iniciar-producao" onclick="iniciarProducao(${p.id})" title="Iniciar produção" aria-label="Iniciar produção">▶</button>` : ''}
+                                    ${p.producaoIniciadaEm && !p.producaoFinalizadaEm ? `<button class="btn-acao btn-finalizar-producao" onclick="finalizarProducao(${p.id})" title="Finalizar produção" aria-label="Finalizar produção">■</button>` : ''}
+                                    <button class="btn-acao btn-historico" onclick="abrirHistoricoProducao(${p.id})" title="Ver histórico da produção" aria-label="Ver histórico da produção">${iconeLucide('eye')}</button>
                                 </td>
                             </tr>
                         `}).join('')}
