@@ -121,8 +121,11 @@
         .logo-menu-mark[hidden], #preview-logo-config[hidden] { display:none; }
         .logo-menu { font-size: 1.28rem; letter-spacing: .12em; font-weight: 800; margin-bottom: 3px; white-space: nowrap; color:#fff; }
         .subtitulo-menu { font-size: 0.75rem; opacity: 0.8; font-weight: 400; white-space: nowrap; }
+        .btn-logo-menu { margin-top:12px; padding:7px 11px; border:1px solid rgba(255,255,255,.28); border-radius:999px; background:rgba(255,255,255,.10); color:#fff; font-size:.75rem; font-weight:600; cursor:pointer; transition:background .18s ease,border-color .18s ease,transform .18s ease; }
+        .btn-logo-menu:hover { background:rgba(255,255,255,.18); border-color:rgba(255,255,255,.48); transform:translateY(-1px); }
         .menu-lateral.minimizado .logo-menu,
-        .menu-lateral.minimizado .subtitulo-menu { display: none; }
+        .menu-lateral.minimizado .subtitulo-menu,
+        .menu-lateral.minimizado .btn-logo-menu { display: none; }
         .menu-lateral.minimizado .cabecalho-menu { padding:58px 6px 14px; background:transparent; border-bottom-color:rgba(148,163,184,.12); }
         .menu-lateral.minimizado .logo-menu-mark { width:42px; height:42px; }
 
@@ -937,11 +940,19 @@
                 <button class="btn-sucesso" onclick="exportarBackupCompleto()">💾 Exportar Backup</button>
             </div>
 
+
+            <div id="conteudo-config"></div>
+        </div>
+
+        <div id="area-logo" class="oculto">
+            <div class="painel-controles">
+                <button class="btn-primario" onclick="voltarDados()">Voltar</button>
+            </div>
             <section class="config-logo">
                 <div class="config-logo-preview"><span id="sem-logo-config">Sem logo</span><img id="preview-logo-config" alt="Logo enviada" hidden></div>
                 <div class="config-logo-info">
                     <h3>Logo do cabeçalho</h3>
-                    <p>Escolha uma imagem PNG, JPG, WebP ou SVG de até 2 MB. Ela será usada no cabeçalho deste navegador.</p>
+                    <p>Escolha uma imagem PNG, JPG, WebP ou SVG. Ela sera otimizada para ate 1 MB e salva para uso compartilhado no sistema.</p>
                     <input type="file" id="arquivo-logo" accept="image/png,image/jpeg,image/webp,image/svg+xml" onchange="prepararLogoCabecalho(event)">
                     <div class="config-logo-actions">
                         <button class="btn-sucesso" onclick="salvarLogoCabecalho()">Aplicar logo</button>
@@ -949,7 +960,6 @@
                     </div>
                 </div>
             </section>
-            <div id="conteudo-config"></div>
         </div>
 
         <section id="area-relatorios" class="oculto">
@@ -1186,7 +1196,7 @@
             const arquivo = evento.target.files?.[0];
             if (!arquivo) return;
             const tiposAceitos = ['image/png','image/jpeg','image/webp','image/svg+xml'];
-            if (!tiposAceitos.includes(arquivo.type)) { alert('Escolha uma imagem PNG, JPG, WebP ou SVG.'); evento.target.value=''; return; }
+                    <p>Escolha uma imagem PNG, JPG, WebP ou SVG. Ela sera otimizada para ate 1 MB e salva para uso compartilhado no sistema.</p>
             if (arquivo.size > 10 * 1024 * 1024) { alert('A imagem original deve ter no m?ximo 10 MB.'); evento.target.value=''; return; }
             try {
                 logoPendente = await comprimirLogo(arquivo);
@@ -1284,6 +1294,7 @@
 
         const ICONES_LUCIDE = {
             layoutDashboard: '<rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect>',
+            imagePlus: '<rect x="3" y="3" width="18" height="18" rx="3"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="m21 15-5-5L5 21"></path><path d="M16 5v6M13 8h6"></path>',
             settings: '<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.51a2 2 0 0 1 1-1.72l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle>',
             barChart: '<path d="M3 3v18h18"></path><path d="M18 17V9"></path><path d="M13 17V5"></path><path d="M8 17v-3"></path>',
             play: '<polygon points="6 3 20 12 6 21 6 3"></polygon>',
@@ -1493,6 +1504,8 @@
             document.getElementById('icone-todas-maquinas').innerHTML = iconeLucide('layoutDashboard');
             document.getElementById('icone-todas-maquinas').classList.add('icone-dashboard');
             document.getElementById('icone-configuracoes').innerHTML = iconeLucide('settings');
+            document.getElementById('icone-logo').innerHTML = iconeLucide('imagePlus');
+            document.getElementById('icone-logo').classList.add('icone-logo');
             document.getElementById('icone-configuracoes').classList.add('icone-config');
             document.getElementById('icone-relatorio').innerHTML = iconeLucide('barChart');
             document.getElementById('icone-turnos').innerHTML = iconeLucide('clock');
@@ -1803,6 +1816,7 @@
             document.getElementById('subtitulo-aba').textContent = nome === 'todas' ? 'Visualização geral' : `Itens do grupo ${nome}`;
             document.getElementById('area-dados').classList.remove('oculto');
             document.getElementById('area-configuracoes').classList.add('oculto');
+            document.getElementById('area-logo').classList.add('oculto');
             document.getElementById('area-relatorios').classList.add('oculto');
             document.getElementById('area-turnos').classList.add('oculto');
             atualizarGraficoMaquinas();
@@ -1811,15 +1825,30 @@
         function voltarDados() { carregarAba(abaAtual); }
         function abrirConfiguracoes() {
             document.getElementById('area-dados').classList.add('oculto');
+            document.getElementById('area-logo').classList.add('oculto');
             document.getElementById('area-configuracoes').classList.remove('oculto');
             document.getElementById('area-relatorios').classList.add('oculto');
             document.getElementById('area-turnos').classList.add('oculto');
             renderizarConfig();
         }
 
+        function abrirConfiguracaoLogo() {
+            document.getElementById('area-dados').classList.add('oculto');
+            document.getElementById('area-configuracoes').classList.add('oculto');
+            document.getElementById('area-logo').classList.add('oculto');
+            document.getElementById('area-relatorios').classList.add('oculto');
+            document.getElementById('area-turnos').classList.add('oculto');
+            document.getElementById('area-logo').classList.remove('oculto');
+            document.querySelectorAll('.menu-item, .menu-relatorio, .menu-turnos').forEach(item => item.classList.remove('ativo'));
+            document.querySelector('.menu-item[title="Adicionar ou alterar logo"]')?.classList.add('ativo');
+            document.getElementById('titulo-aba').textContent = 'Logo da empresa';
+            document.getElementById('subtitulo-aba').textContent = 'Personalize o cabe?alho do sistema';
+        }
+
         function abrirRelatorio() {
             document.getElementById('area-dados').classList.add('oculto');
             document.getElementById('area-configuracoes').classList.add('oculto');
+            document.getElementById('area-logo').classList.add('oculto');
             document.getElementById('area-relatorios').classList.remove('oculto');
             document.getElementById('area-turnos').classList.add('oculto');
             document.querySelectorAll('.menu-item, .menu-relatorio, .menu-turnos').forEach(i => i.classList.remove('ativo'));
@@ -1842,6 +1871,7 @@
         function abrirConfiguracaoTurnos() {
             document.getElementById('area-dados').classList.add('oculto');
             document.getElementById('area-configuracoes').classList.add('oculto');
+            document.getElementById('area-logo').classList.add('oculto');
             document.getElementById('area-relatorios').classList.add('oculto');
             document.getElementById('area-turnos').classList.remove('oculto');
             document.querySelectorAll('.menu-item, .menu-relatorio, .menu-turnos').forEach(i => i.classList.remove('ativo'));
