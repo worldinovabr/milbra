@@ -120,6 +120,8 @@
         .logo-menu-area { position:relative; width:58px; height:58px; border-radius:50%; display:grid; place-items:center; background:rgba(9,29,51,.42); border:2px solid rgba(56,189,248,.92); box-shadow:0 0 0 3px rgba(56,189,248,.12),0 4px 14px rgba(0,0,0,.22); }
         .logo-menu-placeholder { display:grid; place-items:center; color:rgba(219,234,254,.78); }
         .logo-menu-placeholder svg { width:28px;height:28px; }
+        .logo-menu-placeholder[hidden] { display:none; }
+        .logo-file-input { position:fixed; left:-10000px; top:0; width:1px; height:1px; opacity:0; }
         .logo-menu-mark { position:absolute; inset:0; display:block; width:100%; height:100%; padding:5px; border-radius:50%; object-fit:contain; background:#fff; filter:drop-shadow(0 5px 10px rgba(0,0,0,.18)); }
         .logo-menu-mark[hidden], #preview-logo-config[hidden] { display:none; }
         .logo-menu { font-size: 1.28rem; letter-spacing: .12em; font-weight: 800; margin-bottom: 3px; white-space: nowrap; color:#fff; }
@@ -127,9 +129,12 @@
         .menu-lateral.minimizado .logo-menu,
         .menu-lateral.minimizado .subtitulo-menu { display:none; }
         .menu-lateral.minimizado .cabecalho-menu { padding:58px 6px 14px; background:transparent; border-bottom-color:rgba(148,163,184,.12); }
-        .btn-editar-logo { position:absolute; right:-3px; bottom:-3px; z-index:2; display:grid; place-items:center; width:25px; height:25px; padding:0; border:2px solid #fff; border-radius:50%; background:#f97316; color:#fff; cursor:pointer; box-shadow:0 3px 8px rgba(0,0,0,.28); transition:background .18s ease,transform .18s ease; }
+        .btn-editar-logo { position:absolute; right:-2px; bottom:-2px; z-index:2; display:grid; place-items:center; width:18px; height:18px; padding:0; border:1px solid #fff; border-radius:50%; background:#f97316; color:#fff; cursor:pointer; box-shadow:0 2px 5px rgba(0,0,0,.24); opacity:1; transition:background .18s ease,transform .18s ease,opacity .25s ease; }
         .btn-editar-logo:hover { background:#ea580c; transform:scale(1.08); }
-        .btn-editar-logo svg { width:13px;height:13px; }
+        .btn-editar-logo svg { width:10px;height:10px; }
+        .logo-menu-area.lapis-oculto .btn-editar-logo { opacity:0; pointer-events:none; transform:scale(.7); }
+        .logo-menu-area.lapis-oculto:hover .btn-editar-logo,
+        .logo-menu-area.lapis-oculto:focus-within .btn-editar-logo { opacity:1; pointer-events:auto; transform:scale(1); }
         .menu-lateral.minimizado .btn-editar-logo { display:none; }
         .menu-lateral.minimizado .logo-menu-mark { width:42px; height:42px; }
 
@@ -847,10 +852,14 @@
         <div class="cabecalho-menu">
             <button class="btn-minimizar" onclick="alternarMinimizarMenu()" title="Minimizar/Expandir menu">🔛</button>
             <div class="marca-menu">
-                <img class="logo-menu-mark" id="logo-menu-img" alt="Logo personalizada" hidden>
+                <div class="logo-menu-area" onclick="aoClicarAreaLogo(event)">
+                    <span class="logo-menu-placeholder" id="logo-menu-placeholder" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="m21 15-5-5L5 21"></path></svg></span>
+                    <img class="logo-menu-mark" id="logo-menu-img" alt="Logo da empresa" hidden>
+                    <button class="btn-editar-logo" onclick="event.stopPropagation(); abrirSeletorLogo()" title="Adicionar ou alterar logo" aria-label="Adicionar ou alterar logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z"></path></svg></button>
+                    <input class="logo-file-input" type="file" id="arquivo-logo" accept="image/png,image/jpeg,image/webp,image/svg+xml" onchange="prepararLogoCabecalho(event)" aria-label="Selecionar logo da empresa">
+                </div>
                 <div class="logo-menu">MILBRA</div>
             </div>
-            <button class="btn-editar-logo" onclick="abrirConfiguracaoLogo()" title="Adicionar ou alterar logo" aria-label="Adicionar ou alterar logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z"></path></svg></button>
             <div class="subtitulo-menu">PCP - Produção</div>
         </div>
 
@@ -961,7 +970,6 @@
                 <div class="config-logo-info">
                     <h3>Logo do cabeçalho</h3>
                     <p>Escolha uma imagem PNG, JPG, WebP ou SVG. Ela sera otimizada para ate 1 MB e salva para uso compartilhado no sistema.</p>
-                    <input type="file" id="arquivo-logo" accept="image/png,image/jpeg,image/webp,image/svg+xml" onchange="prepararLogoCabecalho(event)">
                     <div class="config-logo-actions">
                         <button class="btn-sucesso" onclick="salvarLogoCabecalho()">Aplicar logo</button>
                         <button class="btn-primario" onclick="restaurarLogoPadrao()">Restaurar padrão</button>
@@ -1165,11 +1173,13 @@
             const imagem = document.getElementById('logo-menu-img');
             const preview = document.getElementById('preview-logo-config');
             const placeholder = document.getElementById('sem-logo-config');
+            const placeholderCabecalho = document.getElementById('logo-menu-placeholder');
             if (!imagem) return;
             const origem = url || '';
             imagem.hidden = !origem;
             preview?.toggleAttribute('hidden', !origem);
             if (placeholder) placeholder.hidden = Boolean(origem);
+            if (placeholderCabecalho) placeholderCabecalho.hidden = Boolean(origem);
             if (origem) {
                 imagem.src = origem;
                 imagem.alt = 'Logo personalizada';
@@ -1202,10 +1212,46 @@
             } finally { imagem.close?.(); }
         }
 
+        let temporizadorLapisLogo = null;
+
+        function mostrarLapisLogo() {
+            const area = document.querySelector('.logo-menu-area');
+            if (!area) return;
+            area.classList.remove('lapis-oculto');
+            clearTimeout(temporizadorLapisLogo);
+            temporizadorLapisLogo = setTimeout(() => area.classList.add('lapis-oculto'), 3500);
+        }
+
+        function aoClicarAreaLogo(evento) {
+            if (evento.target.closest('.btn-editar-logo') || evento.target.closest('.logo-file-input')) return;
+            mostrarLapisLogo();
+            abrirSeletorLogo();
+        }
+
+        function configurarLapisLogo() {
+            const area = document.querySelector('.logo-menu-area');
+            if (!area) return;
+            area.addEventListener('pointerenter', mostrarLapisLogo);
+            area.addEventListener('pointerleave', () => {
+                clearTimeout(temporizadorLapisLogo);
+                temporizadorLapisLogo = setTimeout(() => area.classList.add('lapis-oculto'), 900);
+            });
+            area.addEventListener('focusin', mostrarLapisLogo);
+            mostrarLapisLogo();
+        }
+
+        function abrirSeletorLogo() {
+            const arquivo = document.getElementById('arquivo-logo');
+            if (!arquivo) return;
+            arquivo.value = '';
+            arquivo.click();
+        }
+
         async function prepararLogoCabecalho(evento) {
             const arquivo = evento.target.files?.[0];
             if (!arquivo) return;
             const tiposAceitos = ['image/png','image/jpeg','image/webp','image/svg+xml'];
+            if (!tiposAceitos.includes(arquivo.type)) { alert('Escolha uma imagem PNG, JPG, WebP ou SVG.'); evento.target.value=''; return; }
             if (arquivo.size > 10 * 1024 * 1024) { alert('A imagem original deve ter no m?ximo 10 MB.'); evento.target.value=''; return; }
             try {
                 logoPendente = await comprimirLogo(arquivo);
@@ -1214,11 +1260,20 @@
                 const preview = document.getElementById('preview-logo-config');
                 preview.src = window.logoPreviewPendenteUrl;
                 preview.hidden = false;
-                document.getElementById('sem-logo-config').hidden = true;
+                const previewConfig = document.getElementById('preview-logo-config');
+                if (previewConfig) { previewConfig.src = window.logoPreviewPendenteUrl; previewConfig.hidden = false; }
+                const placeholderConfig = document.getElementById('sem-logo-config');
+                if (placeholderConfig) placeholderConfig.hidden = true;
+                await enviarLogoAoBanco(logoPendente, false);
             } catch (erro) {
                 logoPendente = null;
+                if (window.logoPreviewPendenteUrl) { URL.revokeObjectURL(window.logoPreviewPendenteUrl); window.logoPreviewPendenteUrl = null; }
+                const previewConfig = document.getElementById('preview-logo-config');
+                if (previewConfig) { previewConfig.removeAttribute('src'); previewConfig.hidden = true; }
+                const placeholderConfig = document.getElementById('sem-logo-config');
+                if (placeholderConfig) placeholderConfig.hidden = false;
                 evento.target.value = '';
-                alert(erro.message || 'N?o foi poss?vel preparar a imagem.');
+                alert(erro.message || 'N?o foi poss?vel salvar a imagem da logo.');
             }
         }
 
@@ -1842,15 +1897,7 @@
         }
 
         function abrirConfiguracaoLogo() {
-            document.getElementById('area-dados').classList.add('oculto');
-            document.getElementById('area-configuracoes').classList.add('oculto');
-            document.getElementById('area-logo').classList.add('oculto');
-            document.getElementById('area-relatorios').classList.add('oculto');
-            document.getElementById('area-turnos').classList.add('oculto');
-            document.getElementById('area-logo').classList.remove('oculto');
-            document.querySelectorAll('.menu-item, .menu-relatorio, .menu-turnos').forEach(item => item.classList.remove('ativo'));
-            document.getElementById('titulo-aba').textContent = 'Logo da empresa';
-            document.getElementById('subtitulo-aba').textContent = 'Personalize o cabe\u00e7alho do sistema';
+            abrirSeletorLogo();
         }
 
         function abrirRelatorio() {
@@ -2717,6 +2764,7 @@
         document.addEventListener('touchend', () => clearTimeout(temporizadorLegendaToque), { passive:true });
         document.addEventListener('touchcancel', () => clearTimeout(temporizadorLegendaToque), { passive:true });
         carregarSituacoesDoNavegador();
+        configurarLapisLogo();
         iniciarSistema().catch(erro => console.error('Falha ao iniciar o sistema:', erro));
     </script>
 </body>
