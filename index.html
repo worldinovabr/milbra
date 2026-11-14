@@ -1203,7 +1203,6 @@
             const arquivo = evento.target.files?.[0];
             if (!arquivo) return;
             const tiposAceitos = ['image/png','image/jpeg','image/webp','image/svg+xml'];
-                    <p>Escolha uma imagem PNG, JPG, WebP ou SVG. Ela sera otimizada para ate 1 MB e salva para uso compartilhado no sistema.</p>
             if (arquivo.size > 10 * 1024 * 1024) { alert('A imagem original deve ter no m?ximo 10 MB.'); evento.target.value=''; return; }
             try {
                 logoPendente = await comprimirLogo(arquivo);
