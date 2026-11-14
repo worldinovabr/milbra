@@ -1307,6 +1307,16 @@
 
         async function buscarLogoNoBanco() {
             const snapshot = await firebaseApi.getDoc(documento('grupos','config-logo'));
+            if (snapshot.exists() && snapshot.data().armazenamento === 'firestore-chunks' && Array.isArray(snapshot.data().partes)) {
+                const partes = await Promise.all(snapshot.data().partes.map(async id => {
+                    const parte = await firebaseApi.getDoc(documento('grupos',`config-logo-${id}`));
+                    if (!parte.exists() || typeof parte.data().dados !== 'string') throw new Error('Parte da logo ausente no Firestore.');
+                    return parte.data().dados;
+                }));
+                const bytes = Uint8Array.from(atob(partes.join('')), caractere => caractere.charCodeAt(0));
+                aplicarLogoCabecalho(URL.createObjectURL(new Blob([bytes], {type:snapshot.data().formatoMime || 'image/webp'})));
+                return;
+            }
             if (snapshot.exists() && snapshot.data().url) {
                 try { localStorage.removeItem('milbra-logo-cabecalho'); } catch (erro) {}
                 aplicarLogoCabecalho(snapshot.data().url);
@@ -1315,64 +1325,49 @@
             const logoAntiga = (() => { try { return localStorage.getItem('milbra-logo-cabecalho'); } catch (erro) { return null; } })();
             if (logoAntiga) {
                 aplicarLogoCabecalho(logoAntiga);
-                try {
-                    const blobAntigo = await (await fetch(logoAntiga)).blob();
-                    await enviarLogoAoBanco(await comprimirLogo(blobAntigo), false);
-                } catch (erro) { console.warn('Logo local mantida; migra??o para o Firebase falhou.', erro); }
+                try { await enviarLogoAoBanco(await comprimirLogo(await (await fetch(logoAntiga)).blob()), false); }
+                catch (erro) { console.warn('Logo local mantida; migra??o para o Firebase falhou.', erro); }
             } else aplicarLogoCabecalho(null);
         }
 
         async function enviarLogoAoBanco(blob, mostrarConfirmacao) {
-            if (!firebaseApi || !firestore) throw new Error('Firebase ainda n?o est? conectado.');
+            if (!firebaseApi || !firestore) throw new Error('Firebase Firestore ainda n?o est? conectado.');
             if (blob.size > 1024 * 1024) throw new Error('A imagem convertida excede 1 MB.');
-            let url = null;
-            let blobSalvo = blob;
-            let armazenamento = 'firestore-data-url';
-            if (storage && firebaseStorageApi) {
-                try {
-                    const referencia = firebaseStorageApi.ref(storage,'branding/logo.webp');
-                    const resultado = await firebaseStorageApi.uploadBytes(referencia,blob,{contentType:'image/webp',cacheControl:'public,max-age=300'});
-                    url = await firebaseStorageApi.getDownloadURL(resultado.ref);
-                    armazenamento = 'firebase-storage';
-                } catch (erroStorage) {
-                    console.warn('Firebase Storage indisponível; salvando a logo como URL de dados no Firestore.', erroStorage);
-                }
+            const blobSalvo = blob.type === 'image/webp' ? blob : await comprimirLogo(blob);
+            const dados = new Uint8Array(await blobSalvo.arrayBuffer());
+            let binario = '';
+            for (let inicio=0; inicio<dados.length; inicio+=0x8000) binario += String.fromCharCode(...dados.subarray(inicio,inicio+0x8000));
+            const base64=btoa(binario), tamanhoParte=700*1024, partes=[];
+            for (let inicio=0, indice=0; inicio<base64.length; inicio+=tamanhoParte, indice++) {
+                const id=String(indice).padStart(3,'0'); partes.push(id);
+                await firebaseApi.setDoc(documento('grupos',`config-logo-${id}`),{tipo:'config-logo-parte',dados:base64.slice(inicio,inicio+tamanhoParte),atualizadoEm:new Date().toISOString()});
             }
-            if (!url) {
-                blobSalvo = blob.size <= 700 * 1024 ? blob : await comprimirLogo(blob,700 * 1024);
-                if (blobSalvo.size > 700 * 1024) throw new Error('Não foi possível reduzir a logo para salvá-la com segurança. Escolha uma imagem menor.');
-                url = await new Promise((resolve,reject) => {
-                    const leitor = new FileReader();
-                    leitor.onload = () => typeof leitor.result === 'string' ? resolve(leitor.result) : reject(new Error('Não foi possível converter a logo.'));
-                    leitor.onerror = () => reject(new Error('Não foi possível ler a imagem da logo.'));
-                    leitor.readAsDataURL(blobSalvo);
-                });
-            }
-            await firebaseApi.setDoc(documento('grupos','config-logo'),{tipo:'config-logo',url,formato:'webp',armazenamento,tamanhoBytes:blobSalvo.size,atualizadoEm:new Date().toISOString()});
+            await firebaseApi.setDoc(documento('grupos','config-logo'),{tipo:'config-logo',formato:'webp',formatoMime:'image/webp',armazenamento:'firestore-chunks',partes,tamanhoBytes:blobSalvo.size,atualizadoEm:new Date().toISOString()});
+            const url=URL.createObjectURL(blobSalvo);
             try { localStorage.removeItem('milbra-logo-cabecalho'); } catch (erro) {}
             aplicarLogoCabecalho(url);
-            logoPendente = null;
-            const arquivo = document.getElementById('arquivo-logo');
-            if (arquivo) arquivo.value = '';
+            logoPendente=null;
+            const arquivo=document.getElementById('arquivo-logo'); if (arquivo) arquivo.value='';
             if (window.logoPreviewPendenteUrl) { URL.revokeObjectURL(window.logoPreviewPendenteUrl); window.logoPreviewPendenteUrl=null; }
-            if (mostrarConfirmacao) alert(`Logo convertida para WebP (${(blob.size/1024).toFixed(0)} KB) e salva no Firebase. Ela ser? compartilhada entre os dispositivos.`);
+            if (mostrarConfirmacao) alert(`Logo convertida para WebP (${(blobSalvo.size/1024).toFixed(0)} KB) e salva no Firestore. Ela ser? compartilhada entre os dispositivos.`);
         }
-
         async function salvarLogoCabecalho() {
             if (!logoPendente) return alert('Selecione uma imagem antes de aplicar a logo.');
             try { await enviarLogoAoBanco(logoPendente,true); }
             catch (erro) {
-                console.error('N?o foi poss?vel salvar a logo no Firebase:', erro);
-                alert(`N?o foi poss?vel salvar a logo no Firebase. ${erro.code || ''} ${erro.message || erro} Confira se as regras do Firebase Storage foram publicadas.`);
+                console.error('N?o foi poss?vel salvar a logo no Firestore:', erro);
+                console.error('N?o foi poss?vel salvar a logo no Firestore:', erro);
+                alert('N?o foi poss?vel salvar a logo no Firestore. ' + (erro.code || '') + ' ' + (erro.message || erro));
             }
         }
 
         async function restaurarLogoPadrao() {
-            if (!storage || !firebaseStorageApi || !firebaseApi || !firestore) return alert('Conecte ao Firebase antes de remover a logo compartilhada.');
+            if (!firebaseApi || !firestore) return alert('Conecte ao Firebase antes de remover a logo compartilhada.');
             if (!confirm('Remover a logo personalizada do cabe?alho?')) return;
             try {
-                if (storage && firebaseStorageApi) await firebaseStorageApi.deleteObject(firebaseStorageApi.ref(storage,'branding/logo.webp')).catch(() => {});
-                if (firebaseApi && firestore) await firebaseApi.deleteDoc(documento('grupos','config-logo'));
+                const configuracao=await firebaseApi.getDoc(documento('grupos','config-logo'));
+                if (configuracao.exists() && Array.isArray(configuracao.data().partes)) await Promise.all(configuracao.data().partes.map(id => firebaseApi.deleteDoc(documento('grupos','config-logo-' + id))));
+                await firebaseApi.deleteDoc(documento('grupos','config-logo'));
                 try { localStorage.removeItem('milbra-logo-cabecalho'); } catch (erro) {}
                 logoPendente = null;
                 const arquivo = document.getElementById('arquivo-logo');
