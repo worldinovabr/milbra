@@ -173,6 +173,17 @@
         .icone-solda { color: #FACC15; }
         .icone-dobra { color: #2DD4BF; }
         .icone-generico { color: #CBD5E1; }
+        .menu-item .icone.icone-dashboard { color:#60A5FA; }
+        .menu-item .icone.icone-config { color:#A78BFA; }
+        .menu-item .icone.icone-automaticas { color:#22D3EE; }
+        .menu-item .icone.icone-maq-8 { color:#34D399; }
+        .menu-item .icone.icone-maq-15 { color:#FBBF24; }
+        .menu-item .icone.icone-maq-25 { color:#FB923C; }
+        .menu-item .icone.icone-maq-40 { color:#F87171; }
+        .menu-item .icone.icone-maq-45 { color:#C084FC; }
+        .menu-item .icone.icone-maq-60 { color:#F472B6; }
+        .menu-item .icone.icone-solda { color:#FACC15; }
+        .menu-item .icone.icone-dobra { color:#2DD4BF; }
         .menu-lateral.minimizado .menu-item span:not(.icone) { display: none; }
         .menu-lateral.minimizado .menu-item { position:relative; overflow:visible; }
         .menu-lateral.minimizado .menu-item > span:not(.icone) { display:block; position:absolute; left:calc(100% + 12px); top:50%; transform:translateY(-50%) translateX(-4px); padding:8px 11px; border-radius:8px; background:#0f172a; color:#fff; font-size:.78rem; font-weight:600; opacity:0; visibility:hidden; pointer-events:none; box-shadow:0 8px 22px rgba(0,0,0,.24); transition:opacity .15s ease,transform .15s ease,visibility .15s; z-index:1200; }
@@ -723,7 +734,7 @@
         .linha-produzido { background: rgba(52, 152, 219, 0.08) !important; border-left: 4px solid var(--cor-produzido); opacity: 0.8; }
         .linha-planejado { background: var(--superficie); border-left: 4px solid var(--cor-planejado); }
         .select-status { width: 100%; min-width: 105px; padding: 5px; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--borda); }
-        .input-qtd-executada { width: 76px; min-width: 0; max-width: 100%; padding: 6px 7px; font-size: 0.8rem; border: 1px solid var(--borda); border-radius: 6px; }
+        .input-qtd-executada { display:block; width:100%; min-width:0; max-width:none; padding:6px 7px; font-size:0.8rem; border:1px solid var(--borda); border-radius:6px; box-sizing:border-box; }
 
         .sem-dados { text-align: center; padding: 60px 20px; color: var(--texto-claro); font-style: italic; background: var(--superficie); border-radius: var(--raio); box-shadow: var(--sombra); font-size: 1.1rem; }
         .oculto { display: none !important; }
