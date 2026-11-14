@@ -751,6 +751,13 @@
         .oculto { display: none !important; }
 
         .bloco-aba-config { background: var(--superficie); border-radius: var(--raio); padding: 20px; box-shadow: var(--sombra); margin-bottom: 20px; }
+        .config-logo { display:flex; align-items:center; gap:18px; flex-wrap:wrap; padding:18px; margin-bottom:18px; background:var(--superficie); border:1px solid var(--borda); border-radius:14px; box-shadow:var(--sombra); }
+        .config-logo-preview { width:92px; height:92px; display:grid; place-items:center; padding:8px; border-radius:14px; background:linear-gradient(145deg,#1C426F,#0B1D34); }
+        .config-logo-preview img { width:100%; height:100%; object-fit:contain; }
+        .config-logo-info { flex:1 1 240px; }
+        .config-logo-info h3 { margin-bottom:5px; }
+        .config-logo-info p { color:var(--texto-claro); font-size:.85rem; margin-bottom:10px; }
+        .config-logo-actions { display:flex; gap:8px; flex-wrap:wrap; }
         .cabecalho-aba-config { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
         .input-nome-aba { font-size: 1.1rem; font-weight: 600; border: none; border-bottom: 2px solid var(--borda); border-radius: 0; padding: 5px; width: 100%; max-width: 320px; color: var(--cor-principal); }
         .lista-maquinas-aba { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
@@ -818,7 +825,7 @@
         <div class="cabecalho-menu">
             <button class="btn-minimizar" onclick="alternarMinimizarMenu()" title="Minimizar/Expandir menu">🔛</button>
             <div class="marca-menu">
-                <img class="logo-menu-mark" src="./logo-milbra.svg" alt="Logo Milbra">
+                <img class="logo-menu-mark" id="logo-menu-img" src="./logo-milbra.svg" alt="Logo Milbra">
                 <div class="logo-menu">MILBRA</div>
             </div>
             <div class="subtitulo-menu">PCP - Produção</div>
@@ -918,6 +925,18 @@
                 <button class="btn-sucesso" onclick="exportarBackupCompleto()">💾 Exportar Backup</button>
             </div>
 
+            <section class="config-logo">
+                <div class="config-logo-preview"><img id="preview-logo-config" src="./logo-milbra.svg" alt="Prévia da logo do cabeçalho"></div>
+                <div class="config-logo-info">
+                    <h3>Logo do cabeçalho</h3>
+                    <p>Escolha uma imagem PNG, JPG, WebP ou SVG de até 2 MB. Ela será usada no cabeçalho deste navegador.</p>
+                    <input type="file" id="arquivo-logo" accept="image/png,image/jpeg,image/webp,image/svg+xml" onchange="prepararLogoCabecalho(event)">
+                    <div class="config-logo-actions">
+                        <button class="btn-sucesso" onclick="salvarLogoCabecalho()">Aplicar logo</button>
+                        <button class="btn-primario" onclick="restaurarLogoPadrao()">Restaurar padrão</button>
+                    </div>
+                </div>
+            </section>
             <div id="conteudo-config"></div>
         </div>
 
@@ -1110,6 +1129,57 @@
             }
         }
 
+        function aplicarLogoCabecalho() {
+            const imagem = document.getElementById('logo-menu-img');
+            const preview = document.getElementById('preview-logo-config');
+            if (!imagem) return;
+            let logoSalva = null;
+            try { logoSalva = localStorage.getItem('milbra-logo-cabecalho'); } catch (erro) {}
+            const origem = logoSalva || './logo-milbra.svg';
+            imagem.src = origem;
+            imagem.alt = logoSalva ? 'Logo personalizada' : 'Logo Milbra';
+            if (preview) preview.src = origem;
+        }
+
+        function prepararLogoCabecalho(evento) {
+            const arquivo = evento.target.files?.[0];
+            if (!arquivo) return;
+            const tiposAceitos = ['image/png','image/jpeg','image/webp','image/svg+xml'];
+            if (!tiposAceitos.includes(arquivo.type)) { alert('Escolha uma imagem PNG, JPG, WebP ou SVG.'); evento.target.value=''; return; }
+            if (arquivo.size > 2 * 1024 * 1024) { alert('A imagem deve ter no máximo 2 MB.'); evento.target.value=''; return; }
+            const leitor = new FileReader();
+            leitor.onload = () => {
+                if (typeof leitor.result !== 'string') return;
+                logoPendente = leitor.result;
+                document.getElementById('preview-logo-config').src = logoPendente;
+            };
+            leitor.onerror = () => alert('Não foi possível ler a imagem selecionada.');
+            leitor.readAsDataURL(arquivo);
+        }
+
+        function salvarLogoCabecalho() {
+            if (!logoPendente) return alert('Selecione uma imagem antes de aplicar a logo.');
+            try {
+                localStorage.setItem('milbra-logo-cabecalho', logoPendente);
+                aplicarLogoCabecalho();
+                logoPendente = null;
+                document.getElementById('arquivo-logo').value = '';
+                alert('Logo aplicada ao cabeçalho neste navegador.');
+            } catch (erro) {
+                console.error('Não foi possível salvar a logo:', erro);
+                alert('Não foi possível salvar a imagem. Tente uma versão menor que 2 MB.');
+            }
+        }
+
+        function restaurarLogoPadrao() {
+            if (!confirm('Restaurar a logo padrão da Milbra no cabeçalho?')) return;
+            try { localStorage.removeItem('milbra-logo-cabecalho'); } catch (erro) {}
+            logoPendente = null;
+            const arquivo = document.getElementById('arquivo-logo');
+            if (arquivo) arquivo.value = '';
+            aplicarLogoCabecalho();
+        }
+
         function alternarTema() {
             const proximoTema = document.body.classList.contains('tema-escuro') ? 'claro' : 'escuro';
             localStorage.setItem('temaInterface', proximoTema);
@@ -1272,6 +1342,7 @@
         ];
         let TURNOS = TURNOS_PADRAO.map(t => ({ ...t }));
         let graficoRelatorioTurnos = null;
+        let logoPendente = null;
 
         async function buscarTurnos() {
             const ref = documento('grupos', 'config-turnos');
@@ -1332,6 +1403,7 @@
 
         async function iniciarSistema() {
             aplicarTema(obterTemaInicial());
+            aplicarLogoCabecalho();
             document.getElementById('icone-todas-maquinas').innerHTML = iconeLucide('layoutDashboard');
             document.getElementById('icone-todas-maquinas').classList.add('icone-dashboard');
             document.getElementById('icone-configuracoes').innerHTML = iconeLucide('settings');
