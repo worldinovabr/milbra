@@ -124,7 +124,7 @@
         .menu-lateral.minimizado .logo-menu,
         .menu-lateral.minimizado .subtitulo-menu { display:none; }
         .menu-lateral.minimizado .cabecalho-menu { padding:58px 6px 14px; background:transparent; border-bottom-color:rgba(148,163,184,.12); }
-        .btn-editar-logo { position:absolute; top:10px; left:12px; display:grid; place-items:center; width:32px; height:32px; border:1px solid rgba(255,255,255,.22); border-radius:10px; background:rgba(255,255,255,.10); color:#fff; cursor:pointer; transition:background .18s ease,transform .18s ease; }
+        .btn-editar-logo { position:absolute; top:auto; bottom:10px; right:12px; left:auto; display:grid; place-items:center; width:32px; height:32px; border:1px solid rgba(255,255,255,.22); border-radius:10px; background:rgba(255,255,255,.10); color:#fff; cursor:pointer; transition:background .18s ease,transform .18s ease; }
         .btn-editar-logo:hover { background:rgba(255,255,255,.2); transform:translateY(-1px); }
         .btn-editar-logo svg { width:17px;height:17px; }
         .menu-lateral.minimizado .btn-editar-logo { display:none; }
@@ -851,22 +851,22 @@
             <div class="subtitulo-menu">PCP - Produção</div>
         </div>
 
-        <div class="menu-item ativo" onclick="carregarAba('todas')" title="Todas as Máquinas">
-            <span class="icone" id="icone-todas-maquinas"></span><span>Todas as Máquinas</span>
+        <div class="menu-item ativo" onclick="carregarAba('todas', event)" title="Todas as Máquinas">
+            <span class="icone" id="icone-todas-maquinas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg></span><span>Todas as Máquinas</span>
         </div>
 
         <div id="lista-abas-menu"></div>
 
         <div class="menu-relatorio" onclick="abrirRelatorio()" title="Relatório de produção">
-            <span class="icone" id="icone-relatorio"></span><span>Relatórios</span>
+            <span class="icone" id="icone-relatorio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"></path><path d="M18 17V9"></path><path d="M13 17V5"></path><path d="M8 17v-3"></path></svg></span><span>Relatórios</span>
         </div>
 
         <div class="menu-turnos" onclick="abrirConfiguracaoTurnos()" title="Configuração de turnos">
-            <span class="icone" id="icone-turnos"></span><span>Turnos</span>
+            <span class="icone" id="icone-turnos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg></span><span>Turnos</span>
         </div>
 
         <div class="menu-item" onclick="abrirConfiguracoes()" title="Configurações">
-            <span class="icone" id="icone-configuracoes"></span><span>Configurações</span>
+            <span class="icone" id="icone-configuracoes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.51a2 2 0 0 1 1-1.72l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg></span><span>Configurações</span>
         </div>
         <div class="menu-rodape">© Milbra - Artefatos Metálicos</div>
     </nav>
@@ -1137,9 +1137,11 @@
         }
 
         function obterTemaInicial() {
-            const temaSalvo = localStorage.getItem('temaInterface');
-            if (temaSalvo === 'claro' || temaSalvo === 'escuro') return temaSalvo;
-            return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'escuro' : 'claro';
+            try {
+                const temaSalvo = localStorage.getItem('temaInterface');
+                if (temaSalvo === 'claro' || temaSalvo === 'escuro') return temaSalvo;
+            } catch (erro) {}
+            return window.matchMedia?.('(prefers-color-scheme: dark)')?.matches ? 'escuro' : 'claro';
         }
 
         function aplicarTema(tema) {
@@ -1513,14 +1515,16 @@
             document.getElementById('icone-relatorio').innerHTML = iconeLucide('barChart');
             document.getElementById('icone-turnos').innerHTML = iconeLucide('clock');
 
-            if (localStorage.getItem('menuMinimizado') === 'true') {
-                document.getElementById('menu-lateral').classList.add('minimizado');
-            }
+            try {
+                if (localStorage.getItem('menuMinimizado') === 'true') {
+                    document.getElementById('menu-lateral').classList.add('minimizado');
+                }
+            } catch (erro) {}
 
             ABAS_GRUPOS = { ...GRUPOS_PADRAO };
             atualizarMenuAbas();
             atualizarSelectMaquinas();
-            atualizarGraficoMaquinas();
+            try { atualizarGraficoMaquinas(); } catch (erro) { console.error('Falha ao inicializar o gr?fico:', erro); }
             carregarTabela();
 
             try {
@@ -1533,7 +1537,7 @@
 
                 atualizarMenuAbas();
                 atualizarSelectMaquinas();
-                atualizarGraficoMaquinas();
+                try { atualizarGraficoMaquinas(); } catch (erro) { console.error('Falha ao atualizar o gr?fico:', erro); }
                 carregarTabela();
             } catch (erro) {
                 console.error('Erro ao carregar dados do Firebase:', erro);
@@ -1810,7 +1814,7 @@
             filtro.innerHTML = '<option value="">Todas</option>' + todas.map(m => `<option value="${m}">${m}</option>`).join('');
         }
 
-        function carregarAba(nome, evento = window.event) {
+        function carregarAba(nome, evento) {
             abaAtual = nome;
             document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('ativo'));
             evento?.target?.closest('.menu-item')?.classList.add('ativo');
@@ -2711,7 +2715,7 @@
         document.addEventListener('touchend', () => clearTimeout(temporizadorLegendaToque), { passive:true });
         document.addEventListener('touchcancel', () => clearTimeout(temporizadorLegendaToque), { passive:true });
         carregarSituacoesDoNavegador();
-        document.addEventListener('DOMContentLoaded', iniciarSistema);
+        iniciarSistema().catch(erro => console.error('Falha ao iniciar o sistema:', erro));
     </script>
 </body>
 </html>
