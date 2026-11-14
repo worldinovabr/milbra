@@ -115,6 +115,7 @@
         }
         .marca-menu { display:flex; flex-direction:column; align-items:center; gap:8px; }
         .logo-menu-mark { display:block; width:72px; height:72px; object-fit:contain; filter:drop-shadow(0 5px 10px rgba(0,0,0,.18)); }
+        .logo-menu-mark[hidden], #preview-logo-config[hidden] { display:none; }
         .logo-menu { font-size: 1.28rem; letter-spacing: .12em; font-weight: 800; margin-bottom: 3px; white-space: nowrap; color:#fff; }
         .subtitulo-menu { font-size: 0.75rem; opacity: 0.8; font-weight: 400; white-space: nowrap; }
         .menu-lateral.minimizado .logo-menu,
@@ -825,7 +826,7 @@
         <div class="cabecalho-menu">
             <button class="btn-minimizar" onclick="alternarMinimizarMenu()" title="Minimizar/Expandir menu">🔛</button>
             <div class="marca-menu">
-                <img class="logo-menu-mark" id="logo-menu-img" src="./logo-milbra.svg" alt="Logo Milbra">
+                <img class="logo-menu-mark" id="logo-menu-img" alt="Logo personalizada" hidden>
                 <div class="logo-menu">MILBRA</div>
             </div>
             <div class="subtitulo-menu">PCP - Produção</div>
@@ -926,7 +927,7 @@
             </div>
 
             <section class="config-logo">
-                <div class="config-logo-preview"><img id="preview-logo-config" src="./logo-milbra.svg" alt="Prévia da logo do cabeçalho"></div>
+                <div class="config-logo-preview"><span id="sem-logo-config">Sem logo</span><img id="preview-logo-config" alt="Logo enviada" hidden></div>
                 <div class="config-logo-info">
                     <h3>Logo do cabeçalho</h3>
                     <p>Escolha uma imagem PNG, JPG, WebP ou SVG de até 2 MB. Ela será usada no cabeçalho deste navegador.</p>
@@ -1129,55 +1130,123 @@
             }
         }
 
-        function aplicarLogoCabecalho() {
+        function aplicarLogoCabecalho(url) {
             const imagem = document.getElementById('logo-menu-img');
             const preview = document.getElementById('preview-logo-config');
+            const placeholder = document.getElementById('sem-logo-config');
             if (!imagem) return;
-            let logoSalva = null;
-            try { logoSalva = localStorage.getItem('milbra-logo-cabecalho'); } catch (erro) {}
-            const origem = logoSalva || './logo-milbra.svg';
-            imagem.src = origem;
-            imagem.alt = logoSalva ? 'Logo personalizada' : 'Logo Milbra';
-            if (preview) preview.src = origem;
+            const origem = url || '';
+            imagem.hidden = !origem;
+            preview?.toggleAttribute('hidden', !origem);
+            if (placeholder) placeholder.hidden = Boolean(origem);
+            if (origem) {
+                imagem.src = origem;
+                imagem.alt = 'Logo personalizada';
+                if (preview) preview.src = origem;
+            } else {
+                imagem.removeAttribute('src');
+                if (preview) preview.removeAttribute('src');
+            }
         }
 
-        function prepararLogoCabecalho(evento) {
+        async function comprimirLogo(arquivo) {
+            const limite = 1024 * 1024;
+            let imagem;
+            try { imagem = await createImageBitmap(arquivo); }
+            catch (erro) { throw new Error('N?o foi poss?vel abrir a imagem. Verifique se o arquivo ? v?lido.'); }
+            try {
+                for (const ladoMaximo of [1400, 1000, 720, 480]) {
+                    const escala = Math.min(1, ladoMaximo / Math.max(imagem.width, imagem.height));
+                    const canvas = document.createElement('canvas');
+                    canvas.width = Math.max(1, Math.round(imagem.width * escala));
+                    canvas.height = Math.max(1, Math.round(imagem.height * escala));
+                    const contexto = canvas.getContext('2d');
+                    contexto.drawImage(imagem, 0, 0, canvas.width, canvas.height);
+                    for (const qualidade of [.9,.8,.7,.6,.5,.4,.3]) {
+                        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/webp', qualidade));
+                        if (blob && blob.size <= limite) return blob;
+                    }
+                }
+                throw new Error('A imagem n?o p?de ser reduzida para menos de 1 MB.');
+            } finally { imagem.close?.(); }
+        }
+
+        async function prepararLogoCabecalho(evento) {
             const arquivo = evento.target.files?.[0];
             if (!arquivo) return;
             const tiposAceitos = ['image/png','image/jpeg','image/webp','image/svg+xml'];
             if (!tiposAceitos.includes(arquivo.type)) { alert('Escolha uma imagem PNG, JPG, WebP ou SVG.'); evento.target.value=''; return; }
-            if (arquivo.size > 2 * 1024 * 1024) { alert('A imagem deve ter no máximo 2 MB.'); evento.target.value=''; return; }
-            const leitor = new FileReader();
-            leitor.onload = () => {
-                if (typeof leitor.result !== 'string') return;
-                logoPendente = leitor.result;
-                document.getElementById('preview-logo-config').src = logoPendente;
-            };
-            leitor.onerror = () => alert('Não foi possível ler a imagem selecionada.');
-            leitor.readAsDataURL(arquivo);
-        }
-
-        function salvarLogoCabecalho() {
-            if (!logoPendente) return alert('Selecione uma imagem antes de aplicar a logo.');
+            if (arquivo.size > 10 * 1024 * 1024) { alert('A imagem original deve ter no m?ximo 10 MB.'); evento.target.value=''; return; }
             try {
-                localStorage.setItem('milbra-logo-cabecalho', logoPendente);
-                aplicarLogoCabecalho();
-                logoPendente = null;
-                document.getElementById('arquivo-logo').value = '';
-                alert('Logo aplicada ao cabeçalho neste navegador.');
+                logoPendente = await comprimirLogo(arquivo);
+                if (window.logoPreviewPendenteUrl) URL.revokeObjectURL(window.logoPreviewPendenteUrl);
+                window.logoPreviewPendenteUrl = URL.createObjectURL(logoPendente);
+                const preview = document.getElementById('preview-logo-config');
+                preview.src = window.logoPreviewPendenteUrl;
+                preview.hidden = false;
+                document.getElementById('sem-logo-config').hidden = true;
             } catch (erro) {
-                console.error('Não foi possível salvar a logo:', erro);
-                alert('Não foi possível salvar a imagem. Tente uma versão menor que 2 MB.');
+                logoPendente = null;
+                evento.target.value = '';
+                alert(erro.message || 'N?o foi poss?vel preparar a imagem.');
             }
         }
 
-        function restaurarLogoPadrao() {
-            if (!confirm('Restaurar a logo padrão da Milbra no cabeçalho?')) return;
+        async function buscarLogoNoBanco() {
+            const snapshot = await firebaseApi.getDoc(documento('grupos','config-logo'));
+            if (snapshot.exists() && snapshot.data().url) {
+                try { localStorage.removeItem('milbra-logo-cabecalho'); } catch (erro) {}
+                aplicarLogoCabecalho(snapshot.data().url);
+                return;
+            }
+            const logoAntiga = (() => { try { return localStorage.getItem('milbra-logo-cabecalho'); } catch (erro) { return null; } })();
+            if (logoAntiga) {
+                aplicarLogoCabecalho(logoAntiga);
+                try {
+                    const blobAntigo = await (await fetch(logoAntiga)).blob();
+                    await enviarLogoAoBanco(await comprimirLogo(blobAntigo), false);
+                } catch (erro) { console.warn('Logo local mantida; migra??o para o Firebase falhou.', erro); }
+            } else aplicarLogoCabecalho(null);
+        }
+
+        async function enviarLogoAoBanco(blob, mostrarConfirmacao) {
+            if (!storage || !firebaseStorageApi || !firebaseApi || !firestore) throw new Error('Firebase Storage ainda n?o est? conectado.');
+            if (blob.size > 1024 * 1024) throw new Error('A imagem convertida excede 1 MB.');
+            const referencia = firebaseStorageApi.ref(storage,'branding/logo.webp');
+            const resultado = await firebaseStorageApi.uploadBytes(referencia,blob,{contentType:'image/webp',cacheControl:'public,max-age=300'});
+            const url = await firebaseStorageApi.getDownloadURL(resultado.ref);
+            await firebaseApi.setDoc(documento('grupos','config-logo'),{tipo:'config-logo',url,formato:'webp',tamanhoBytes:blob.size,atualizadoEm:new Date().toISOString()});
             try { localStorage.removeItem('milbra-logo-cabecalho'); } catch (erro) {}
+            aplicarLogoCabecalho(url);
             logoPendente = null;
             const arquivo = document.getElementById('arquivo-logo');
             if (arquivo) arquivo.value = '';
-            aplicarLogoCabecalho();
+            if (window.logoPreviewPendenteUrl) { URL.revokeObjectURL(window.logoPreviewPendenteUrl); window.logoPreviewPendenteUrl=null; }
+            if (mostrarConfirmacao) alert(`Logo convertida para WebP (${(blob.size/1024).toFixed(0)} KB) e salva no Firebase. Ela ser? compartilhada entre os dispositivos.`);
+        }
+
+        async function salvarLogoCabecalho() {
+            if (!logoPendente) return alert('Selecione uma imagem antes de aplicar a logo.');
+            try { await enviarLogoAoBanco(logoPendente,true); }
+            catch (erro) {
+                console.error('N?o foi poss?vel salvar a logo no Firebase:', erro);
+                alert(`N?o foi poss?vel salvar a logo no Firebase. ${erro.code || ''} ${erro.message || erro} Confira se as regras do Firebase Storage foram publicadas.`);
+            }
+        }
+
+        async function restaurarLogoPadrao() {
+            if (!storage || !firebaseStorageApi || !firebaseApi || !firestore) return alert('Conecte ao Firebase antes de remover a logo compartilhada.');
+            if (!confirm('Remover a logo personalizada do cabe?alho?')) return;
+            try {
+                if (storage && firebaseStorageApi) await firebaseStorageApi.deleteObject(firebaseStorageApi.ref(storage,'branding/logo.webp')).catch(() => {});
+                if (firebaseApi && firestore) await firebaseApi.deleteDoc(documento('grupos','config-logo'));
+                try { localStorage.removeItem('milbra-logo-cabecalho'); } catch (erro) {}
+                logoPendente = null;
+                const arquivo = document.getElementById('arquivo-logo');
+                if (arquivo) arquivo.value = '';
+                if (window.logoPreviewPendenteUrl) { URL.revokeObjectURL(window.logoPreviewPendenteUrl); window.logoPreviewPendenteUrl=null; }
+                aplicarLogoCabecalho(null);
+            } catch (erro) { alert(`N?o foi poss?vel remover a logo do Firebase. ${erro.message || erro}`); }
         }
 
         function alternarTema() {
@@ -1270,17 +1339,22 @@
 
         const FIREBASE_SDK_URL = 'https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js';
         const FIRESTORE_SDK_URL = 'https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js';
+        const FIREBASE_STORAGE_SDK_URL = 'https://www.gstatic.com/firebasejs/12.1.0/firebase-storage.js';
         const ANALYTICS_SDK_URL = 'https://www.gstatic.com/firebasejs/12.1.0/firebase-analytics.js';
         let firestore;
         let firebaseApi;
+        let firebaseStorageApi;
+        let storage;
 
         async function inicializarBanco() {
-            const [{ initializeApp }, firestoreModulo] = await Promise.all([
+            const [{ initializeApp }, firestoreModulo, storageModulo] = await Promise.all([
                 import(FIREBASE_SDK_URL),
-                import(FIRESTORE_SDK_URL)
+                import(FIRESTORE_SDK_URL),
+                import(FIREBASE_STORAGE_SDK_URL)
             ]);
 
             firebaseApi = firestoreModulo;
+            firebaseStorageApi = storageModulo;
 
             const resposta = await fetch('./firebase-config.json', { cache: 'no-store' });
             if (!resposta.ok) throw new Error('NÃ£o foi possÃ­vel carregar firebase-config.json');
@@ -1288,6 +1362,7 @@
             const firebaseConfig = await resposta.json();
             const app = initializeApp(firebaseConfig);
             firestore = firebaseApi.getFirestore(app);
+            storage = firebaseStorageApi.getStorage(app);
 
             if (firebaseConfig.measurementId && location.protocol === 'https:') {
                 import(ANALYTICS_SDK_URL)
@@ -1331,7 +1406,7 @@
             const g = {};
             snapshot.forEach(doc => {
                 const item = doc.data();
-                if (doc.id === 'config-turnos' || item.tipo === 'config-turnos') return;
+                if (['config-turnos','config-logo'].includes(doc.id) || ['config-turnos','config-logo'].includes(item.tipo)) return;
                 g[item.nome] = item.maquinas || [];
             });
             return g;
@@ -1423,6 +1498,7 @@
 
             try {
                 await inicializarBanco();
+                await buscarLogoNoBanco();
                 ABAS_GRUPOS = { ...GRUPOS_PADRAO, ...await buscarTodosGrupos() };
                 TURNOS = await buscarTurnos();
                 BANCO_ITENS = await buscarItens();
@@ -2294,12 +2370,15 @@
         async function iniciarProducao(id, retomada = false) {
             const p = PROGRAMACOES.find(i => i.id === id);
             if (!p || (!retomada && p.producaoIniciadaEm) || (retomada && !p.producaoFinalizadaEm)) return;
+            const conflito = buscarConflitoEmMaquina(p.maquina, id);
+            if (conflito) { alertarConflitoEmMaquina(p.maquina, conflito); return; }
             const inspetora = prompt(retomada ? 'Nome da inspetora respons\u00e1vel pela retomada:' : 'Nome da inspetora que est\u00e1 iniciando a produ\u00e7\u00e3o:');
             if (!inspetora || !inspetora.trim()) return;
             const acao = retomada ? 'retomar' : 'iniciar';
             if (!confirm(`Confirma ${acao} a produ\u00e7\u00e3o de ${p.nome || 'este item'} na m\u00e1quina ${p.maquina || ''}?`)) return;
             const agora = new Date().toISOString();
             p.inspetoraInicio = inspetora.trim();
+            p.status = 'Em máquina';
             p.condicaoMaquina = 'producao';
             p.producaoIniciadaEm = agora;
             p.producaoFinalizadaEm = null;
@@ -2312,6 +2391,7 @@
                 p.historicoProducao.push({ tipo: 'situacao', titulo: situacao?.titulo || p.situacaoMaquina, em: agora, ...p.turnoAtual });
             }
             await salvarProg(p);
+            atualizarGraficoMaquinas();
             carregarTabela();
         }
 
@@ -2330,12 +2410,14 @@
             p.inspetoraFim = inspetora.trim();
             p.producaoFinalizadaEm = agora;
             p.condicaoMaquina = valorCondicao;
+            p.status = valorCondicao === 'disponivel' ? 'Produzido' : valorCondicao === 'troca' ? 'Próximo' : 'Em máquina';
             const turnoFinalizacao = metadadosTurno(new Date(agora));
             p.turnoAtual = turnoFinalizacao;
             if (!Array.isArray(p.historicoProducao)) p.historicoProducao = [];
             p.historicoProducao.push({ tipo: 'fim', titulo: 'Produ\u00e7\u00e3o finalizada', inspetora: p.inspetoraFim, em: agora, qtdExecutada:Number(p.qtdExecutada || 0), ...turnoFinalizacao });
             p.historicoProducao.push({ tipo: 'condicao-maquina', titulo: `Condi\u00e7\u00e3o da m\u00e1quina: ${nomeCondicao}`, valor: valorCondicao, inspetora: p.inspetoraFim, em: agora, ...turnoFinalizacao });
             await salvarProg(p);
+            atualizarGraficoMaquinas();
             carregarTabela();
         }
 
