@@ -122,8 +122,12 @@
         .logo-menu { font-size: 1.28rem; letter-spacing: .12em; font-weight: 800; margin-bottom: 3px; white-space: nowrap; color:#fff; }
         .subtitulo-menu { font-size: 0.75rem; opacity: 0.8; font-weight: 400; white-space: nowrap; }
         .menu-lateral.minimizado .logo-menu,
-        .menu-lateral.minimizado .subtitulo-menu,
+        .menu-lateral.minimizado .subtitulo-menu { display:none; }
         .menu-lateral.minimizado .cabecalho-menu { padding:58px 6px 14px; background:transparent; border-bottom-color:rgba(148,163,184,.12); }
+        .btn-editar-logo { position:absolute; top:10px; left:12px; display:grid; place-items:center; width:32px; height:32px; border:1px solid rgba(255,255,255,.22); border-radius:10px; background:rgba(255,255,255,.10); color:#fff; cursor:pointer; transition:background .18s ease,transform .18s ease; }
+        .btn-editar-logo:hover { background:rgba(255,255,255,.2); transform:translateY(-1px); }
+        .btn-editar-logo svg { width:17px;height:17px; }
+        .menu-lateral.minimizado .btn-editar-logo { display:none; }
         .menu-lateral.minimizado .logo-menu-mark { width:42px; height:42px; }
 
         .btn-minimizar {
@@ -178,7 +182,6 @@
         .menu-item .icone svg { width: 19px; height: 19px; stroke-width: 2; filter: drop-shadow(0 1px 2px rgba(0,0,0,.24)); }
         .icone-dashboard { color: #60A5FA; }
         .icone-config { color: #A78BFA; }
-        .icone-logo { color:#F472B6; }
         .icone-automaticas { color: #22D3EE; }
         .icone-maq-8 { color: #34D399; }
         .icone-maq-15 { color: #FBBF24; }
@@ -844,6 +847,7 @@
                 <img class="logo-menu-mark" id="logo-menu-img" alt="Logo personalizada" hidden>
                 <div class="logo-menu">MILBRA</div>
             </div>
+            <button class="btn-editar-logo" onclick="abrirConfiguracaoLogo()" title="Adicionar ou alterar logo" aria-label="Adicionar ou alterar logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z"></path></svg></button>
             <div class="subtitulo-menu">PCP - Produção</div>
         </div>
 
@@ -852,10 +856,6 @@
         </div>
 
         <div id="lista-abas-menu"></div>
-
-        <div class="menu-item" onclick="abrirConfiguracaoLogo()" title="Adicionar ou alterar logo">
-            <span class="icone icone-logo" id="icone-logo"></span><span>Logo da empresa</span>
-        </div>
 
         <div class="menu-relatorio" onclick="abrirRelatorio()" title="Relatório de produção">
             <span class="icone" id="icone-relatorio"></span><span>Relatórios</span>
@@ -1509,8 +1509,6 @@
             document.getElementById('icone-todas-maquinas').innerHTML = iconeLucide('layoutDashboard');
             document.getElementById('icone-todas-maquinas').classList.add('icone-dashboard');
             document.getElementById('icone-configuracoes').innerHTML = iconeLucide('settings');
-            document.getElementById('icone-logo').innerHTML = iconeLucide('imagePlus');
-            document.getElementById('icone-logo').classList.add('icone-logo');
             document.getElementById('icone-configuracoes').classList.add('icone-config');
             document.getElementById('icone-relatorio').innerHTML = iconeLucide('barChart');
             document.getElementById('icone-turnos').innerHTML = iconeLucide('clock');
@@ -1783,7 +1781,7 @@
                 const item = document.createElement('div');
                 item.className = 'menu-item';
                 item.title = nome;
-                item.onclick = () => carregarAba(nome);
+                item.onclick = evento => carregarAba(nome, evento);
                 const icone = ICONES_GRUPOS[nome] || iconeLucide('wrench');
                 const classeIcone = CLASSES_ICONES_GRUPOS[nome] || 'icone-generico';
                 item.innerHTML = `<span class="icone ${classeIcone}">${icone}</span><span>${nome}</span>`;
@@ -1795,7 +1793,7 @@
                     const item = document.createElement('div');
                     item.className = 'menu-item';
                     item.title = nome;
-                    item.onclick = () => carregarAba(nome);
+                    item.onclick = evento => carregarAba(nome, evento);
                     const icone = ICONES_GRUPOS[nome] || iconeLucide('wrench');
                     const classeIcone = CLASSES_ICONES_GRUPOS[nome] || 'icone-generico';
                     const paleta = ['#38bdf8','#a78bfa','#fb7185','#34d399','#fbbf24','#f472b6','#2dd4bf'];
@@ -1812,10 +1810,10 @@
             filtro.innerHTML = '<option value="">Todas</option>' + todas.map(m => `<option value="${m}">${m}</option>`).join('');
         }
 
-        function carregarAba(nome) {
+        function carregarAba(nome, evento = window.event) {
             abaAtual = nome;
             document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('ativo'));
-            event.target.closest('.menu-item')?.classList.add('ativo');
+            evento?.target?.closest('.menu-item')?.classList.add('ativo');
 
             document.getElementById('titulo-aba').textContent = nome === 'todas' ? 'Todas as Máquinas' : nome;
             document.getElementById('subtitulo-aba').textContent = nome === 'todas' ? 'Visualização geral' : `Itens do grupo ${nome}`;
@@ -1845,9 +1843,8 @@
             document.getElementById('area-turnos').classList.add('oculto');
             document.getElementById('area-logo').classList.remove('oculto');
             document.querySelectorAll('.menu-item, .menu-relatorio, .menu-turnos').forEach(item => item.classList.remove('ativo'));
-            document.querySelector('.menu-item[title="Adicionar ou alterar logo"]')?.classList.add('ativo');
             document.getElementById('titulo-aba').textContent = 'Logo da empresa';
-            document.getElementById('subtitulo-aba').textContent = 'Personalize o cabe?alho do sistema';
+            document.getElementById('subtitulo-aba').textContent = 'Personalize o cabe\u00e7alho do sistema';
         }
 
         function abrirRelatorio() {
@@ -2713,6 +2710,7 @@
 
         document.addEventListener('touchend', () => clearTimeout(temporizadorLegendaToque), { passive:true });
         document.addEventListener('touchcancel', () => clearTimeout(temporizadorLegendaToque), { passive:true });
+        carregarSituacoesDoNavegador();
         document.addEventListener('DOMContentLoaded', iniciarSistema);
     </script>
 </body>
