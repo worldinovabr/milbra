@@ -158,7 +158,9 @@
         .menu-item.ativo { background: linear-gradient(110deg, rgba(249,115,22,.25), rgba(249,115,22,.08)); border-color: rgba(253,186,116,.2); box-shadow: inset 3px 0 #fb923c, 0 5px 16px rgba(0,0,0,.12); font-weight: 600; }
         .menu-item:hover { background: rgba(255,255,255,.09); border-color: rgba(255,255,255,.08); }
         .menu-item .icone { flex-shrink: 0; width: 20px; height: 20px; color: rgba(255, 255, 255, 0.72); display: inline-flex; align-items: center; justify-content: center; }
-        .menu-item .icone svg { width: 18px; height: 18px; stroke-width: 1.75; }
+        .menu-item .icone { width: 32px; height: 32px; border-radius: 10px; background: color-mix(in srgb, currentColor 15%, transparent); transition: transform .18s ease, background .18s ease; }
+        .menu-item:hover .icone, .menu-item.ativo .icone { transform: scale(1.06); background: color-mix(in srgb, currentColor 24%, transparent); }
+        .menu-item .icone svg { width: 19px; height: 19px; stroke-width: 2; filter: drop-shadow(0 1px 2px rgba(0,0,0,.24)); }
         .icone-dashboard { color: #60A5FA; }
         .icone-config { color: #A78BFA; }
         .icone-automaticas { color: #22D3EE; }
@@ -548,18 +550,26 @@
 
         /* Ajuste dos botões de ação */
         .btn-acao {
-            width: 28px;
-            height: 28px;
+            width: 34px;
+            min-width: 34px;
+            height: 34px;
             padding: 0;
             border-radius: 50%;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            margin-right: 3px;
+            margin: 0;
+            box-shadow: 0 3px 9px rgba(15,23,42,.18);
         }
+        .acoes-producao { display:inline-flex; flex-flow:row nowrap; align-items:center; justify-content:flex-start; gap:7px; min-width:max-content; }
+        .acoes-producao .btn-situacao { margin:0; width:34px; height:34px; min-width:34px; }
+        .acoes-producao .btn-acao svg { width:17px; height:17px; stroke-width:2.2; }
+        .acoes-producao .btn-perigo { background:linear-gradient(145deg,#fb7185,#dc2626); color:#fff; }
+        .acoes-producao .btn-editar { background:linear-gradient(145deg,#64748b,#334155); color:#fff; }
+        .acoes-producao button:hover { transform:translateY(-2px) scale(1.04); box-shadow:0 7px 15px rgba(15,23,42,.24); }
         .btn-editar {
-            background: #334155;
+            background: linear-gradient(145deg,#64748b,#334155);
             color: #FFFFFF;
         }
         .btn-editar:hover {
@@ -649,9 +659,9 @@
         .opcao-situacao.falta-componente .opcao-situacao-icone { background: #8E44AD; }
         .acoes-situacao { display: flex; gap: 6px; }
         .acoes-situacao button { padding: 6px 9px; font-size: .75rem; }
-        .btn-historico { background: #334155; color: #fff; }
-        .btn-iniciar-producao { background: #27AE60; color: #fff; }
-        .btn-finalizar-producao { background: #E74C3C; color: #fff; }
+        .btn-historico { background: linear-gradient(145deg,#64748b,#334155); color: #fff; }
+        .btn-iniciar-producao { background: linear-gradient(145deg,#34d399,#059669); color: #fff; }
+        .btn-finalizar-producao { background: linear-gradient(145deg,#fb7185,#dc2626); color: #fff; }
         .modal-historico { max-width: 600px; }
         .resumo-producao { display: grid; gap: 8px; padding: 14px; background: var(--fundo-cinza); border-radius: 8px; margin-bottom: 14px; }
         .linha-tempo-producao { display: grid; gap: 8px; max-height: 45vh; overflow-y: auto; }
@@ -1053,6 +1063,9 @@
             settings: '<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.51a2 2 0 0 1 1-1.72l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle>',
             barChart: '<path d="M3 3v18h18"></path><path d="M18 17V9"></path><path d="M13 17V5"></path><path d="M8 17v-3"></path>',
             play: '<polygon points="6 3 20 12 6 21 6 3"></polygon>',
+            eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"></path><circle cx="12" cy="12" r="3"></circle>',
+            edit: '<path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z"></path>',
+            trash: '<path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="m19 6-1 14H6L5 6"></path><path d="M10 11v5M14 11v5"></path>',
             rotateCcw: '<path d="M3 12a9 9 0 1 0 2.64-6.36L3 8"></path><path d="M3 3v5h5"></path>',
             stop: '<rect x="5" y="5" width="14" height="14" rx="2"></rect>',
             cpu: '<rect width="16" height="16" x="4" y="4" rx="2"></rect><rect width="6" height="6" x="9" y="9" rx="1"></rect><path d="M15 2v2"></path><path d="M15 20v2"></path><path d="M2 15h2"></path><path d="M2 9h2"></path><path d="M20 15h2"></path><path d="M20 9h2"></path><path d="M9 2v2"></path><path d="M9 20v2"></path>',
@@ -1833,7 +1846,9 @@
         async function alterarStatus(id, novo) {
             const p = PROGRAMACOES.find(i => i.id === id);
             if (!p) return;
-            if (novo === 'Em máquina') {
+            if (novo === p.status) return;
+            if (!confirm(`Confirma a altera\u00e7\u00e3o do status de ${p.nome || 'item'} para "${novo}"?`)) { carregarTabela(); return; }
+            if (novo === 'Em m\u00e1quina') {
                 const conflito = buscarConflitoEmMaquina(p.maquina, id);
                 if (conflito) {
                     alertarConflitoEmMaquina(p.maquina, conflito);
@@ -1948,6 +1963,9 @@
             const p = PROGRAMACOES.find(i => i.id === idSituacaoAtual);
             if (!p) return fecharModalSituacao();
 
+            if (p.situacaoMaquina === valor) return fecharModalSituacao();
+            const situacaoSelecionada = SITUACOES_MAQUINA.find(s => s.valor === valor);
+            if (!confirm(`Confirma a altera\u00e7\u00e3o da situa\u00e7\u00e3o da m\u00e1quina para "${situacaoSelecionada?.titulo || valor}"?`)) return;
             if (p.producaoIniciadaEm) {
                 if (!Array.isArray(p.historicoProducao)) p.historicoProducao = [];
                 const anterior = SITUACOES_MAQUINA.find(s => s.valor === p.situacaoMaquina);
@@ -1971,6 +1989,8 @@
             if (!p || (!retomada && p.producaoIniciadaEm) || (retomada && !p.producaoFinalizadaEm)) return;
             const inspetora = prompt(retomada ? 'Nome da inspetora respons\u00e1vel pela retomada:' : 'Nome da inspetora que est\u00e1 iniciando a produ\u00e7\u00e3o:');
             if (!inspetora || !inspetora.trim()) return;
+            const acao = retomada ? 'retomar' : 'iniciar';
+            if (!confirm(`Confirma ${acao} a produ\u00e7\u00e3o de ${p.nome || 'este item'} na m\u00e1quina ${p.maquina || ''}?`)) return;
             const agora = new Date().toISOString();
             p.inspetoraInicio = inspetora.trim();
             p.condicaoMaquina = 'producao';
@@ -1997,6 +2017,7 @@
             const opcoes = { '1': ['disponivel', 'Dispon\u00edvel'], '2': ['troca', 'Processo de troca'], '3': ['manutencao', 'Manuten\u00e7\u00e3o'] };
             const [valorCondicao, nomeCondicao] = opcoes[condicao.trim()] || [];
             if (!valorCondicao) { alert('Escolha 1, 2 ou 3 para informar a condi\u00e7\u00e3o da m\u00e1quina.'); return; }
+            if (!confirm(`Confirma a finaliza\u00e7\u00e3o da produ\u00e7\u00e3o?\n\nInspetora: ${inspetora.trim()}\nCondi\u00e7\u00e3o da m\u00e1quina: ${nomeCondicao}`)) return;
             const agora = new Date().toISOString();
             p.inspetoraFim = inspetora.trim();
             p.producaoFinalizadaEm = agora;
@@ -2168,12 +2189,13 @@
                                     >
                                 </td>
                                 <td>
-                                    <button class="btn-editar btn-acao" onclick="editarProgramacao(${p.id})" title="Editar programação">✏️</button>
-                                    <button class="btn-perigo btn-acao" onclick="excluirItem(${p.id})" title="Excluir programação">🗑️</button>
+                                    <div class="acoes-producao">
+                                    <button class="btn-editar btn-acao" onclick="editarProgramacao(${p.id})" title="Editar programa&#231;&#227;o">${iconeLucide('edit')}</button>
+                                    <button class="btn-perigo btn-acao" onclick="excluirItem(${p.id})" title="Excluir programa&#231;&#227;o">${iconeLucide('trash')}</button>
                                     <button class="btn-situacao ${classeSituacao}" onclick="alterarSituacaoMaq(${p.id})" title="${textoSituacao}">${iconeSituacao}</button>
                                     ${p.producaoIniciadaEm && !p.producaoFinalizadaEm ? `<button class="btn-acao btn-finalizar-producao" onclick="finalizarProducao(${p.id})" title="Finalizar produção" aria-label="Finalizar produção">${iconeLucide('stop')}</button>` : `<button class="btn-acao btn-iniciar-producao" onclick="iniciarProducao(${p.id}, ${Boolean(p.producaoFinalizadaEm)})" title="${p.producaoFinalizadaEm ? 'Retomar produção' : 'Iniciar produção'}" aria-label="${p.producaoFinalizadaEm ? 'Retomar produção' : 'Iniciar produção'}">${iconeLucide(p.producaoFinalizadaEm ? 'rotateCcw' : 'play')}</button>`}
-                                    ${p.producaoIniciadaEm && !p.producaoFinalizadaEm ? `<button class="btn-acao btn-finalizar-producao" onclick="finalizarProducao(${p.id})" title="Finalizar produção" aria-label="Finalizar produção">■</button>` : ''}
                                     <button class="btn-acao btn-historico" onclick="abrirHistoricoProducao(${p.id})" title="Ver histórico da produção" aria-label="Ver histórico da produção">${iconeLucide('eye')}</button>
+                                    </div>
                                 </td>
                             </tr>
                         `}).join('')}
