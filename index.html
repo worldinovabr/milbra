@@ -55,7 +55,7 @@
             --sombra: 0 1px 2px rgba(0, 0, 0, 0.28);
         }
         body.tema-escuro .menu-lateral {
-            background: #0B1220;
+            background: linear-gradient(180deg, #1C426F 0%, #102B4D 58%, #0B1D34 100%);
         }
         body.tema-escuro .menu-item.ativo,
         body.tema-escuro .menu-item:hover {
@@ -87,7 +87,7 @@
         .menu-lateral {
             width: var(--largura-menu);
             min-width: var(--largura-menu);
-            background: linear-gradient(180deg, #102b46 0%, #0a1b2d 100%);
+            background: linear-gradient(180deg, #1C426F 0%, #102B4D 58%, #0B1D34 100%);
             color: var(--branco);
             padding: 0;
             display: flex;
@@ -107,16 +107,20 @@
         .menu-lateral.fechado { transform: translateX(-100%); }
 
         .cabecalho-menu {
-            padding: 28px 16px 22px;
-            background: radial-gradient(ellipse at top, rgba(249,115,22,.24), transparent 72%);
+            padding: 24px 16px 20px;
+            background: radial-gradient(ellipse at top, rgba(255,255,255,.14), rgba(28,66,111,.18) 55%, transparent 100%);
             text-align: center;
             border-bottom: 1px solid rgba(255,255,255,0.15);
             position: relative;
         }
-        .logo-menu { font-size: 1.28rem; letter-spacing: .12em; font-weight: 800; margin-bottom: 5px; white-space: nowrap; }
+        .marca-menu { display:flex; flex-direction:column; align-items:center; gap:8px; }
+        .logo-menu-mark { display:block; width:72px; height:72px; object-fit:contain; filter:drop-shadow(0 5px 10px rgba(0,0,0,.18)); }
+        .logo-menu { font-size: 1.28rem; letter-spacing: .12em; font-weight: 800; margin-bottom: 3px; white-space: nowrap; color:#fff; }
         .subtitulo-menu { font-size: 0.75rem; opacity: 0.8; font-weight: 400; white-space: nowrap; }
         .menu-lateral.minimizado .logo-menu,
         .menu-lateral.minimizado .subtitulo-menu { display: none; }
+        .menu-lateral.minimizado .cabecalho-menu { padding:58px 6px 14px; }
+        .menu-lateral.minimizado .logo-menu-mark { width:42px; height:42px; }
 
         .btn-minimizar {
             position: absolute;
@@ -155,7 +159,7 @@
             padding: 14px 10px;
             justify-content: center;
         }
-        .menu-item.ativo { background: linear-gradient(110deg, rgba(249,115,22,.25), rgba(249,115,22,.08)); border-color: rgba(253,186,116,.2); box-shadow: inset 3px 0 #fb923c, 0 5px 16px rgba(0,0,0,.12); font-weight: 600; }
+        .menu-item.ativo { background: linear-gradient(110deg, rgba(96,165,250,.25), rgba(96,165,250,.08)); border-color: rgba(147,197,253,.22); box-shadow: inset 3px 0 #60A5FA, 0 5px 16px rgba(0,0,0,.12); font-weight: 600; }
         .menu-item:hover { background: rgba(255,255,255,.09); border-color: rgba(255,255,255,.08); }
         .menu-item .icone { flex-shrink: 0; width: 20px; height: 20px; color: rgba(255, 255, 255, 0.72); display: inline-flex; align-items: center; justify-content: center; }
         .menu-item .icone { width: 32px; height: 32px; border-radius: 10px; background: color-mix(in srgb, currentColor 15%, transparent); transition: transform .18s ease, background .18s ease; }
@@ -212,22 +216,25 @@
 
         .btn-menu-mobile {
             position: fixed;
-            top: 15px;
-            left: 15px;
+            top: 12px;
+            left: 12px;
             z-index: 1000;
-            background: var(--cor-principal);
+            background: rgba(15,23,42,.76);
             color: white;
-            border: none;
-            border-radius: 50%;
-            width: 45px;
-            height: 45px;
-            font-size: 1.2rem;
+            border: 1px solid rgba(255,255,255,.18);
+            border-radius: 10px;
+            width: 35px;
+            height: 35px;
+            font-size: .95rem;
             display: none;
             align-items: center;
             justify-content: center;
-            box-shadow: var(--sombra);
+            box-shadow: 0 3px 10px rgba(15,23,42,.12);
             cursor: pointer;
+            opacity:.78;
+            transition:opacity .18s ease,background .18s ease;
         }
+        .btn-menu-mobile:hover,.btn-menu-mobile:focus-visible { opacity:1; background:rgba(15,23,42,.94); }
 
         .area-principal {
             flex: 1;
@@ -438,7 +445,9 @@
         .relatorio-cabecalho h2 { font-size:1.65rem; margin-bottom:5px; }
         .relatorio-cabecalho p { color:var(--texto-claro); }
         .relatorio-periodo { display:flex; gap:10px; align-items:end; flex-wrap:wrap; padding:16px; background:var(--superficie); border:1px solid var(--borda); border-radius:14px; box-shadow:var(--sombra); margin-bottom:18px; }
-        .relatorio-periodo .campo-filtro { flex:0 1 190px; }
+        .relatorio-periodo .campo-filtro { flex:1 1 185px; min-width:185px; }
+        .relatorio-periodo #relatorio-maquina { min-width:230px; }
+        .relatorio-periodo #relatorio-turno { min-width:210px; }
         .relatorio-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(175px,1fr)); gap:14px; margin-bottom:18px; }
         .relatorio-card { position:relative; overflow:hidden; padding:18px; background:var(--superficie); border:1px solid var(--borda); border-radius:14px; box-shadow:0 8px 24px rgba(15,23,42,.05); }
         .relatorio-card::after { content:''; position:absolute; width:74px; height:74px; border-radius:50%; right:-22px; top:-25px; background:color-mix(in srgb,var(--card-cor,#f97316) 13%,transparent); }
@@ -452,8 +461,10 @@
         .relatorio-linha { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:10px 12px; border-radius:9px; background:var(--fundo-cinza); }
         .relatorio-linha span { color:var(--texto-claro); }
         .relatorio-tabela { width:100%; border-collapse:collapse; font-size:.84rem; }
-        .relatorio-tabela th,.relatorio-tabela td { padding:10px 8px; text-align:left; border-bottom:1px solid var(--borda); }
+        .relatorio-tabela th,.relatorio-tabela td { padding:10px 8px; text-align:left; border-bottom:1px solid var(--borda); vertical-align:top; }
+        .relatorio-tabela td small { display:block; margin-top:3px; color:var(--texto-claro); }
         .relatorio-tabela th { color:var(--texto-claro); font-size:.74rem; text-transform:uppercase; letter-spacing:.04em; }
+        .relatorio-tabela tfoot th,.relatorio-tabela tfoot td { font-weight:800; color:var(--texto-escuro); background:var(--fundo-cinza); border-top:2px solid var(--borda); }
         .turno-editor { display:grid; grid-template-columns:1.2fr 1.2fr 1fr 1fr auto; align-items:end; gap:12px; padding:16px; margin-bottom:12px; border:1px solid var(--borda); border-radius:12px; background:var(--superficie); box-shadow:var(--sombra); }
         .turno-editor .campo-filtro { min-width:0; }
         .turno-atual { padding:12px 14px; margin-bottom:16px; border-radius:10px; background:rgba(14,165,233,.1); color:var(--texto-escuro); }
@@ -794,7 +805,7 @@
             .tabela-producao td { padding: 9px 7px; }
             .grupo-campos-modal { grid-template-columns: 1fr; }
             .relatorio-grade { grid-template-columns:1fr; }
-            .relatorio-periodo .campo-filtro { flex-basis:100%; }
+            .relatorio-periodo .campo-filtro { flex:1 1 100%; min-width:100%; }
             .area-grafico-maquinas { padding: 12px 10px 20px; }
             #graficoMaquinas { height: 200px !important; }
         }
@@ -806,7 +817,10 @@
     <nav class="menu-lateral" id="menu-lateral">
         <div class="cabecalho-menu">
             <button class="btn-minimizar" onclick="alternarMinimizarMenu()" title="Minimizar/Expandir menu">🔛</button>
-            <div class="logo-menu">MILBRA</div>
+            <div class="marca-menu">
+                <img class="logo-menu-mark" src="./logo-milbra.svg" alt="Logo Milbra">
+                <div class="logo-menu">MILBRA</div>
+            </div>
             <div class="subtitulo-menu">PCP - Produção</div>
         </div>
 
@@ -1047,11 +1061,28 @@
         let graficoMaquinas = null;
         let idSituacaoAtual = null;
 
-        function abrirFecharMenu() { 
+        function abrirFecharMenu() {
             const menu = document.getElementById('menu-lateral');
-            menu.classList.toggle('aberto');
-            menu.classList.toggle('fechado');
+            const aberto = menu.classList.toggle('aberto');
+            menu.classList.toggle('fechado', !aberto);
         }
+
+        function fecharMenuMobile() {
+            const menu = document.getElementById('menu-lateral');
+            menu.classList.remove('aberto');
+            menu.classList.add('fechado');
+        }
+
+        document.addEventListener('pointerdown', evento => {
+            if (!window.matchMedia('(max-width: 768px)').matches) return;
+            const alvo = evento.target;
+            if (!(alvo instanceof Element) || alvo.closest('#menu-lateral') || alvo.closest('.btn-menu-mobile')) return;
+            if (document.getElementById('menu-lateral').classList.contains('aberto')) fecharMenuMobile();
+        });
+
+        document.addEventListener('keydown', evento => {
+            if (evento.key === 'Escape' && window.matchMedia('(max-width: 768px)').matches && document.getElementById('menu-lateral').classList.contains('aberto')) fecharMenuMobile();
+        });
 
         function alternarMinimizarMenu() {
             const menu = document.getElementById('menu-lateral');
@@ -1777,7 +1808,7 @@
             const porTurno={};
             finalizacoes.forEach(e=>{const nome=e.turnoNome||'Sem turno registrado';porTurno[nome]=(porTurno[nome]||0)+Number(e.qtdExecutada??e.producao.qtdExecutada??0);});
             const periodo=inicioValor||fimValor?`${inicioValor?new Date(`${inicioValor}T00:00:00`).toLocaleDateString('pt-BR'):'In\u00edcio aberto'} a ${fimValor?new Date(`${fimValor}T00:00:00`).toLocaleDateString('pt-BR'):'Hoje'}`:'Todo o per\u00edodo';
-            const tbody=eventos.slice(0,200).map(e=>`<tr><td>${formatarDataHora(e.em)}</td><td>${escaparHtml(e.producao.maquina||'?')}</td><td>${escaparHtml(e.producao.nome||'?')}</td><td>${escaparHtml(e.turnoNome||'Sem turno')}${e.responsavelTurno?`<small>${escaparHtml(e.responsavelTurno)}</small>`:''}</td><td>${escaparHtml(e.titulo||e.tipo)}</td><td>${escaparHtml(e.inspetora||'?')}</td></tr>`).join('');
+            const tbody=eventos.slice(0,200).map(e=>{const qtd=e.tipo==='fim'?Number(e.qtdExecutada??e.producao.qtdExecutada??0):null;return `<tr><td>${formatarDataHora(e.em)}</td><td>${escaparHtml(e.producao.maquina||'N/A')}</td><td>${escaparHtml(e.producao.nome||'N/A')}</td><td>${e.turnoId?escaparHtml(e.turnoNome||'N/A'):'N/A'}</td><td>${e.turnoId?escaparHtml(e.responsavelTurno||'N/A'):'N/A'}</td><td>${escaparHtml(e.titulo||e.tipo)}</td><td>${escaparHtml(e.inspetora||'N/A')}</td><td>${qtd===null?'&mdash;':qtd.toLocaleString('pt-BR')}</td></tr>`}).join('');
             const listaSituacoes=topSituacoes.map(([nome,total])=>`<div class="relatorio-linha"><span>${escaparHtml(nome)}</span><strong>${total}</strong></div>`).join('')||'<div class="relatorio-vazio">Sem altera\u00e7\u00f5es de situa\u00e7\u00e3o no per\u00edodo.</div>';
             const listaMaquinas=Object.entries(porMaquina).sort((a,b)=>b[1]-a[1]).map(([nome,total])=>`<div class="relatorio-linha"><span>${escaparHtml(nome)}</span><strong>${total.toLocaleString('pt-BR')} un.</strong></div>`).join('')||'<div class="relatorio-vazio">Sem volumes finalizados no per\u00edodo.</div>';
             const listaTurnos=Object.entries(porTurno).sort((a,b)=>b[1]-a[1]).map(([nome,total])=>`<div class="relatorio-linha"><span>${escaparHtml(nome)}</span><strong>${total.toLocaleString('pt-BR')} un.</strong></div>`).join('')||'<div class="relatorio-vazio">Sem finaliza\u00e7\u00f5es com turno registrado.</div>';
@@ -1803,7 +1834,7 @@
                     <section class="relatorio-bloco"><h3>Produ\u00e7\u00e3o por turno</h3><div class="relatorio-lista">${listaTurnos}</div></section>
                     <section class="relatorio-bloco"><h3>Situa\u00e7\u00f5es e pontos de aten\u00e7\u00e3o</h3><div class="relatorio-lista">${listaSituacoes}</div><small style="display:block;margin-top:10px;color:var(--texto-claro)">Registros antigos anteriores ao controle por turno podem aparecer sem identifica\u00e7\u00e3o de turno.</small></section>
                 </div>
-                <section class="relatorio-bloco" style="margin-top:16px;overflow-x:auto"><h3>Linha do tempo detalhada</h3>${tbody?`<table class="relatorio-tabela"><thead><tr><th>Data e hora</th><th>M\u00e1quina</th><th>Item</th><th>Turno / Respons\u00e1vel</th><th>Evento / Situa\u00e7\u00e3o</th><th>Inspetora</th></tr></thead><tbody>${tbody}</tbody></table>${eventos.length>200?`<p>Exibindo 200 de ${eventos.length} eventos.</p>`:''}`:'<div class="relatorio-vazio">Nenhum evento registrado no per\u00edodo selecionado.</div>'}</section>`;
+                <section class="relatorio-bloco" style="margin-top:16px;overflow-x:auto"><h3>Linha do tempo detalhada</h3>${tbody?`<table class="relatorio-tabela"><thead><tr><th>Data e hora</th><th>M\u00e1quina</th><th>Item</th><th>Turno</th><th>Respons\u00e1vel pelo turno</th><th>Evento / Situa\u00e7\u00e3o</th><th>Inspetora</th><th>Qtd. executada</th></tr></thead><tbody>${tbody}</tbody><tfoot><tr><th colspan="7">${turnoId?'TOTAL PRODUZIDO NO TURNO':'TOTAL PRODUZIDO NO PERÍODO'} (${finalizacoes.length} finalizações)</th><td>${unidades.toLocaleString('pt-BR')} un.</td></tr></tfoot></table>${eventos.length>200?`<p>Exibindo 200 de ${eventos.length} eventos.</p>`:''}`:'<div class="relatorio-vazio">Nenhum evento registrado no per\u00edodo selecionado.</div>'}</section>`;
         }
 
         function imprimirRelatorio() { window.print(); }
