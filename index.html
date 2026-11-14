@@ -174,6 +174,19 @@
         .icone-dobra { color: #2DD4BF; }
         .icone-generico { color: #CBD5E1; }
         .menu-lateral.minimizado .menu-item span:not(.icone) { display: none; }
+        .menu-lateral.minimizado .menu-item { position:relative; overflow:visible; }
+        .menu-lateral.minimizado .menu-item > span:not(.icone) { display:block; position:absolute; left:calc(100% + 12px); top:50%; transform:translateY(-50%) translateX(-4px); padding:8px 11px; border-radius:8px; background:#0f172a; color:#fff; font-size:.78rem; font-weight:600; opacity:0; visibility:hidden; pointer-events:none; box-shadow:0 8px 22px rgba(0,0,0,.24); transition:opacity .15s ease,transform .15s ease,visibility .15s; z-index:1200; }
+        .menu-lateral.minimizado .menu-item:hover > span:not(.icone) { opacity:1; visibility:visible; transform:translateY(-50%) translateX(0); }
+        .menu-lateral.minimizado .menu-relatorio { position:relative; overflow:visible; }
+        .menu-lateral.minimizado .menu-relatorio > span:not(.icone) { display:block; position:absolute; left:calc(100% + 12px); top:50%; transform:translateY(-50%) translateX(-4px); padding:8px 11px; border-radius:8px; background:#0f172a; color:#fff; font-size:.78rem; font-weight:600; opacity:0; visibility:hidden; pointer-events:none; box-shadow:0 8px 22px rgba(0,0,0,.24); transition:opacity .15s ease,transform .15s ease,visibility .15s; z-index:1200; }
+        .menu-lateral.minimizado .menu-relatorio:hover > span:not(.icone) { opacity:1; visibility:visible; transform:translateY(-50%) translateX(0); }
+        .menu-turnos { margin:4px 10px; padding:12px 14px; display:flex; align-items:center; gap:12px; color:rgba(255,255,255,.9); cursor:pointer; border:1px solid transparent; border-radius:10px; font-size:.85rem; position:relative; }
+        .menu-turnos:hover,.menu-turnos.ativo { background:rgba(255,255,255,.09); border-color:rgba(255,255,255,.08); }
+        .menu-turnos .icone { width:32px;height:32px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;color:#38bdf8;background:rgba(56,189,248,.15); }
+        .menu-turnos svg { width:19px;height:19px; }
+        .menu-lateral.minimizado .menu-turnos { justify-content:center;padding:12px 10px; }
+        .menu-lateral.minimizado .menu-turnos > span:not(.icone) { display:block;position:absolute;left:calc(100% + 12px);top:50%;transform:translateY(-50%) translateX(-4px);padding:8px 11px;border-radius:8px;background:#0f172a;color:#fff;font-size:.78rem;font-weight:600;opacity:0;visibility:hidden;pointer-events:none;box-shadow:0 8px 22px rgba(0,0,0,.24);transition:opacity .15s ease,transform .15s ease,visibility .15s;z-index:1200; }
+        .menu-lateral.minimizado .menu-turnos:hover > span:not(.icone) { opacity:1;visibility:visible;transform:translateY(-50%) translateX(0); }
 
         .menu-rodape {
             margin-top: auto;
@@ -430,6 +443,12 @@
         .relatorio-tabela { width:100%; border-collapse:collapse; font-size:.84rem; }
         .relatorio-tabela th,.relatorio-tabela td { padding:10px 8px; text-align:left; border-bottom:1px solid var(--borda); }
         .relatorio-tabela th { color:var(--texto-claro); font-size:.74rem; text-transform:uppercase; letter-spacing:.04em; }
+        .turno-editor { display:grid; grid-template-columns:1.2fr 1.2fr 1fr 1fr auto; align-items:end; gap:12px; padding:16px; margin-bottom:12px; border:1px solid var(--borda); border-radius:12px; background:var(--superficie); box-shadow:var(--sombra); }
+        .turno-editor .campo-filtro { min-width:0; }
+        .turno-atual { padding:12px 14px; margin-bottom:16px; border-radius:10px; background:rgba(14,165,233,.1); color:var(--texto-escuro); }
+        .grafico-relatorio { position:relative; height:320px; }
+        @media(max-width:850px) { .turno-editor { grid-template-columns:repeat(2,minmax(0,1fr)); } .turno-editor button { grid-column:1/-1; } }
+        @media(max-width:520px) { .turno-editor { grid-template-columns:1fr; } }
         .relatorio-vazio { padding:24px; text-align:center; color:var(--texto-claro); border-radius:10px; background:var(--fundo-cinza); }
         @media print {
             body { display:block; background:#fff; color:#111827; }
@@ -697,14 +716,14 @@
         .tabela-producao th:nth-child(7), .tabela-producao td:nth-child(7) { min-width: 120px; }
         .tabela-producao th:nth-child(8), .tabela-producao td:nth-child(8) { min-width: 105px; }
         .tabela-producao th:nth-child(9), .tabela-producao td:nth-child(9) { min-width: 70px; }
-        .tabela-producao th:nth-child(10), .tabela-producao td:nth-child(10) { min-width: 130px; }
+        .tabela-producao th:nth-child(10), .tabela-producao td:nth-child(10) { min-width: 92px; width: 92px; }
         .tabela-producao th:nth-child(11), .tabela-producao td:nth-child(11) { min-width: 125px; }
         .linha-em-maquina { background: rgba(39, 174, 96, 0.08) !important; border-left: 4px solid var(--cor-em-maquina); }
         .linha-proximo { background: rgba(243, 156, 18, 0.08) !important; border-left: 4px solid var(--cor-proximo); }
         .linha-produzido { background: rgba(52, 152, 219, 0.08) !important; border-left: 4px solid var(--cor-produzido); opacity: 0.8; }
         .linha-planejado { background: var(--superficie); border-left: 4px solid var(--cor-planejado); }
         .select-status { width: 100%; min-width: 105px; padding: 5px; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--borda); }
-        .input-qtd-executada { width: 100%; min-width: 90px; padding: 6px; font-size: 0.8rem; border: 1px solid var(--borda); border-radius: 4px; }
+        .input-qtd-executada { width: 76px; min-width: 0; max-width: 100%; padding: 6px 7px; font-size: 0.8rem; border: 1px solid var(--borda); border-radius: 6px; }
 
         .sem-dados { text-align: center; padding: 60px 20px; color: var(--texto-claro); font-style: italic; background: var(--superficie); border-radius: var(--raio); box-shadow: var(--sombra); font-size: 1.1rem; }
         .oculto { display: none !important; }
@@ -780,7 +799,7 @@
             <div class="subtitulo-menu">PCP - Produção</div>
         </div>
 
-        <div class="menu-item ativo" onclick="carregarAba('todas')">
+        <div class="menu-item ativo" onclick="carregarAba('todas')" title="Todas as Máquinas">
             <span class="icone" id="icone-todas-maquinas"></span><span>Todas as Máquinas</span>
         </div>
 
@@ -790,7 +809,11 @@
             <span class="icone" id="icone-relatorio"></span><span>Relatórios</span>
         </div>
 
-        <div class="menu-item" onclick="abrirConfiguracoes()">
+        <div class="menu-turnos" onclick="abrirConfiguracaoTurnos()" title="Configuração de turnos">
+            <span class="icone" id="icone-turnos"></span><span>Turnos</span>
+        </div>
+
+        <div class="menu-item" onclick="abrirConfiguracoes()" title="Configurações">
             <span class="icone" id="icone-configuracoes"></span><span>Configurações</span>
         </div>
         <div class="menu-rodape">© Milbra - Artefatos Metálicos</div>
@@ -882,9 +905,18 @@
                 <div class="campo-filtro"><label>Data inicial</label><input type="date" id="relatorio-data-inicio" onchange="renderizarRelatorio()"></div>
                 <div class="campo-filtro"><label>Data final</label><input type="date" id="relatorio-data-fim" onchange="renderizarRelatorio()"></div>
                 <div class="campo-filtro"><label>Máquina</label><select id="relatorio-maquina" onchange="renderizarRelatorio()"><option value="">Todas as máquinas</option></select></div>
+                <div class="campo-filtro"><label>Turno</label><select id="relatorio-turno" onchange="renderizarRelatorio()"><option value="">Todos os turnos</option></select></div>
                 <button class="btn-primario" onclick="definirPeriodoMesAtual()">Mês atual</button>
             </div>
+            <section class="relatorio-bloco" style="margin-bottom:16px"><h3>Produção por dia e turno</h3><div class="grafico-relatorio"><canvas id="graficoRelatorioTurnos"></canvas></div></section>
             <div id="conteudo-relatorio"></div>
+        </section>
+
+        <section id="area-turnos" class="oculto">
+            <div class="relatorio-cabecalho turnos-cabecalho"><div><h2>Configuração de turnos</h2><p>Defina a quantidade, o responsável e o horário de cada turno.</p></div><button class="btn-primario" onclick="adicionarTurno()">+ Adicionar turno</button></div>
+            <div id="turno-atual" class="turno-atual"></div>
+            <div id="lista-config-turnos"></div>
+            <button class="btn-sucesso" onclick="salvarConfiguracaoTurnos()">Salvar configuração</button>
         </section>
     </main>
 
@@ -1067,6 +1099,7 @@
             edit: '<path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z"></path>',
             trash: '<path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="m19 6-1 14H6L5 6"></path><path d="M10 11v5M14 11v5"></path>',
             rotateCcw: '<path d="M3 12a9 9 0 1 0 2.64-6.36L3 8"></path><path d="M3 3v5h5"></path>',
+            clock: '<circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path>',
             stop: '<rect x="5" y="5" width="14" height="14" rx="2"></rect>',
             cpu: '<rect width="16" height="16" x="4" y="4" rx="2"></rect><rect width="6" height="6" x="9" y="9" rx="1"></rect><path d="M15 2v2"></path><path d="M15 20v2"></path><path d="M2 15h2"></path><path d="M2 9h2"></path><path d="M20 15h2"></path><path d="M20 9h2"></path><path d="M9 2v2"></path><path d="M9 20v2"></path>',
             wrench: '<path d="M14.7 6.3a4 4 0 0 0-5 5L3 18a2.1 2.1 0 0 0 3 3l6.7-6.7a4 4 0 0 0 5-5l-2.6 2.6-2.4-2.4 2-3.2z"></path>',
@@ -1186,9 +1219,46 @@
             const g = {};
             snapshot.forEach(doc => {
                 const item = doc.data();
+                if (doc.id === 'config-turnos' || item.tipo === 'config-turnos') return;
                 g[item.nome] = item.maquinas || [];
             });
             return g;
+        }
+        const TURNOS_PADRAO = [
+            { id: 'turno-1', nome: '1º Turno', responsavel: '', inicio: '06:00', fim: '14:00' },
+            { id: 'turno-2', nome: '2º Turno', responsavel: '', inicio: '14:00', fim: '22:00' }
+        ];
+        let TURNOS = TURNOS_PADRAO.map(t => ({ ...t }));
+        let graficoRelatorioTurnos = null;
+
+        async function buscarTurnos() {
+            const ref = documento('grupos', 'config-turnos');
+            const snapshot = await firebaseApi.getDoc(ref);
+            if (snapshot.exists() && Array.isArray(snapshot.data().turnos)) return snapshot.data().turnos;
+            return TURNOS_PADRAO.map(t => ({ ...t }));
+        }
+
+        async function persistirTurnos(turnos) {
+            await firebaseApi.setDoc(documento('grupos', 'config-turnos'), { tipo: 'config-turnos', turnos });
+        }
+
+        function turnoDaData(data = new Date()) {
+            const minutos = data.getHours() * 60 + data.getMinutes();
+            for (const turno of TURNOS) {
+                if (!turno.inicio || !turno.fim) continue;
+                const [hi, mi] = turno.inicio.split(':').map(Number);
+                const [hf, mf] = turno.fim.split(':').map(Number);
+                const inicio = hi * 60 + mi;
+                const fim = hf * 60 + mf;
+                const ativo = inicio < fim ? minutos >= inicio && minutos < fim : minutos >= inicio || minutos < fim;
+                if (ativo) return turno;
+            }
+            return null;
+        }
+
+        function metadadosTurno(data = new Date()) {
+            const turno = turnoDaData(data);
+            return { turnoId: turno?.id || '', turnoNome: turno?.nome || 'Sem turno configurado', responsavelTurno: turno?.responsavel || 'NÃ£o informado' };
         }
         async function salvarItem(item) {
             await firebaseApi.setDoc(documento('itensBanco', item.codigo), item);
@@ -1225,6 +1295,7 @@
             document.getElementById('icone-configuracoes').innerHTML = iconeLucide('settings');
             document.getElementById('icone-configuracoes').classList.add('icone-config');
             document.getElementById('icone-relatorio').innerHTML = iconeLucide('barChart');
+            document.getElementById('icone-turnos').innerHTML = iconeLucide('clock');
 
             if (localStorage.getItem('menuMinimizado') === 'true') {
                 document.getElementById('menu-lateral').classList.add('minimizado');
@@ -1239,6 +1310,7 @@
             try {
                 await inicializarBanco();
                 ABAS_GRUPOS = { ...GRUPOS_PADRAO, ...await buscarTodosGrupos() };
+                TURNOS = await buscarTurnos();
                 BANCO_ITENS = await buscarItens();
                 PROGRAMACOES = await buscarProgs();
 
@@ -1248,6 +1320,7 @@
                 carregarTabela();
             } catch (erro) {
                 console.error('Erro ao carregar dados do Firebase:', erro);
+                TURNOS = TURNOS_PADRAO.map(t => ({ ...t }));
                 alert('NÃ£o foi possÃ­vel conectar ao Firebase agora. As categorias padrÃ£o foram carregadas, mas o salvamento online pode estar indisponÃ­vel.');
             }
         }
@@ -1490,6 +1563,7 @@
             Object.keys(GRUPOS_PADRAO).forEach(nome => {
                 const item = document.createElement('div');
                 item.className = 'menu-item';
+                item.title = nome;
                 item.onclick = () => carregarAba(nome);
                 const icone = ICONES_GRUPOS[nome] || iconeLucide('wrench');
                 const classeIcone = CLASSES_ICONES_GRUPOS[nome] || 'icone-generico';
@@ -1501,10 +1575,13 @@
                 if (!GRUPOS_PADRAO[nome]) {
                     const item = document.createElement('div');
                     item.className = 'menu-item';
+                    item.title = nome;
                     item.onclick = () => carregarAba(nome);
                     const icone = ICONES_GRUPOS[nome] || iconeLucide('wrench');
                     const classeIcone = CLASSES_ICONES_GRUPOS[nome] || 'icone-generico';
-                    item.innerHTML = `<span class="icone ${classeIcone}">${icone}</span><span>${nome}</span>`;
+                    const paleta = ['#38bdf8','#a78bfa','#fb7185','#34d399','#fbbf24','#f472b6','#2dd4bf'];
+                    const corIcone = paleta[Object.keys(ABAS_GRUPOS).indexOf(nome) % paleta.length];
+                    item.innerHTML = `<span class="icone ${classeIcone}" style="${GRUPOS_PADRAO[nome] ? '' : `color:${corIcone}`} ">${icone}</span><span>${nome}</span>`;
                     container.appendChild(item);
                 }
             });
@@ -1526,6 +1603,7 @@
             document.getElementById('area-dados').classList.remove('oculto');
             document.getElementById('area-configuracoes').classList.add('oculto');
             document.getElementById('area-relatorios').classList.add('oculto');
+            document.getElementById('area-turnos').classList.add('oculto');
             atualizarGraficoMaquinas();
             carregarTabela();
         }
@@ -1534,6 +1612,7 @@
             document.getElementById('area-dados').classList.add('oculto');
             document.getElementById('area-configuracoes').classList.remove('oculto');
             document.getElementById('area-relatorios').classList.add('oculto');
+            document.getElementById('area-turnos').classList.add('oculto');
             renderizarConfig();
         }
 
@@ -1541,7 +1620,8 @@
             document.getElementById('area-dados').classList.add('oculto');
             document.getElementById('area-configuracoes').classList.add('oculto');
             document.getElementById('area-relatorios').classList.remove('oculto');
-            document.querySelectorAll('.menu-item, .menu-relatorio').forEach(i => i.classList.remove('ativo'));
+            document.getElementById('area-turnos').classList.add('oculto');
+            document.querySelectorAll('.menu-item, .menu-relatorio, .menu-turnos').forEach(i => i.classList.remove('ativo'));
             document.querySelector('.menu-relatorio')?.classList.add('ativo');
             document.getElementById('titulo-aba').textContent = 'Relatório de produção';
             document.getElementById('subtitulo-aba').textContent = 'Indicadores detalhados por período e máquina';
@@ -1549,8 +1629,99 @@
             const valorAtual = filtro.value;
             filtro.innerHTML = '<option value="">Todas as máquinas</option>' + [...new Set([...Object.values(ABAS_GRUPOS).flat(), ...PROGRAMACOES.map(p => p.maquina).filter(Boolean)])].sort().map(m => `<option value="${m}">${m}</option>`).join('');
             filtro.value = valorAtual;
+            atualizarFiltroTurnos();
             if (!document.getElementById('relatorio-data-inicio').value) definirPeriodoMesAtual();
             else renderizarRelatorio();
+        }
+
+        function escaparHtml(valor) {
+            return String(valor ?? '').replace(/[&<>"']/g, caractere => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[caractere]);
+        }
+
+        function abrirConfiguracaoTurnos() {
+            document.getElementById('area-dados').classList.add('oculto');
+            document.getElementById('area-configuracoes').classList.add('oculto');
+            document.getElementById('area-relatorios').classList.add('oculto');
+            document.getElementById('area-turnos').classList.remove('oculto');
+            document.querySelectorAll('.menu-item, .menu-relatorio, .menu-turnos').forEach(i => i.classList.remove('ativo'));
+            document.querySelector('.menu-turnos')?.classList.add('ativo');
+            document.getElementById('titulo-aba').textContent = 'Turnos de produção';
+            document.getElementById('subtitulo-aba').textContent = 'Responsáveis e horários de cada equipe';
+            renderizarConfiguracaoTurnos();
+        }
+
+        function renderizarConfiguracaoTurnos() {
+            const turnoAtual = turnoDaData();
+            document.getElementById('turno-atual').innerHTML = turnoAtual
+                ? `<strong>Turno atual: ${escaparHtml(turnoAtual.nome)}</strong> · ${escaparHtml(turnoAtual.inicio)}–${escaparHtml(turnoAtual.fim)} · Responsável: ${escaparHtml(turnoAtual.responsavel || 'não informado')}`
+                : 'Nenhum turno está ativo no horário atual. Confira os horários configurados.';
+            document.getElementById('lista-config-turnos').innerHTML = TURNOS.map((turno, indice) => `
+                <div class="turno-editor">
+                    <div class="campo-filtro"><label>Nome do turno</label><input data-turno="${indice}" data-campo="nome" value="${escaparHtml(turno.nome)}" maxlength="50" placeholder="Ex.: 1º Turno"></div>
+                    <div class="campo-filtro"><label>Responsável</label><input data-turno="${indice}" data-campo="responsavel" value="${escaparHtml(turno.responsavel)}" maxlength="80" placeholder="Nome do responsável"></div>
+                    <div class="campo-filtro"><label>Horário de início</label><input type="time" data-turno="${indice}" data-campo="inicio" value="${escaparHtml(turno.inicio)}" required></div>
+                    <div class="campo-filtro"><label>Horário final</label><input type="time" data-turno="${indice}" data-campo="fim" value="${escaparHtml(turno.fim)}" required></div>
+                    <button class="btn-perigo btn-pequeno" onclick="removerTurno(${indice})" title="Remover turno">Remover</button>
+                </div>`).join('');
+        }
+
+        function adicionarTurno() {
+            TURNOS = lerTurnosDoFormulario();
+            const numero = TURNOS.length + 1;
+            TURNOS.push({ id:`turno-${Date.now()}`, nome:`${numero}º Turno`, responsavel:'', inicio:'22:00', fim:'06:00' });
+            renderizarConfiguracaoTurnos();
+        }
+
+        function removerTurno(indice) {
+            const rascunho = lerTurnosDoFormulario();
+            const turno = rascunho[indice];
+            if (!confirm(`Confirma a remoção do turno "${turno?.nome || ''}"? Os eventos já registrados manterão seus dados.`)) return;
+            TURNOS = rascunho;
+            TURNOS.splice(indice, 1);
+            renderizarConfiguracaoTurnos();
+        }
+
+        function lerTurnosDoFormulario() {
+            const linhas = [...document.querySelectorAll('#lista-config-turnos .turno-editor')];
+            return linhas.map((linha, indice) => {
+                const valor = campo => linha.querySelector(`[data-campo="${campo}"]`).value.trim();
+                return { ...TURNOS[indice], nome:valor('nome'), responsavel:valor('responsavel'), inicio:valor('inicio'), fim:valor('fim') };
+            });
+        }
+
+        async function salvarConfiguracaoTurnos() {
+            const novos = lerTurnosDoFormulario();
+            if (!novos.length) return alert('Configure pelo menos um turno.');
+            if (novos.some(t => !t.nome || !t.inicio || !t.fim)) return alert('Preencha o nome e os horários de todos os turnos.');
+            const nomes = novos.map(t => t.nome.toLocaleLowerCase());
+            if (new Set(nomes).size !== nomes.length) return alert('Cada turno precisa ter um nome diferente.');
+            if (novos.some(t => t.inicio === t.fim)) return alert('O início e o final de um turno não podem ser iguais.');
+            const ocupacao = Array(1440).fill(0);
+            novos.forEach(t => {
+                const [hi,mi]=t.inicio.split(':').map(Number), [hf,mf]=t.fim.split(':').map(Number);
+                const inicio=hi*60+mi, fim=hf*60+mf;
+                for(let minuto=0;minuto<1440;minuto++) if(inicio<fim ? minuto>=inicio&&minuto<fim : minuto>=inicio||minuto<fim) ocupacao[minuto]++;
+            });
+            if (ocupacao.some(total => total > 1)) return alert('Os horários dos turnos não podem se sobrepor.');
+            if (!confirm(`Salvar a configuração de ${novos.length} turno(s)?`)) return;
+            try {
+                await persistirTurnos(novos);
+                TURNOS = novos;
+                renderizarConfiguracaoTurnos();
+                atualizarFiltroTurnos();
+                if (!document.getElementById('area-relatorios').classList.contains('oculto')) renderizarRelatorio();
+                alert('Configuração de turnos salva com sucesso.');
+            } catch (erro) {
+                console.error('Erro ao salvar turnos:', erro);
+                alert(`Não foi possível salvar a configuração de turnos. ${erro.message || erro}`);
+            }
+        }
+
+        function atualizarFiltroTurnos() {
+            const filtro = document.getElementById('relatorio-turno');
+            const selecionado = filtro.value;
+            filtro.innerHTML = '<option value="">Todos os turnos</option>' + TURNOS.map(t => `<option value="${escaparHtml(t.id)}">${escaparHtml(t.nome)}</option>`).join('');
+            filtro.value = TURNOS.some(t => t.id === selecionado) ? selecionado : '';
         }
 
         function definirPeriodoMesAtual() {
@@ -1565,47 +1736,63 @@
             const inicioValor = document.getElementById('relatorio-data-inicio').value;
             const fimValor = document.getElementById('relatorio-data-fim').value;
             const maquina = document.getElementById('relatorio-maquina').value;
+            const turnoId = document.getElementById('relatorio-turno').value;
             const inicioMs = inicioValor ? new Date(`${inicioValor}T00:00:00`).getTime() : -Infinity;
             const fimMs = fimValor ? new Date(`${fimValor}T23:59:59.999`).getTime() : Infinity;
-            const producoes = PROGRAMACOES.filter(p => {
-                const inicio = p.producaoIniciadaEm ? new Date(p.producaoIniciadaEm).getTime() : NaN;
-                const fim = p.producaoFinalizadaEm ? new Date(p.producaoFinalizadaEm).getTime() : NaN;
-                const tocaPeriodo = (Number.isFinite(inicio) && inicio <= fimMs && (!Number.isFinite(fim) || fim >= inicioMs)) ||
-                    (Number.isFinite(fim) && fim >= inicioMs && fim <= fimMs);
-                return (!maquina || p.maquina === maquina) && tocaPeriodo;
-            });
-            const eventos = producoes.flatMap(p => (Array.isArray(p.historicoProducao) ? p.historicoProducao : []).map(e => ({ ...e, producao: p })))
-                .filter(e => { const t = new Date(e.em).getTime(); return t >= inicioMs && t <= fimMs; })
+            const eventos = PROGRAMACOES.flatMap(p => (Array.isArray(p.historicoProducao) ? p.historicoProducao : []).map(e => ({ ...e, producao:p })))
+                .filter(e => { const t=new Date(e.em).getTime(); return t>=inicioMs && t<=fimMs && (!maquina || e.producao.maquina===maquina) && (!turnoId || e.turnoId===turnoId); })
                 .sort((a,b) => new Date(b.em)-new Date(a.em));
-            const finalizadas = producoes.filter(p => p.producaoFinalizadaEm && new Date(p.producaoFinalizadaEm).getTime() >= inicioMs && new Date(p.producaoFinalizadaEm).getTime() <= fimMs);
-            const emAndamento = producoes.filter(p => p.producaoIniciadaEm && !p.producaoFinalizadaEm).length;
-            const unidades = finalizadas.reduce((total,p) => total + Number(p.qtdExecutada || 0),0);
-            const duracoes = finalizadas.map(p => (new Date(p.producaoFinalizadaEm)-new Date(p.producaoIniciadaEm))/60000).filter(n => Number.isFinite(n) && n >= 0);
-            const mediaMin = duracoes.length ? duracoes.reduce((a,b)=>a+b,0)/duracoes.length : 0;
-            const paradas = eventos.filter(e => e.tipo === 'situacao' && e.valor && e.valor !== 'trabalhando');
-            const contagemSituacoes = {};
-            eventos.filter(e=>e.tipo==='situacao').forEach(e => { const nome=e.titulo||'Situação sem nome'; contagemSituacoes[nome]=(contagemSituacoes[nome]||0)+1; });
-            const topSituacoes = Object.entries(contagemSituacoes).sort((a,b)=>b[1]-a[1]).slice(0,6);
-            const porMaquina = {};
-            finalizadas.forEach(p => { const nome=p.maquina||'Sem máquina'; porMaquina[nome]=(porMaquina[nome]||0)+Number(p.qtdExecutada||0); });
-            const periodo = inicioValor || fimValor ? `${inicioValor ? new Date(`${inicioValor}T00:00:00`).toLocaleDateString('pt-BR') : 'Início aberto'} a ${fimValor ? new Date(`${fimValor}T00:00:00`).toLocaleDateString('pt-BR') : 'Hoje'}` : 'Todo o período';
-            const tbody = eventos.slice(0,100).map(e => `<tr><td>${formatarDataHora(e.em)}</td><td>${e.producao.maquina||'—'}</td><td>${e.producao.nome||'—'}</td><td>${e.titulo||e.tipo}</td><td>${e.inspetora||'—'}</td></tr>`).join('');
-            const cardsSituacao = topSituacoes.map(([nome,total])=>`<div class="relatorio-linha"><span>${nome}</span><strong>${total}</strong></div>`).join('') || '<div class="relatorio-vazio">Sem mudanças de situação registradas neste período.</div>';
-            const cardsMaquina = Object.entries(porMaquina).sort((a,b)=>b[1]-a[1]).map(([nome,total])=>`<div class="relatorio-linha"><span>${nome}</span><strong>${total.toLocaleString('pt-BR')} un.</strong></div>`).join('') || '<div class="relatorio-vazio">Sem volumes finalizados no período.</div>';
-            document.getElementById('conteudo-relatorio').innerHTML = `
-                <p style="color:var(--texto-claro);margin:0 0 12px">Período: <strong>${periodo}</strong>${maquina ? ` · Máquina: <strong>${maquina}</strong>` : ''}</p>
+            const finalizacoes = eventos.filter(e => e.tipo==='fim');
+            const producoes = [...new Map(eventos.map(e => [e.producao.id,e.producao])).values()];
+            const emAndamento = PROGRAMACOES.filter(p => {
+                if (!p.producaoIniciadaEm || p.producaoFinalizadaEm) return false;
+                const inicio=new Date(p.producaoIniciadaEm).getTime();
+                return inicio<=fimMs && Date.now()>=inicioMs && (!maquina || p.maquina===maquina) && (!turnoId || p.turnoAtual?.turnoId===turnoId);
+            }).length;
+            const unidades = finalizacoes.reduce((soma,e)=>soma+Number(e.qtdExecutada ?? e.producao.qtdExecutada ?? 0),0);
+            const duracoes = finalizacoes.map(e => {
+                const historico=e.producao.historicoProducao||[];
+                const fim=new Date(e.em).getTime();
+                const inicioEvento=[...historico].reverse().find(item => ['inicio','retomada'].includes(item.tipo) && new Date(item.em).getTime()<=fim);
+                return inicioEvento ? (fim-new Date(inicioEvento.em).getTime())/60000 : NaN;
+            }).filter(n=>Number.isFinite(n)&&n>=0);
+            const mediaMin=duracoes.length?duracoes.reduce((a,b)=>a+b,0)/duracoes.length:0;
+            const paradas=eventos.filter(e=>e.tipo==='situacao'&&e.valor&&e.valor!=='trabalhando');
+            const contagemSituacoes={};
+            eventos.filter(e=>e.tipo==='situacao').forEach(e=>{const nome=e.titulo||'Situa\u00e7\u00e3o';contagemSituacoes[nome]=(contagemSituacoes[nome]||0)+1;});
+            const topSituacoes=Object.entries(contagemSituacoes).sort((a,b)=>b[1]-a[1]).slice(0,6);
+            const porMaquina={};
+            finalizacoes.forEach(e=>{const nome=e.producao.maquina||'Sem m\u00e1quina';porMaquina[nome]=(porMaquina[nome]||0)+Number(e.qtdExecutada??e.producao.qtdExecutada??0);});
+            const porTurno={};
+            finalizacoes.forEach(e=>{const nome=e.turnoNome||'Sem turno registrado';porTurno[nome]=(porTurno[nome]||0)+Number(e.qtdExecutada??e.producao.qtdExecutada??0);});
+            const periodo=inicioValor||fimValor?`${inicioValor?new Date(`${inicioValor}T00:00:00`).toLocaleDateString('pt-BR'):'In\u00edcio aberto'} a ${fimValor?new Date(`${fimValor}T00:00:00`).toLocaleDateString('pt-BR'):'Hoje'}`:'Todo o per\u00edodo';
+            const tbody=eventos.slice(0,200).map(e=>`<tr><td>${formatarDataHora(e.em)}</td><td>${escaparHtml(e.producao.maquina||'?')}</td><td>${escaparHtml(e.producao.nome||'?')}</td><td>${escaparHtml(e.turnoNome||'Sem turno')}${e.responsavelTurno?`<small>${escaparHtml(e.responsavelTurno)}</small>`:''}</td><td>${escaparHtml(e.titulo||e.tipo)}</td><td>${escaparHtml(e.inspetora||'?')}</td></tr>`).join('');
+            const listaSituacoes=topSituacoes.map(([nome,total])=>`<div class="relatorio-linha"><span>${escaparHtml(nome)}</span><strong>${total}</strong></div>`).join('')||'<div class="relatorio-vazio">Sem altera\u00e7\u00f5es de situa\u00e7\u00e3o no per\u00edodo.</div>';
+            const listaMaquinas=Object.entries(porMaquina).sort((a,b)=>b[1]-a[1]).map(([nome,total])=>`<div class="relatorio-linha"><span>${escaparHtml(nome)}</span><strong>${total.toLocaleString('pt-BR')} un.</strong></div>`).join('')||'<div class="relatorio-vazio">Sem volumes finalizados no per\u00edodo.</div>';
+            const listaTurnos=Object.entries(porTurno).sort((a,b)=>b[1]-a[1]).map(([nome,total])=>`<div class="relatorio-linha"><span>${escaparHtml(nome)}</span><strong>${total.toLocaleString('pt-BR')} un.</strong></div>`).join('')||'<div class="relatorio-vazio">Sem finaliza\u00e7\u00f5es com turno registrado.</div>';
+            const turnosGrafico=turnoId?TURNOS.filter(t=>t.id===turnoId):TURNOS;
+            const datas=[...new Set(finalizacoes.map(e=>chaveDataLocal(e.em)))].sort();
+            if (graficoRelatorioTurnos) graficoRelatorioTurnos.destroy();
+            const canvas=document.getElementById('graficoRelatorioTurnos');
+            if (canvas && typeof Chart!=='undefined') {
+                graficoRelatorioTurnos=new Chart(canvas,{type:'bar',data:{labels:datas.map(d=>new Date(`${d}T00:00:00`).toLocaleDateString('pt-BR')),
+                    datasets:turnosGrafico.map((t,i)=>({label:t.nome,data:datas.map(data=>finalizacoes.filter(e=>e.turnoId===t.id&&chaveDataLocal(e.em)===data).reduce((soma,e)=>soma+Number(e.qtdExecutada??e.producao.qtdExecutada??0),0)),backgroundColor:['rgba(14,165,233,.78)','rgba(249,115,22,.78)','rgba(139,92,246,.78)','rgba(34,197,94,.78)'][i%4],borderRadius:6}))},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom'}},scales:{y:{beginAtZero:true,title:{display:true,text:'Unidades produzidas'}},x:{grid:{display:false}}}}});
+            }
+            document.getElementById('conteudo-relatorio').innerHTML=`
+                <p style="color:var(--texto-claro);margin:0 0 12px">Per\u00edodo: <strong>${periodo}</strong>${maquina?` &middot; M\u00e1quina: <strong>${escaparHtml(maquina)}</strong>`:''}${turnoId?` &middot; Turno: <strong>${escaparHtml(TURNOS.find(t=>t.id===turnoId)?.nome||'')}</strong>`:''}</p>
                 <div class="relatorio-cards">
-                    <article class="relatorio-card" style="--card-cor:#22c55e"><span>Produções finalizadas</span><strong>${finalizadas.length}</strong><small>No intervalo selecionado</small></article>
-                    <article class="relatorio-card" style="--card-cor:#f59e0b"><span>Em andamento</span><strong>${emAndamento}</strong><small>Produções iniciadas sem finalização</small></article>
-                    <article class="relatorio-card" style="--card-cor:#3b82f6"><span>Unidades produzidas</span><strong>${unidades.toLocaleString('pt-BR')}</strong><small>Soma da quantidade executada</small></article>
-                    <article class="relatorio-card" style="--card-cor:#8b5cf6"><span>Tempo médio de ciclo</span><strong>${duracoes.length ? `${Math.floor(mediaMin/60)}h ${Math.round(mediaMin%60)}m` : '—'}</strong><small>Entre início e finalização</small></article>
-                    <article class="relatorio-card" style="--card-cor:#ef4444"><span>Eventos de parada</span><strong>${paradas.length}</strong><small>Registros de situação diferente de produção normal</small></article>
+                    <article class="relatorio-card" style="--card-cor:#22c55e"><span>Produ\u00e7\u00f5es finalizadas</span><strong>${finalizacoes.length}</strong><small>No intervalo selecionado</small></article>
+                    <article class="relatorio-card" style="--card-cor:#f59e0b"><span>Em andamento</span><strong>${emAndamento}</strong><small>Produ\u00e7\u00f5es sem finaliza\u00e7\u00e3o</small></article>
+                    <article class="relatorio-card" style="--card-cor:#3b82f6"><span>Unidades produzidas</span><strong>${unidades.toLocaleString('pt-BR')}</strong><small>Soma registrada nas finaliza\u00e7\u00f5es</small></article>
+                    <article class="relatorio-card" style="--card-cor:#8b5cf6"><span>Tempo m\u00e9dio de ciclo</span><strong>${duracoes.length?`${Math.floor(mediaMin/60)}h ${Math.round(mediaMin%60)}m`:'?'}</strong><small>In\u00edcio/retomada at\u00e9 finaliza\u00e7\u00e3o</small></article>
+                    <article class="relatorio-card" style="--card-cor:#ef4444"><span>Eventos de parada</span><strong>${paradas.length}</strong><small>Situa\u00e7\u00f5es fora da produ\u00e7\u00e3o normal</small></article>
                 </div>
                 <div class="relatorio-grade">
-                    <section class="relatorio-bloco"><h3>Produção finalizada por máquina</h3><div class="relatorio-lista">${cardsMaquina}</div></section>
-                    <section class="relatorio-bloco"><h3>Situações e pontos de atenção</h3><div class="relatorio-lista">${cardsSituacao}</div><small style="display:block;margin-top:10px;color:var(--texto-claro)">O total representa eventos registrados. As paradas anteriores a esta atualização não possuem duração histórica.</small></section>
+                    <section class="relatorio-bloco"><h3>Produ\u00e7\u00e3o finalizada por m\u00e1quina</h3><div class="relatorio-lista">${listaMaquinas}</div></section>
+                    <section class="relatorio-bloco"><h3>Produ\u00e7\u00e3o por turno</h3><div class="relatorio-lista">${listaTurnos}</div></section>
+                    <section class="relatorio-bloco"><h3>Situa\u00e7\u00f5es e pontos de aten\u00e7\u00e3o</h3><div class="relatorio-lista">${listaSituacoes}</div><small style="display:block;margin-top:10px;color:var(--texto-claro)">Registros antigos anteriores ao controle por turno podem aparecer sem identifica\u00e7\u00e3o de turno.</small></section>
                 </div>
-                <section class="relatorio-bloco" style="margin-top:16px;overflow-x:auto"><h3>Linha do tempo detalhada</h3>${tbody ? `<table class="relatorio-tabela"><thead><tr><th>Data e hora</th><th>Máquina</th><th>Item</th><th>Evento / Situação</th><th>Inspetora</th></tr></thead><tbody>${tbody}</tbody></table>${eventos.length>100?`<p style="color:var(--texto-claro);margin-top:10px">Exibindo 100 de ${eventos.length} eventos.</p>`:''}` : '<div class="relatorio-vazio">Nenhum evento de produção registrado para o período. Inicie a produção para começar a formar o histórico.</div>'}</section>`;
+                <section class="relatorio-bloco" style="margin-top:16px;overflow-x:auto"><h3>Linha do tempo detalhada</h3>${tbody?`<table class="relatorio-tabela"><thead><tr><th>Data e hora</th><th>M\u00e1quina</th><th>Item</th><th>Turno / Respons\u00e1vel</th><th>Evento / Situa\u00e7\u00e3o</th><th>Inspetora</th></tr></thead><tbody>${tbody}</tbody></table>${eventos.length>200?`<p>Exibindo 200 de ${eventos.length} eventos.</p>`:''}`:'<div class="relatorio-vazio">Nenhum evento registrado no per\u00edodo selecionado.</div>'}</section>`;
         }
 
         function imprimirRelatorio() { window.print(); }
@@ -1966,11 +2153,12 @@
             if (p.situacaoMaquina === valor) return fecharModalSituacao();
             const situacaoSelecionada = SITUACOES_MAQUINA.find(s => s.valor === valor);
             if (!confirm(`Confirma a altera\u00e7\u00e3o da situa\u00e7\u00e3o da m\u00e1quina para "${situacaoSelecionada?.titulo || valor}"?`)) return;
-            if (p.producaoIniciadaEm) {
+            if (p.producaoIniciadaEm && !p.producaoFinalizadaEm) {
                 if (!Array.isArray(p.historicoProducao)) p.historicoProducao = [];
                 const anterior = SITUACOES_MAQUINA.find(s => s.valor === p.situacaoMaquina);
                 const nova = SITUACOES_MAQUINA.find(s => s.valor === valor);
-                p.historicoProducao.push({ tipo: 'situacao', valor, titulo: nova?.titulo || valor, anterior: anterior?.titulo || p.situacaoMaquina || 'Situação desconhecida', em: new Date().toISOString() });
+                const agora = new Date();
+                p.historicoProducao.push({ tipo: 'situacao', valor, titulo: nova?.titulo || valor, anterior: anterior?.titulo || p.situacaoMaquina || 'Situação desconhecida', em: agora.toISOString(), ...metadadosTurno(agora) });
             }
             p.situacaoMaquina = valor;
             await salvarProg(p);
@@ -1982,6 +2170,11 @@
             if (!valor) return '—';
             const data = new Date(valor);
             return Number.isNaN(data.getTime()) ? '—' : data.toLocaleString('pt-BR');
+        }
+
+        function chaveDataLocal(valor) {
+            const data = new Date(valor);
+            return `${data.getFullYear()}-${String(data.getMonth()+1).padStart(2,'0')}-${String(data.getDate()).padStart(2,'0')}`;
         }
 
         async function iniciarProducao(id, retomada = false) {
@@ -1997,11 +2190,12 @@
             p.producaoIniciadaEm = agora;
             p.producaoFinalizadaEm = null;
             p.inspetoraFim = null;
+            p.turnoAtual = metadadosTurno(new Date(agora));
             if (!Array.isArray(p.historicoProducao)) p.historicoProducao = [];
-            p.historicoProducao.push({ tipo: retomada ? 'retomada' : 'inicio', titulo: retomada ? 'Produ\u00e7\u00e3o retomada' : 'Produ\u00e7\u00e3o iniciada', inspetora: p.inspetoraInicio, em: agora });
+            p.historicoProducao.push({ tipo: retomada ? 'retomada' : 'inicio', titulo: retomada ? 'Produ\u00e7\u00e3o retomada' : 'Produ\u00e7\u00e3o iniciada', inspetora: p.inspetoraInicio, em: agora, ...p.turnoAtual });
             if (p.situacaoMaquina) {
                 const situacao = SITUACOES_MAQUINA.find(s => s.valor === p.situacaoMaquina);
-                p.historicoProducao.push({ tipo: 'situacao', titulo: situacao?.titulo || p.situacaoMaquina, em: agora });
+                p.historicoProducao.push({ tipo: 'situacao', titulo: situacao?.titulo || p.situacaoMaquina, em: agora, ...p.turnoAtual });
             }
             await salvarProg(p);
             carregarTabela();
@@ -2022,9 +2216,11 @@
             p.inspetoraFim = inspetora.trim();
             p.producaoFinalizadaEm = agora;
             p.condicaoMaquina = valorCondicao;
+            const turnoFinalizacao = metadadosTurno(new Date(agora));
+            p.turnoAtual = turnoFinalizacao;
             if (!Array.isArray(p.historicoProducao)) p.historicoProducao = [];
-            p.historicoProducao.push({ tipo: 'fim', titulo: 'Produ\u00e7\u00e3o finalizada', inspetora: p.inspetoraFim, em: agora });
-            p.historicoProducao.push({ tipo: 'condicao-maquina', titulo: `Condi\u00e7\u00e3o da m\u00e1quina: ${nomeCondicao}`, valor: valorCondicao, inspetora: p.inspetoraFim, em: agora });
+            p.historicoProducao.push({ tipo: 'fim', titulo: 'Produ\u00e7\u00e3o finalizada', inspetora: p.inspetoraFim, em: agora, qtdExecutada:Number(p.qtdExecutada || 0), ...turnoFinalizacao });
+            p.historicoProducao.push({ tipo: 'condicao-maquina', titulo: `Condi\u00e7\u00e3o da m\u00e1quina: ${nomeCondicao}`, valor: valorCondicao, inspetora: p.inspetoraFim, em: agora, ...turnoFinalizacao });
             await salvarProg(p);
             carregarTabela();
         }
@@ -2218,6 +2414,7 @@
             const dados = {
                 dataExportacao: new Date().toLocaleString('pt-BR'),
                 grupos: ABAS_GRUPOS,
+                turnos: TURNOS,
                 itens: BANCO_ITENS,
                 programacoes: PROGRAMACOES
             };
