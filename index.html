@@ -116,17 +116,20 @@
             border-bottom: 1px solid rgba(255,255,255,0.15);
             position: relative;
         }
-        .marca-menu { display:flex; flex-direction:column; align-items:center; gap:8px; }
-        .logo-menu-mark { display:block; width:72px; height:72px; object-fit:contain; filter:drop-shadow(0 5px 10px rgba(0,0,0,.18)); }
+        .marca-menu { display:flex; flex-direction:column; align-items:center; gap:7px; }
+        .logo-menu-area { position:relative; width:58px; height:58px; border-radius:50%; display:grid; place-items:center; background:rgba(9,29,51,.42); border:2px solid rgba(56,189,248,.92); box-shadow:0 0 0 3px rgba(56,189,248,.12),0 4px 14px rgba(0,0,0,.22); }
+        .logo-menu-placeholder { display:grid; place-items:center; color:rgba(219,234,254,.78); }
+        .logo-menu-placeholder svg { width:28px;height:28px; }
+        .logo-menu-mark { position:absolute; inset:0; display:block; width:100%; height:100%; padding:5px; border-radius:50%; object-fit:contain; background:#fff; filter:drop-shadow(0 5px 10px rgba(0,0,0,.18)); }
         .logo-menu-mark[hidden], #preview-logo-config[hidden] { display:none; }
         .logo-menu { font-size: 1.28rem; letter-spacing: .12em; font-weight: 800; margin-bottom: 3px; white-space: nowrap; color:#fff; }
         .subtitulo-menu { font-size: 0.75rem; opacity: 0.8; font-weight: 400; white-space: nowrap; }
         .menu-lateral.minimizado .logo-menu,
         .menu-lateral.minimizado .subtitulo-menu { display:none; }
         .menu-lateral.minimizado .cabecalho-menu { padding:58px 6px 14px; background:transparent; border-bottom-color:rgba(148,163,184,.12); }
-        .btn-editar-logo { position:absolute; top:auto; bottom:10px; right:12px; left:auto; display:grid; place-items:center; width:32px; height:32px; border:1px solid rgba(255,255,255,.22); border-radius:10px; background:rgba(255,255,255,.10); color:#fff; cursor:pointer; transition:background .18s ease,transform .18s ease; }
-        .btn-editar-logo:hover { background:rgba(255,255,255,.2); transform:translateY(-1px); }
-        .btn-editar-logo svg { width:17px;height:17px; }
+        .btn-editar-logo { position:absolute; right:-3px; bottom:-3px; z-index:2; display:grid; place-items:center; width:25px; height:25px; padding:0; border:2px solid #fff; border-radius:50%; background:#f97316; color:#fff; cursor:pointer; box-shadow:0 3px 8px rgba(0,0,0,.28); transition:background .18s ease,transform .18s ease; }
+        .btn-editar-logo:hover { background:#ea580c; transform:scale(1.08); }
+        .btn-editar-logo svg { width:13px;height:13px; }
         .menu-lateral.minimizado .btn-editar-logo { display:none; }
         .menu-lateral.minimizado .logo-menu-mark { width:42px; height:42px; }
 
