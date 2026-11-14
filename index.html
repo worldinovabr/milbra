@@ -483,6 +483,14 @@
             transform: scale(1.15);
             animation-play-state: paused;
         }
+        .maquina-condicao { display:inline-flex; align-items:center; gap:7px; padding:5px 9px; border-radius:999px; font-weight:700; animation: pulso-maquina-condicao 1.45s ease-in-out infinite; }
+        .maquina-condicao::before { content:''; width:7px; height:7px; flex:0 0 7px; border-radius:50%; background:currentColor; }
+        .maquina-condicao.producao { color:#16a34a; background:rgba(34,197,94,.12); }
+        .maquina-condicao.disponivel { color:#2563eb; background:rgba(59,130,246,.12); }
+        .maquina-condicao.troca { color:#ea580c; background:rgba(249,115,22,.14); }
+        .maquina-condicao.manutencao { color:#dc2626; background:rgba(239,68,68,.13); }
+        @keyframes pulso-maquina-condicao { 0%,100% { opacity:1; box-shadow:0 0 0 0 currentColor; } 50% { opacity:.68; box-shadow:0 0 0 4px color-mix(in srgb,currentColor 22%,transparent); } }
+        @media (prefers-reduced-motion: reduce) { .maquina-condicao { animation:none; } }
         .situacao-trabalhando {
             background: #27AE60;
             color: white;
@@ -1044,6 +1052,9 @@
             layoutDashboard: '<rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect>',
             settings: '<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.51a2 2 0 0 1 1-1.72l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle>',
             barChart: '<path d="M3 3v18h18"></path><path d="M18 17V9"></path><path d="M13 17V5"></path><path d="M8 17v-3"></path>',
+            play: '<polygon points="6 3 20 12 6 21 6 3"></polygon>',
+            rotateCcw: '<path d="M3 12a9 9 0 1 0 2.64-6.36L3 8"></path><path d="M3 3v5h5"></path>',
+            stop: '<rect x="5" y="5" width="14" height="14" rx="2"></rect>',
             cpu: '<rect width="16" height="16" x="4" y="4" rx="2"></rect><rect width="6" height="6" x="9" y="9" rx="1"></rect><path d="M15 2v2"></path><path d="M15 20v2"></path><path d="M2 15h2"></path><path d="M2 9h2"></path><path d="M20 15h2"></path><path d="M20 9h2"></path><path d="M9 2v2"></path><path d="M9 20v2"></path>',
             wrench: '<path d="M14.7 6.3a4 4 0 0 0-5 5L3 18a2.1 2.1 0 0 0 3 3l6.7-6.7a4 4 0 0 0 5-5l-2.6 2.6-2.4-2.4 2-3.2z"></path>',
             zap: '<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46L12 10h8a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46L12 14z"></path>',
@@ -1955,15 +1966,19 @@
             return Number.isNaN(data.getTime()) ? '—' : data.toLocaleString('pt-BR');
         }
 
-        async function iniciarProducao(id) {
+        async function iniciarProducao(id, retomada = false) {
             const p = PROGRAMACOES.find(i => i.id === id);
-            if (!p || p.producaoIniciadaEm) return;
-            const inspetora = prompt('Nome da inspetora que está iniciando a produção:');
+            if (!p || (!retomada && p.producaoIniciadaEm) || (retomada && !p.producaoFinalizadaEm)) return;
+            const inspetora = prompt(retomada ? 'Nome da inspetora respons\u00e1vel pela retomada:' : 'Nome da inspetora que est\u00e1 iniciando a produ\u00e7\u00e3o:');
             if (!inspetora || !inspetora.trim()) return;
             const agora = new Date().toISOString();
             p.inspetoraInicio = inspetora.trim();
+            p.condicaoMaquina = 'producao';
             p.producaoIniciadaEm = agora;
-            p.historicoProducao = [{ tipo: 'inicio', titulo: 'Produção iniciada', inspetora: p.inspetoraInicio, em: agora }];
+            p.producaoFinalizadaEm = null;
+            p.inspetoraFim = null;
+            if (!Array.isArray(p.historicoProducao)) p.historicoProducao = [];
+            p.historicoProducao.push({ tipo: retomada ? 'retomada' : 'inicio', titulo: retomada ? 'Produ\u00e7\u00e3o retomada' : 'Produ\u00e7\u00e3o iniciada', inspetora: p.inspetoraInicio, em: agora });
             if (p.situacaoMaquina) {
                 const situacao = SITUACOES_MAQUINA.find(s => s.valor === p.situacaoMaquina);
                 p.historicoProducao.push({ tipo: 'situacao', titulo: situacao?.titulo || p.situacaoMaquina, em: agora });
@@ -1975,13 +1990,20 @@
         async function finalizarProducao(id) {
             const p = PROGRAMACOES.find(i => i.id === id);
             if (!p || !p.producaoIniciadaEm || p.producaoFinalizadaEm) return;
-            const inspetora = prompt('Nome da inspetora que está finalizando a produção:');
+            const inspetora = prompt('Nome da inspetora respons\u00e1vel pela finaliza\u00e7\u00e3o:');
             if (!inspetora || !inspetora.trim()) return;
+            const condicao = prompt('Informe a condi\u00e7\u00e3o da m\u00e1quina ap\u00f3s a produ\u00e7\u00e3o:\n1 - Dispon\u00edvel\n2 - Processo de troca\n3 - Manuten\u00e7\u00e3o', '1');
+            if (condicao === null) return;
+            const opcoes = { '1': ['disponivel', 'Dispon\u00edvel'], '2': ['troca', 'Processo de troca'], '3': ['manutencao', 'Manuten\u00e7\u00e3o'] };
+            const [valorCondicao, nomeCondicao] = opcoes[condicao.trim()] || [];
+            if (!valorCondicao) { alert('Escolha 1, 2 ou 3 para informar a condi\u00e7\u00e3o da m\u00e1quina.'); return; }
             const agora = new Date().toISOString();
             p.inspetoraFim = inspetora.trim();
             p.producaoFinalizadaEm = agora;
+            p.condicaoMaquina = valorCondicao;
             if (!Array.isArray(p.historicoProducao)) p.historicoProducao = [];
-            p.historicoProducao.push({ tipo: 'fim', titulo: 'Produção finalizada', inspetora: p.inspetoraFim, em: agora });
+            p.historicoProducao.push({ tipo: 'fim', titulo: 'Produ\u00e7\u00e3o finalizada', inspetora: p.inspetoraFim, em: agora });
+            p.historicoProducao.push({ tipo: 'condicao-maquina', titulo: `Condi\u00e7\u00e3o da m\u00e1quina: ${nomeCondicao}`, valor: valorCondicao, inspetora: p.inspetoraFim, em: agora });
             await salvarProg(p);
             carregarTabela();
         }
@@ -2005,8 +2027,8 @@
                     ? Math.max(0, (new Date(proximo.em) - new Date(evento.em)) / 60000) : null;
                 const nome = evento.titulo || 'Situação da máquina';
                 const detalhe = evento.tipo === 'inicio' || evento.tipo === 'fim'
-                    ? `Inspetora: ${evento.inspetora || 'não informada'}`
-                    : `Situação: ${nome}${anterior ? ` · Anterior: ${anterior.titulo}` : ''}${paradaMinutos !== null ? ` · Parada: ${paradaMinutos.toFixed(0)} min${proximo.tipo === 'fim' ? ' (até a finalização)' : ''}` : ''}`;
+                    ? `Inspetora: ${evento.inspetora || 'n\u00e3o informada'}`
+                    : `${evento.tipo === 'condicao-maquina' ? 'Respons\u00e1vel' : 'Situa\u00e7\u00e3o'}: ${nome}${evento.tipo === 'condicao-maquina' ? ` \u00b7 Inspetora: ${evento.inspetora || p.inspetoraFim || 'n\u00e3o informada'}` : ''}${anterior ? ` \u00b7 Anterior: ${anterior.titulo}` : ''}${paradaMinutos !== null ? ` \u00b7 Parada: ${paradaMinutos.toFixed(0)} min${proximo.tipo === 'fim' ? ' (at\u00e9 a finaliza\u00e7\u00e3o)' : ''}` : ''}`;
                 return `<div class="evento-producao"><strong>${nome}</strong><small>${formatarDataHora(evento.em)} · ${detalhe}</small></div>`;
             }).join('');
             document.getElementById('conteudo-historico-producao').innerHTML = `
@@ -2132,7 +2154,7 @@
                                 <td>${p.op || '-'}</td>
                                 <td>${p.nome || '-'}</td>
                                 <td>${p.cliente || '-'}</td>
-                                <td>${p.maquina || '-'}</td>
+                                <td><span class="maquina-condicao ${p.condicaoMaquina || (p.producaoIniciadaEm && !p.producaoFinalizadaEm ? 'producao' : 'disponivel')}" title="${p.condicaoMaquina === 'manutencao' ? 'Manuten\u00e7\u00e3o' : p.condicaoMaquina === 'troca' ? 'Processo de troca' : p.condicaoMaquina === 'disponivel' ? 'Dispon\u00edvel' : p.producaoIniciadaEm && !p.producaoFinalizadaEm ? 'Produ\u00e7\u00e3o em andamento' : 'Dispon\u00edvel'}">${p.maquina || '-'}</span></td>
                                 <td>${p.dataEntrega ? new Date(p.dataEntrega).toLocaleDateString('pt-BR') : '-'}</td>
                                 <td>${p.qtdPedida || 0}</td>
                                 <td>
@@ -2149,7 +2171,7 @@
                                     <button class="btn-editar btn-acao" onclick="editarProgramacao(${p.id})" title="Editar programação">✏️</button>
                                     <button class="btn-perigo btn-acao" onclick="excluirItem(${p.id})" title="Excluir programação">🗑️</button>
                                     <button class="btn-situacao ${classeSituacao}" onclick="alterarSituacaoMaq(${p.id})" title="${textoSituacao}">${iconeSituacao}</button>
-                                    ${!p.producaoIniciadaEm ? `<button class="btn-acao btn-iniciar-producao" onclick="iniciarProducao(${p.id})" title="Iniciar produção" aria-label="Iniciar produção">▶</button>` : ''}
+                                    ${p.producaoIniciadaEm && !p.producaoFinalizadaEm ? `<button class="btn-acao btn-finalizar-producao" onclick="finalizarProducao(${p.id})" title="Finalizar produção" aria-label="Finalizar produção">${iconeLucide('stop')}</button>` : `<button class="btn-acao btn-iniciar-producao" onclick="iniciarProducao(${p.id}, ${Boolean(p.producaoFinalizadaEm)})" title="${p.producaoFinalizadaEm ? 'Retomar produção' : 'Iniciar produção'}" aria-label="${p.producaoFinalizadaEm ? 'Retomar produção' : 'Iniciar produção'}">${iconeLucide(p.producaoFinalizadaEm ? 'rotateCcw' : 'play')}</button>`}
                                     ${p.producaoIniciadaEm && !p.producaoFinalizadaEm ? `<button class="btn-acao btn-finalizar-producao" onclick="finalizarProducao(${p.id})" title="Finalizar produção" aria-label="Finalizar produção">■</button>` : ''}
                                     <button class="btn-acao btn-historico" onclick="abrirHistoricoProducao(${p.id})" title="Ver histórico da produção" aria-label="Ver histórico da produção">${iconeLucide('eye')}</button>
                                 </td>
