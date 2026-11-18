@@ -174,7 +174,7 @@
             white-space: nowrap;
             overflow: hidden;
         }
-        .menu-item > span:not(.icone) { min-width:0; overflow:hidden; text-overflow:ellipsis; }
+        .menu-item > span:not(.icone) { min-width:0; }
         .menu-lateral.minimizado .menu-item {
             margin: 4px 8px;
             padding: 8px 10px;
@@ -217,10 +217,10 @@
         .menu-item .icone.icone-dobra { color:#2DD4BF; }
         .menu-lateral.minimizado .menu-item span:not(.icone) { display: none; }
         .menu-lateral.minimizado .menu-item { position:relative; overflow:visible; }
-        .menu-lateral.minimizado .menu-item > span:not(.icone) { display:block; position:absolute; left:calc(100% + 12px); top:50%; transform:translateY(-50%) translateX(-4px); padding:8px 11px; border-radius:8px; background:#0f172a; color:#fff; font-size:.78rem; font-weight:600; opacity:0; visibility:hidden; pointer-events:none; box-shadow:0 8px 22px rgba(0,0,0,.24); transition:opacity .15s ease,transform .15s ease,visibility .15s; z-index:1200; }
-        .menu-lateral.minimizado .menu-item:hover > span:not(.icone) { opacity:1; visibility:visible; transform:translateY(-50%) translateX(0); }
+        .menu-lateral.minimizado .menu-item > span:not(.icone) { display:block; position:absolute; left:calc(100% + 12px); top:50%; transform:translateY(-50%) translateX(-4px); width:max-content; max-width:calc(100vw - var(--largura-menu-min) - 28px); white-space:normal; overflow:visible; text-overflow:clip; padding:8px 11px; border-radius:8px; background:#0f172a; color:#fff; font-size:.78rem; font-weight:600; opacity:0; visibility:hidden; pointer-events:none; box-shadow:0 8px 22px rgba(0,0,0,.24); transition:opacity .15s ease,transform .15s ease,visibility .15s; z-index:1200; }
+        .menu-lateral.minimizado .menu-item:hover > span:not(.icone), .menu-lateral.minimizado .menu-item:focus-visible > span:not(.icone) { opacity:1; visibility:visible; transform:translateY(-50%) translateX(0); }
         .menu-lateral.minimizado .menu-relatorio { position:relative; overflow:visible; }
-        .menu-lateral.minimizado .menu-relatorio > span:not(.icone) { display:block; position:absolute; left:calc(100% + 12px); top:50%; transform:translateY(-50%) translateX(-4px); padding:8px 11px; border-radius:8px; background:#0f172a; color:#fff; font-size:.78rem; font-weight:600; opacity:0; visibility:hidden; pointer-events:none; box-shadow:0 8px 22px rgba(0,0,0,.24); transition:opacity .15s ease,transform .15s ease,visibility .15s; z-index:1200; }
+        .menu-lateral.minimizado .menu-relatorio > span:not(.icone), .menu-lateral.minimizado .menu-turnos > span:not(.icone) { display:block; position:absolute; left:calc(100% + 12px); top:50%; transform:translateY(-50%) translateX(-4px); width:max-content; max-width:calc(100vw - var(--largura-menu-min) - 28px); white-space:normal; overflow:visible; text-overflow:clip; padding:8px 11px; border-radius:8px; background:#0f172a; color:#fff; font-size:.78rem; font-weight:600; opacity:0; visibility:hidden; pointer-events:none; box-shadow:0 8px 22px rgba(0,0,0,.24); transition:opacity .15s ease,transform .15s ease,visibility .15s; z-index:1200; }
         .menu-lateral.minimizado .menu-relatorio:hover > span:not(.icone) { opacity:1; visibility:visible; transform:translateY(-50%) translateX(0); }
         .menu-turnos { margin:4px 10px; padding:12px 14px; display:flex; align-items:center; gap:12px; color:rgba(255,255,255,.9); cursor:pointer; border:1px solid transparent; border-radius:10px; font-size:.85rem; position:relative; }
         .menu-turnos:hover,.menu-turnos.ativo { background:rgba(255,255,255,.09); border-color:rgba(255,255,255,.08); }
@@ -228,8 +228,7 @@
         .menu-turnos svg { width:19px;height:19px; }
         .menu-lateral.minimizado .menu-turnos { justify-content:center;padding:8px 10px; min-height:48px; margin:4px 8px; border-color:transparent; }
         .menu-lateral.minimizado .menu-turnos .icone { width:36px;height:36px;border-radius:11px; }
-        .menu-lateral.minimizado .menu-turnos > span:not(.icone) { display:block;position:absolute;left:calc(100% + 12px);top:50%;transform:translateY(-50%) translateX(-4px);padding:8px 11px;border-radius:8px;background:#0f172a;color:#fff;font-size:.78rem;font-weight:600;opacity:0;visibility:hidden;pointer-events:none;box-shadow:0 8px 22px rgba(0,0,0,.24);transition:opacity .15s ease,transform .15s ease,visibility .15s;z-index:1200; }
-        .menu-lateral.minimizado .menu-turnos:hover > span:not(.icone) { opacity:1;visibility:visible;transform:translateY(-50%) translateX(0); }
+        .menu-lateral.minimizado .menu-relatorio:hover > span:not(.icone), .menu-lateral.minimizado .menu-turnos:hover > span:not(.icone), .menu-lateral.minimizado .menu-relatorio:focus-visible > span:not(.icone), .menu-lateral.minimizado .menu-turnos:focus-visible > span:not(.icone) { opacity:1;visibility:visible;transform:translateY(-50%) translateX(0); }
 
         .menu-rodape {
             margin-top: auto;
@@ -811,17 +810,18 @@
                 border-bottom-color: rgba(10, 61, 98, 0.12);
             }
             .cabecalho-pagina h1 {
-                font-size: clamp(1.75rem, 9vw, 2.45rem);
+                font-size: clamp(1.45rem, 7vw, 2.1rem);
                 line-height: 1.05;
                 margin-bottom: 8px;
-                max-width: none;
-                white-space: nowrap;
+                max-width: 100%;
+                white-space: normal;
+                overflow-wrap: anywhere;
             }
             .cabecalho-pagina p {
-                font-size: clamp(0.72rem, 4.8vw, 1rem);
+                font-size: clamp(0.82rem, 4vw, 1rem);
                 line-height: 1.42;
-                max-width: none;
-                white-space: nowrap;
+                max-width: 100%;
+                white-space: normal;
             }
             .legenda-status {
                 display: grid;
@@ -848,6 +848,22 @@
             .relatorio-periodo .campo-filtro { flex:1 1 100%; min-width:100%; }
             .area-grafico-maquinas { padding: 12px 10px 20px; }
             #graficoMaquinas { height: 200px !important; }
+            .menu-lateral.minimizado .menu-item > span:not(.icone),
+            .menu-lateral.minimizado .menu-relatorio > span:not(.icone),
+            .menu-lateral.minimizado .menu-turnos > span:not(.icone) {
+                position:fixed;
+                left:calc(var(--largura-menu-min) + 10px);
+                top:auto;
+                transform:none;
+                max-width:calc(100vw - var(--largura-menu-min) - 22px);
+                z-index:2000;
+            }
+            .menu-lateral.minimizado .menu-item:hover > span:not(.icone),
+            .menu-lateral.minimizado .menu-item:focus-visible > span:not(.icone),
+            .menu-lateral.minimizado .menu-relatorio:hover > span:not(.icone),
+            .menu-lateral.minimizado .menu-turnos:hover > span:not(.icone),
+            .menu-lateral.minimizado .menu-relatorio:focus-visible > span:not(.icone),
+            .menu-lateral.minimizado .menu-turnos:focus-visible > span:not(.icone) { transform:none; }
         }
     </style>
 </head>
@@ -1785,9 +1801,8 @@
                             borderWidth: 1.2,
                             borderRadius: { bottomLeft: 5, bottomRight: 5 },
                             hoverBorderColor: 'rgba(255, 255, 255, 0.58)',
-                            barPercentage: 0.56,
-                            categoryPercentage: 0.68,
-                            maxBarThickness: 34,
+                            barPercentage: 0.7,
+                            categoryPercentage: 0.8,
                             stack: 'volume'
                         },
                         {
@@ -1798,9 +1813,8 @@
                             borderWidth: 1.2,
                             borderRadius: { topLeft: 5, topRight: 5 },
                             hoverBorderColor: 'rgba(255, 255, 255, 0.58)',
-                            barPercentage: 0.56,
-                            categoryPercentage: 0.68,
-                            maxBarThickness: 34,
+                            barPercentage: 0.7,
+                            categoryPercentage: 0.8,
                             stack: 'volume'
                         }
                     ]
