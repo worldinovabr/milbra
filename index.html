@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -976,6 +976,21 @@
         .menu-lateral > .cabecalho-menu,
         .menu-lateral > #lista-abas-menu,
         .menu-lateral > .menu-rodape { flex-shrink:0; }
+        .menu-lateral:not(.minimizado) .menu-item > span:not(.icone),
+        .menu-lateral:not(.minimizado) .menu-relatorio > span:not(.icone),
+        .menu-lateral:not(.minimizado) .menu-turnos > span:not(.icone) { flex:1 1 auto; min-width:0; white-space:normal; overflow-wrap:anywhere; line-height:1.15; }
+        .menu-lateral:not(.minimizado) .menu-item,
+        .menu-lateral:not(.minimizado) .menu-relatorio,
+        .menu-lateral:not(.minimizado) .menu-turnos { overflow:hidden; }
+        .menu-lateral:not(.minimizado) .menu-item:hover,
+        .menu-lateral:not(.minimizado) .menu-relatorio:hover,
+        .menu-lateral:not(.minimizado) .menu-turnos:hover { background:transparent; border-color:transparent; box-shadow:none; }
+        .menu-lateral:not(.minimizado) .menu-item.ativo,
+        .menu-lateral:not(.minimizado) .menu-relatorio.ativo,
+        .menu-lateral:not(.minimizado) .menu-turnos.ativo,
+        .menu-lateral.minimizado .menu-item.ativo,
+        .menu-lateral.minimizado .menu-relatorio.ativo,
+        .menu-lateral.minimizado .menu-turnos.ativo { background:var(--menu-glass-hover); border-color:var(--menu-glass-border); box-shadow:inset 3px 0 #60A5FA,inset 0 1px 0 rgba(255,255,255,.15),0 5px 14px rgba(0,0,0,.12); -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); }
     </style>
 </head>
 <body>
@@ -996,7 +1011,7 @@
             <div class="subtitulo-menu">PCP - Produção</div>
         </div>
 
-        <div class="menu-item ativo" onclick="carregarAba('todas', event)" title="Todas as Máquinas">
+        <div class="menu-item ativo" data-aba="todas" onclick="carregarAba('todas', event)" title="Todas as Máquinas">
             <span class="icone" id="icone-todas-maquinas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg></span><span>Todas as Máquinas</span>
         </div>
 
@@ -2023,6 +2038,7 @@
             Object.keys(GRUPOS_PADRAO).filter(nome => nome && nome.trim().toLowerCase() !== 'undefined').forEach(nome => {
                 const item = document.createElement('div');
                 item.className = 'menu-item';
+                item.dataset.aba = nome;
                 item.title = nome;
                 item.onclick = evento => carregarAba(nome, evento);
                 const icone = ICONES_GRUPOS[nome] || iconeLucide('wrench');
@@ -2035,6 +2051,7 @@
                 if (!GRUPOS_PADRAO[nome]) {
                     const item = document.createElement('div');
                     item.className = 'menu-item';
+                    item.dataset.aba = nome;
                     item.title = nome;
                     item.onclick = evento => carregarAba(nome, evento);
                     const icone = ICONES_GRUPOS[nome] || iconeLucide('wrench');
@@ -2055,8 +2072,10 @@
 
         function carregarAba(nome, evento) {
             abaAtual = nome;
-            document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('ativo'));
-            evento?.target?.closest('.menu-item')?.classList.add('ativo');
+            document.querySelectorAll('.menu-item, .menu-relatorio, .menu-turnos').forEach(i => i.classList.remove('ativo'));
+            const itemAtivo = evento?.target?.closest('.menu-item')
+                || [...document.querySelectorAll('#menu-lateral .menu-item')].find(item => item.dataset.aba === String(nome));
+            itemAtivo?.classList.add('ativo');
 
             document.getElementById('titulo-aba').textContent = nome === 'todas' ? 'Todas as Máquinas' : nome;
             document.getElementById('subtitulo-aba').textContent = nome === 'todas' ? 'Visualização geral' : `Itens do grupo ${nome}`;
@@ -2070,6 +2089,8 @@
         }
         function voltarDados() { carregarAba(abaAtual); }
         function abrirConfiguracoes() {
+            document.querySelectorAll('.menu-item, .menu-relatorio, .menu-turnos').forEach(i => i.classList.remove('ativo'));
+            document.getElementById('icone-configuracoes')?.closest('.menu-item')?.classList.add('ativo');
             document.getElementById('area-dados').classList.add('oculto');
             document.getElementById('area-logo').classList.add('oculto');
             document.getElementById('area-configuracoes').classList.remove('oculto');
