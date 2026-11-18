@@ -1,4 +1,4 @@
-﻿!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -81,6 +81,8 @@
             color: var(--texto-escuro);
             display: flex;
             min-height: 100vh;
+            min-width: 0;
+            overflow-x: hidden;
             transition: background-color 0.25s ease, color 0.25s ease;
         }
 
@@ -264,13 +266,17 @@
         .btn-menu-mobile:hover,.btn-menu-mobile:focus-visible { opacity:1; background:rgba(15,23,42,.94); }
 
         .area-principal {
-            flex: 1;
+            flex: 1 1 auto;
             margin-left: var(--largura-menu);
             padding: 30px 25px;
-            width: 100%;
+            width: auto;
+            min-width: 0;
             transition: margin-left 0.3s ease;
         }
         .menu-lateral.minimizado ~ .area-principal {
+            margin-left: var(--largura-menu-min);
+        }
+        body > .menu-lateral.minimizado + .area-principal {
             margin-left: var(--largura-menu-min);
         }
 
@@ -370,6 +376,7 @@
             position: relative;
             overflow: hidden;
             max-width: 100%;
+            min-width: 0;
         }
         .area-grafico-maquinas::before {
             content: '';
@@ -396,9 +403,11 @@
             gap: 6px;
         }
         #graficoMaquinas {
+            display: block;
             width: 100% !important;
             height: 220px !important;
             max-height: 240px;
+            max-width: 100%;
             position: relative;
             z-index: 1;
             filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.18));
@@ -1555,8 +1564,10 @@
             const g = {};
             snapshot.forEach(doc => {
                 const item = doc.data();
-                if (['config-turnos','config-logo'].includes(doc.id) || ['config-turnos','config-logo'].includes(item.tipo)) return;
-                g[item.nome] = item.maquinas || [];
+                if (item.tipo || ['config-turnos','config-logo'].includes(doc.id)) return;
+                const nome = String(item.nome || '').trim();
+                if (!nome || nome.toLowerCase() === 'undefined') return;
+                g[nome] = Array.isArray(item.maquinas) ? item.maquinas.filter(maquina => typeof maquina === 'string' && maquina.trim()) : [];
             });
             return g;
         }
@@ -1803,6 +1814,7 @@
                             hoverBorderColor: 'rgba(255, 255, 255, 0.58)',
                             barPercentage: 0.7,
                             categoryPercentage: 0.8,
+                            maxBarThickness: 48,
                             stack: 'volume'
                         },
                         {
@@ -1815,6 +1827,7 @@
                             hoverBorderColor: 'rgba(255, 255, 255, 0.58)',
                             barPercentage: 0.7,
                             categoryPercentage: 0.8,
+                            maxBarThickness: 48,
                             stack: 'volume'
                         }
                     ]
@@ -1908,7 +1921,7 @@
                 item.onclick = evento => carregarAba(nome, evento);
                 const icone = ICONES_GRUPOS[nome] || iconeLucide('wrench');
                 const classeIcone = CLASSES_ICONES_GRUPOS[nome] || 'icone-generico';
-                item.innerHTML = `<span class="icone ${classeIcone}">${icone}</span><span>${nome}</span>`;
+                item.innerHTML = `<span class="icone ${classeIcone}">${icone}</span><span>${escaparHtml(nome)}</span>`;
                 container.appendChild(item);
             });
 
@@ -1922,7 +1935,7 @@
                     const classeIcone = CLASSES_ICONES_GRUPOS[nome] || 'icone-generico';
                     const paleta = ['#38bdf8','#a78bfa','#fb7185','#34d399','#fbbf24','#f472b6','#2dd4bf'];
                     const corIcone = paleta[Object.keys(ABAS_GRUPOS).indexOf(nome) % paleta.length];
-                    item.innerHTML = `<span class="icone ${classeIcone}" style="${GRUPOS_PADRAO[nome] ? '' : `color:${corIcone}`} ">${icone}</span><span>${nome}</span>`;
+                    item.innerHTML = `<span class="icone ${classeIcone}" style="color:${corIcone}">${icone}</span><span>${escaparHtml(nome)}</span>`;
                     container.appendChild(item);
                 }
             });
@@ -1931,7 +1944,7 @@
         function atualizarSelectMaquinas() {
             const filtro = document.getElementById('filtro-maquina');
             const todas = Object.values(ABAS_GRUPOS).flat().sort();
-            filtro.innerHTML = '<option value="">Todas</option>' + todas.map(m => `<option value="${m}">${m}</option>`).join('');
+            filtro.innerHTML = '<option value="">Todas</option>' + todas.map(m => `<option value="${escaparHtml(m)}">${escaparHtml(m)}</option>`).join('');
         }
 
         function carregarAba(nome, evento) {
@@ -1975,7 +1988,7 @@
             document.getElementById('subtitulo-aba').textContent = 'Indicadores detalhados por período e máquina';
             const filtro = document.getElementById('relatorio-maquina');
             const valorAtual = filtro.value;
-            filtro.innerHTML = '<option value="">Todas as máquinas</option>' + [...new Set([...Object.values(ABAS_GRUPOS).flat(), ...PROGRAMACOES.map(p => p.maquina).filter(Boolean)])].sort().map(m => `<option value="${m}">${m}</option>`).join('');
+            filtro.innerHTML = '<option value="">Todas as máquinas</option>' + [...new Set([...Object.values(ABAS_GRUPOS).flat(), ...PROGRAMACOES.map(p => p.maquina).filter(Boolean)])].sort().map(m => `<option value="${escaparHtml(m)}">${escaparHtml(m)}</option>`).join('');
             filtro.value = valorAtual;
             atualizarFiltroTurnos();
             if (!document.getElementById('relatorio-data-inicio').value) definirPeriodoMesAtual();
@@ -1984,6 +1997,10 @@
 
         function escaparHtml(valor) {
             return String(valor ?? '').replace(/[&<>"']/g, caractere => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[caractere]);
+        }
+
+        function escaparJsEmHtml(valor) {
+            return escaparHtml(JSON.stringify(valor) ?? 'null');
         }
 
         function abrirConfiguracaoTurnos() {
@@ -2156,11 +2173,11 @@
                 const ehPadrao = GRUPOS_PADRAO[nome] !== undefined;
                 bloco.innerHTML = `
                     <div class="cabecalho-aba-config">
-                        <input type="text" class="input-nome-aba" value="${nome}" ${ehPadrao ? 'readonly' : ''}>
-                        ${!ehPadrao ? `<button class="btn-perigo btn-pequeno" onclick="excluirGrupoConf('${nome}')">Excluir</button>` : ''}
+                        <input type="text" class="input-nome-aba" value="${escaparHtml(nome)}" ${ehPadrao ? 'readonly' : ''}>
+                        ${!ehPadrao ? `<button class="btn-perigo btn-pequeno" onclick="excluirGrupoConf(${escaparJsEmHtml(nome)})">Excluir</button>` : ''}
                     </div>
-                    <div class="lista-maquinas-aba" id="maq-${nome}"></div>
-                    <button class="btn-primario btn-pequeno" onclick="adicionarMaq('${nome}')">+ Adicionar Máquina</button>
+                    <div class="lista-maquinas-aba" id="maq-${escaparHtml(nome)}"></div>
+                    <button class="btn-primario btn-pequeno" onclick="adicionarMaq(${escaparJsEmHtml(nome)})">+ Adicionar Máquina</button>
                 `;
                 container.appendChild(bloco);
                 const lista = document.getElementById(`maq-${nome}`);
@@ -2168,8 +2185,8 @@
                     const item = document.createElement('div');
                     item.className = 'item-maquina-aba';
                     item.innerHTML = `
-                        <input type="text" value="${m}" onchange="alterarMaq('${nome}', ${i}, this.value)">
-                        <button class="btn-perigo btn-pequeno" onclick="removerMaq('${nome}', ${i})">Excluir</button>
+                        <input type="text" value="${escaparHtml(m)}" onchange="alterarMaq(${escaparJsEmHtml(nome)}, ${i}, this.value)">
+                        <button class="btn-perigo btn-pequeno" onclick="removerMaq(${escaparJsEmHtml(nome)}, ${i})">Excluir</button>
                     `;
                     lista.appendChild(item);
                 });
@@ -2276,9 +2293,9 @@
             const listaCli = document.getElementById('lista-clientes');
             const listaMaq = document.getElementById('lista-maquinas');
 
-            listaCod.innerHTML = BANCO_ITENS.map(i => `<option value="${i.codigo}">`).join('');
-            listaCli.innerHTML = [...new Set(PROGRAMACOES.map(p => p.cliente).filter(Boolean))].map(c => `<option value="${c}">`).join('');
-            listaMaq.innerHTML = Object.values(ABAS_GRUPOS).flat().map(m => `<option value="${m}">`).join('');
+            listaCod.innerHTML = BANCO_ITENS.map(i => `<option value="${escaparHtml(i.codigo)}">`).join('');
+            listaCli.innerHTML = [...new Set(PROGRAMACOES.map(p => p.cliente).filter(Boolean))].map(c => `<option value="${escaparHtml(c)}">`).join('');
+            listaMaq.innerHTML = Object.values(ABAS_GRUPOS).flat().map(m => `<option value="${escaparHtml(m)}">`).join('');
         }
 
         function preencherDadosItem() {
@@ -2425,12 +2442,12 @@
         function renderizarSituacoesModal(situacaoAtual = '') {
             const lista = document.getElementById('lista-situacoes-modal');
             lista.innerHTML = SITUACOES_MAQUINA.map(s => `
-                <div class="opcao-situacao ${s.classe || ''} ${situacaoAtual === s.valor ? 'ativo' : ''}" style="--situacao-cor:${s.cor || '#64748b'}">
-                    <span class="opcao-situacao-icone" style="background:${s.cor || ''}">${s.icone}</span>
-                    <span><strong>${s.titulo}</strong><small>${s.detalhe || ''}</small></span>
+                <div class="opcao-situacao ${String(s.classe || '').replace(/[^a-z0-9_-]/gi, '')} ${situacaoAtual === s.valor ? 'ativo' : ''}" style="--situacao-cor:${/^#[0-9a-f]{3,8}$/i.test(String(s.cor || '')) ? s.cor : '#64748b'}">
+                    <span class="opcao-situacao-icone" style="background:${/^#[0-9a-f]{3,8}$/i.test(String(s.cor || '')) ? s.cor : '#64748b'}">${escaparHtml(s.icone)}</span>
+                    <span><strong>${escaparHtml(s.titulo)}</strong><small>${escaparHtml(s.detalhe || '')}</small></span>
                     <span class="acoes-situacao">
-                        <button type="button" class="btn-primario" onclick="selecionarSituacaoMaq('${s.valor}')">Usar</button>
-                        <button type="button" class="btn-editar" onclick="editarSituacao('${s.valor}')" aria-label="Editar ${s.titulo}">✏️</button>
+                        <button type="button" class="btn-primario" onclick="selecionarSituacaoMaq(${escaparJsEmHtml(s.valor)})">Usar</button>
+                        <button type="button" class="btn-editar" onclick="editarSituacao(${escaparJsEmHtml(s.valor)})" aria-label="Editar ${escaparHtml(s.titulo)}">✏️</button>
                     </span>
                 </div>
             `).join('');
@@ -2601,13 +2618,13 @@
                 const detalhe = evento.tipo === 'inicio' || evento.tipo === 'fim'
                     ? `Inspetora: ${evento.inspetora || 'n\u00e3o informada'}`
                     : `${evento.tipo === 'condicao-maquina' ? 'Respons\u00e1vel' : 'Situa\u00e7\u00e3o'}: ${nome}${evento.tipo === 'condicao-maquina' ? ` \u00b7 Inspetora: ${evento.inspetora || p.inspetoraFim || 'n\u00e3o informada'}` : ''}${anterior ? ` \u00b7 Anterior: ${anterior.titulo}` : ''}${paradaMinutos !== null ? ` \u00b7 Parada: ${paradaMinutos.toFixed(0)} min${proximo.tipo === 'fim' ? ' (at\u00e9 a finaliza\u00e7\u00e3o)' : ''}` : ''}`;
-                return `<div class="evento-producao"><strong>${nome}</strong><small>${formatarDataHora(evento.em)} · ${detalhe}</small></div>`;
+                return `<div class="evento-producao"><strong>${escaparHtml(nome)}</strong><small>${formatarDataHora(evento.em)} · ${escaparHtml(detalhe)}</small></div>`;
             }).join('');
             document.getElementById('conteudo-historico-producao').innerHTML = `
                 <div class="resumo-producao">
-                    <strong>${p.nome || 'Item'} · ${p.maquina || 'Máquina não informada'}</strong>
-                    <span>Início: ${formatarDataHora(p.producaoIniciadaEm)}${p.inspetoraInicio ? ` · ${p.inspetoraInicio}` : ''}</span>
-                    <span>Finalização: ${formatarDataHora(p.producaoFinalizadaEm)}${p.inspetoraFim ? ` · ${p.inspetoraFim}` : ''}</span>
+                    <strong>${escaparHtml(p.nome || 'Item')} · ${escaparHtml(p.maquina || 'Máquina não informada')}</strong>
+                    <span>Início: ${formatarDataHora(p.producaoIniciadaEm)}${p.inspetoraInicio ? ` · ${escaparHtml(p.inspetoraInicio)}` : ''}</span>
+                    <span>Finalização: ${formatarDataHora(p.producaoFinalizadaEm)}${p.inspetoraFim ? ` · ${escaparHtml(p.inspetoraFim)}` : ''}</span>
                     <span>Duração: ${duracao === null ? 'Produção ainda não iniciada' : `${Math.floor(duracao / 60)} h ${Math.floor(duracao % 60)} min${!fim ? ' (em andamento)' : ''}`}</span>
                 </div>
                 <div class="linha-tempo-producao">${eventos || '<div class="sem-dados">Nenhum início de produção registrado.</div>'}</div>`;
@@ -2689,7 +2706,7 @@
                     </thead>
                     <tbody>
                         ${dados.map(p => {
-                            const classeStatus = (p.status || 'Planejado').replace(' ', '-').toLowerCase();
+                            const classeStatus = String(p.status || 'Planejado').replace(/[^a-z0-9_-]/gi, '-').toLowerCase();
                             const situacao = p.situacaoMaquina || 'trabalhando';
                             let classeSituacao = 'situacao-trabalhando';
                             let iconeSituacao = '⚡';
@@ -2714,38 +2731,38 @@
                             return `
                             <tr class="linha-${classeStatus}">
                                 <td>
-                                    <select class="select-status ${classeStatus}" onchange="alterarStatus(${p.id}, this.value)">
+                                    <select class="select-status ${classeStatus}" onchange="alterarStatus(${escaparJsEmHtml(p.id)}, this.value)">
                                         <option value="Planejado" ${(p.status || 'Planejado') === 'Planejado' ? 'selected' : ''}>Planejado</option>
                                         <option value="Próximo" ${(p.status || 'Planejado') === 'Próximo' ? 'selected' : ''}>Próximo</option>
                                         <option value="Em máquina" ${(p.status || 'Planejado') === 'Em máquina' ? 'selected' : ''}>Em máquina</option>
                                         <option value="Produzido" ${(p.status || 'Planejado') === 'Produzido' ? 'selected' : ''}>Produzido</option>
                                     </select>
                                 </td>
-                                <td>${p.codigo || '-'}</td>
-                                <td>${p.codigoSubproduto || '-'}</td>
-                                <td>${p.op || '-'}</td>
-                                <td>${p.nome || '-'}</td>
-                                <td>${p.cliente || '-'}</td>
-                                <td><span class="maquina-condicao ${p.condicaoMaquina || (p.producaoIniciadaEm && !p.producaoFinalizadaEm ? 'producao' : 'disponivel')}" title="${p.condicaoMaquina === 'manutencao' ? 'Manuten\u00e7\u00e3o' : p.condicaoMaquina === 'troca' ? 'Processo de troca' : p.condicaoMaquina === 'disponivel' ? 'Dispon\u00edvel' : p.producaoIniciadaEm && !p.producaoFinalizadaEm ? 'Produ\u00e7\u00e3o em andamento' : 'Dispon\u00edvel'}">${p.maquina || '-'}</span></td>
+                                <td>${escaparHtml(p.codigo || '-')}</td>
+                                <td>${escaparHtml(p.codigoSubproduto || '-')}</td>
+                                <td>${escaparHtml(p.op || '-')}</td>
+                                <td>${escaparHtml(p.nome || '-')}</td>
+                                <td>${escaparHtml(p.cliente || '-')}</td>
+                                <td><span class="maquina-condicao ${['manutencao', 'troca', 'disponivel'].includes(p.condicaoMaquina) ? p.condicaoMaquina : p.producaoIniciadaEm && !p.producaoFinalizadaEm ? 'producao' : 'disponivel'}" title="${p.condicaoMaquina === 'manutencao' ? 'Manuten\u00e7\u00e3o' : p.condicaoMaquina === 'troca' ? 'Processo de troca' : p.condicaoMaquina === 'disponivel' ? 'Dispon\u00edvel' : p.producaoIniciadaEm && !p.producaoFinalizadaEm ? 'Produ\u00e7\u00e3o em andamento' : 'Dispon\u00edvel'}">${escaparHtml(p.maquina || '-')}</span></td>
                                 <td>${p.dataEntrega ? new Date(p.dataEntrega).toLocaleDateString('pt-BR') : '-'}</td>
-                                <td>${p.qtdPedida || 0}</td>
+                                <td>${escaparHtml(p.qtdPedida || 0)}</td>
                                 <td>
                                     <input
                                         class="input-qtd-executada"
                                         type="number"
                                         min="0"
-                                        value="${p.qtdExecutada || ''}"
+                                        value="${escaparHtml(p.qtdExecutada || '')}"
                                         placeholder="0"
-                                        onchange="alterarQtdExecutada(${p.id}, this.value)"
+                                        onchange="alterarQtdExecutada(${escaparJsEmHtml(p.id)}, this.value)"
                                     >
                                 </td>
                                 <td>
                                     <div class="acoes-producao">
-                                    <button class="btn-editar btn-acao" onclick="editarProgramacao(${p.id})" title="Editar programa&#231;&#227;o">${iconeLucide('edit')}</button>
-                                    <button class="btn-perigo btn-acao" onclick="excluirItem(${p.id})" title="Excluir programa&#231;&#227;o">${iconeLucide('trash')}</button>
-                                    <button class="btn-situacao ${classeSituacao}" onclick="alterarSituacaoMaq(${p.id})" title="${textoSituacao}">${iconeSituacao}</button>
-                                    ${p.producaoIniciadaEm && !p.producaoFinalizadaEm ? `<button class="btn-acao btn-finalizar-producao" onclick="finalizarProducao(${p.id})" title="Finalizar produção" aria-label="Finalizar produção">${iconeLucide('stop')}</button>` : `<button class="btn-acao btn-iniciar-producao" onclick="iniciarProducao(${p.id}, ${Boolean(p.producaoFinalizadaEm)})" title="${p.producaoFinalizadaEm ? 'Retomar produção' : 'Iniciar produção'}" aria-label="${p.producaoFinalizadaEm ? 'Retomar produção' : 'Iniciar produção'}">${iconeLucide(p.producaoFinalizadaEm ? 'rotateCcw' : 'play')}</button>`}
-                                    <button class="btn-acao btn-historico" onclick="abrirHistoricoProducao(${p.id})" title="Ver histórico da produção" aria-label="Ver histórico da produção">${iconeLucide('eye')}</button>
+                                    <button class="btn-editar btn-acao" onclick="editarProgramacao(${escaparJsEmHtml(p.id)})" title="Editar programa&#231;&#227;o">${iconeLucide('edit')}</button>
+                                    <button class="btn-perigo btn-acao" onclick="excluirItem(${escaparJsEmHtml(p.id)})" title="Excluir programa&#231;&#227;o">${iconeLucide('trash')}</button>
+                                    <button class="btn-situacao ${classeSituacao}" onclick="alterarSituacaoMaq(${escaparJsEmHtml(p.id)})" title="${textoSituacao}">${iconeSituacao}</button>
+                                    ${p.producaoIniciadaEm && !p.producaoFinalizadaEm ? `<button class="btn-acao btn-finalizar-producao" onclick="finalizarProducao(${escaparJsEmHtml(p.id)})" title="Finalizar produção" aria-label="Finalizar produção">${iconeLucide('stop')}</button>` : `<button class="btn-acao btn-iniciar-producao" onclick="iniciarProducao(${escaparJsEmHtml(p.id)}, ${Boolean(p.producaoFinalizadaEm)})" title="${p.producaoFinalizadaEm ? 'Retomar produção' : 'Iniciar produção'}" aria-label="${p.producaoFinalizadaEm ? 'Retomar produção' : 'Iniciar produção'}">${iconeLucide(p.producaoFinalizadaEm ? 'rotateCcw' : 'play')}</button>`}
+                                    <button class="btn-acao btn-historico" onclick="abrirHistoricoProducao(${escaparJsEmHtml(p.id)})" title="Ver histórico da produção" aria-label="Ver histórico da produção">${iconeLucide('eye')}</button>
                                     </div>
                                 </td>
                             </tr>
