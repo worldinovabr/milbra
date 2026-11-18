@@ -38,6 +38,9 @@
             --raio: 8px;
             --largura-menu: 250px;
             --largura-menu-min: 70px;
+            --menu-glass-bg: rgba(255,255,255,.075);
+            --menu-glass-hover: rgba(255,255,255,.13);
+            --menu-glass-border: rgba(255,255,255,.12);
         }
 
         body.tema-escuro {
@@ -941,6 +944,28 @@
             #area-dados .painel-controles .campo-filtro { min-width:0; }
             #area-dados .painel-controles > button { width:100%; min-width:0; min-height:44px; padding:8px; white-space:normal; line-height:1.15; font-size:.82rem; }
         }
+
+        .menu-lateral .menu-item,
+        .menu-lateral .menu-relatorio,
+        .menu-lateral .menu-turnos { background:var(--menu-glass-bg); border-color:var(--menu-glass-border); box-shadow:inset 0 1px 0 rgba(255,255,255,.08); -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); }
+        .menu-lateral .menu-item:hover,
+        .menu-lateral .menu-item:focus-visible,
+        .menu-lateral .menu-relatorio:hover,
+        .menu-lateral .menu-relatorio:focus-visible,
+        .menu-lateral .menu-turnos:hover,
+        .menu-lateral .menu-turnos:focus-visible { background:var(--menu-glass-hover); border-color:rgba(255,255,255,.2); box-shadow:inset 0 1px 0 rgba(255,255,255,.15),0 5px 14px rgba(0,0,0,.12); }
+        .menu-lateral .menu-item.ativo,
+        .menu-lateral .menu-relatorio.ativo,
+        .menu-lateral .menu-turnos.ativo { background:var(--menu-glass-hover); border-color:rgba(255,255,255,.2); box-shadow:inset 3px 0 #60A5FA,inset 0 1px 0 rgba(255,255,255,.15); }
+        .menu-lateral.minimizado .menu-item { background:var(--menu-glass-bg); border-color:var(--menu-glass-border); box-shadow:inset 0 1px 0 rgba(255,255,255,.08); }
+        .menu-lateral.minimizado .menu-item.ativo { background:var(--menu-glass-hover); border-color:rgba(255,255,255,.2); box-shadow:inset 3px 0 #60A5FA,inset 0 1px 0 rgba(255,255,255,.15); }
+        .menu-lateral.minimizado .menu-item:hover { background:var(--menu-glass-hover); border-color:rgba(255,255,255,.2); }
+        .menu-lateral.minimizado .menu-relatorio,
+        .menu-lateral.minimizado .menu-turnos { border-color:var(--menu-glass-border); }
+        .menu-lateral.minimizado .menu-item > span:not(.icone),
+        .menu-lateral.minimizado .menu-relatorio > span:not(.icone),
+        .menu-lateral.minimizado .menu-turnos > span:not(.icone) { background:var(--menu-glass-hover); border-color:rgba(255,255,255,.18); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); box-shadow:inset 0 1px 0 rgba(255,255,255,.13),0 8px 22px rgba(0,0,0,.2); }
+        .menu-lateral.minimizado .menu-item.ativo > span:not(.icone) { background:var(--menu-glass-hover); border-color:rgba(255,255,255,.24); }
     </style>
 </head>
 <body>
