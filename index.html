@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -149,14 +149,16 @@
             height: 32px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 1rem;
+            padding: 0;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: background 0.2s;
         }
+        .btn-minimizar svg { width:18px; height:18px; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; transition:transform .2s ease; }
         .btn-minimizar:hover { background: rgba(255,255,255,0.2); }
-        .menu-lateral.minimizado .btn-minimizar { right: 19px; transform: rotate(180deg); }
+        .menu-lateral.minimizado .btn-minimizar { right: 19px; }
+        .menu-lateral.minimizado .btn-minimizar svg { transform: rotate(180deg); }
 
         .menu-item {
             margin: 4px 10px;
@@ -170,7 +172,9 @@
             border: 1px solid transparent;
             border-radius: 10px;
             white-space: nowrap;
+            overflow: hidden;
         }
+        .menu-item > span:not(.icone) { min-width:0; overflow:hidden; text-overflow:ellipsis; }
         .menu-lateral.minimizado .menu-item {
             margin: 4px 8px;
             padding: 8px 10px;
@@ -852,7 +856,7 @@
 
     <nav class="menu-lateral" id="menu-lateral">
         <div class="cabecalho-menu">
-            <button class="btn-minimizar" onclick="alternarMinimizarMenu()" title="Minimizar/Expandir menu">🔛</button>
+            <button class="btn-minimizar" onclick="alternarMinimizarMenu()" title="Minimizar/Expandir menu" aria-label="Minimizar ou expandir menu"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path><path d="M20 18l-6-6 6-6"></path></svg></button>
             <div class="marca-menu">
                 <div class="logo-menu-area" onclick="aoClicarAreaLogo(event)">
                     <span class="logo-menu-placeholder" id="logo-menu-placeholder" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="m21 15-5-5L5 21"></path></svg></span>
@@ -1781,8 +1785,9 @@
                             borderWidth: 1.2,
                             borderRadius: { bottomLeft: 5, bottomRight: 5 },
                             hoverBorderColor: 'rgba(255, 255, 255, 0.58)',
-                            barPercentage: 0.7,
-                            categoryPercentage: 0.8,
+                            barPercentage: 0.56,
+                            categoryPercentage: 0.68,
+                            maxBarThickness: 34,
                             stack: 'volume'
                         },
                         {
@@ -1793,8 +1798,9 @@
                             borderWidth: 1.2,
                             borderRadius: { topLeft: 5, topRight: 5 },
                             hoverBorderColor: 'rgba(255, 255, 255, 0.58)',
-                            barPercentage: 0.7,
-                            categoryPercentage: 0.8,
+                            barPercentage: 0.56,
+                            categoryPercentage: 0.68,
+                            maxBarThickness: 34,
                             stack: 'volume'
                         }
                     ]
@@ -1881,7 +1887,7 @@
             const container = document.getElementById('lista-abas-menu');
             container.innerHTML = '';
 
-            Object.keys(GRUPOS_PADRAO).forEach(nome => {
+            Object.keys(GRUPOS_PADRAO).filter(nome => nome && nome.trim().toLowerCase() !== 'undefined').forEach(nome => {
                 const item = document.createElement('div');
                 item.className = 'menu-item';
                 item.title = nome;
@@ -1892,7 +1898,7 @@
                 container.appendChild(item);
             });
 
-            Object.keys(ABAS_GRUPOS).forEach(nome => {
+            Object.keys(ABAS_GRUPOS).filter(nome => nome && nome.trim().toLowerCase() !== 'undefined').forEach(nome => {
                 if (!GRUPOS_PADRAO[nome]) {
                     const item = document.createElement('div');
                     item.className = 'menu-item';
