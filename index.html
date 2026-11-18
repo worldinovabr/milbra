@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0A3D62">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -81,6 +81,7 @@
             color: var(--texto-escuro);
             display: flex;
             min-height: 100vh;
+            min-height: 100dvh;
             min-width: 0;
             overflow-x: hidden;
             transition: background-color 0.25s ease, color 0.25s ease;
@@ -96,6 +97,7 @@
             flex-direction: column;
             position: fixed;
             height: 100vh;
+            height: 100dvh;
             overflow-y: auto;
             overflow-x: hidden;
             z-index: 999;
@@ -138,7 +140,7 @@
         .logo-menu-area.lapis-oculto:hover .btn-editar-logo,
         .logo-menu-area.lapis-oculto:focus-within .btn-editar-logo { opacity:1; pointer-events:auto; transform:scale(1); }
         .menu-lateral.minimizado .btn-editar-logo { display:none; }
-        .menu-lateral.minimizado .logo-menu-mark { width:42px; height:42px; }
+        .menu-lateral.minimizado .logo-menu-mark { inset:50% auto auto 50%; width:42px; height:42px; transform:translate(-50%,-50%); }
 
         .btn-minimizar {
             position: absolute;
@@ -792,6 +794,21 @@
         .oculto { display: none !important; }
 
         .bloco-aba-config { background: var(--superficie); border-radius: var(--raio); padding: 20px; box-shadow: var(--sombra); margin-bottom: 20px; }
+        #area-configuracoes > .painel-controles { justify-content:space-between; align-items:center; border-radius:14px; border-color:var(--borda); box-shadow:0 8px 24px rgba(15,23,42,.06); }
+        #area-configuracoes .botoes-backup { justify-content:flex-start; margin:0 0 16px; }
+        #area-configuracoes .bloco-aba-config { position:relative; padding:20px; border:1px solid var(--borda); border-radius:16px; box-shadow:0 8px 24px rgba(15,23,42,.055); transition:border-color .18s ease,box-shadow .18s ease; }
+        #area-configuracoes .bloco-aba-config:focus-within { border-color:color-mix(in srgb,var(--cor-principal) 42%,var(--borda)); box-shadow:0 10px 28px rgba(15,23,42,.08),0 0 0 3px color-mix(in srgb,var(--cor-principal) 9%,transparent); }
+        #area-configuracoes .cabecalho-aba-config { align-items:center; padding-bottom:14px; border-bottom:1px solid var(--borda); }
+        #area-configuracoes .input-nome-aba { flex:1 1 220px; width:auto; max-width:none; min-width:0; padding:11px 13px; border:1px solid var(--borda); border-radius:10px; background:var(--superficie-elevada); color:var(--texto-escuro); font-size:.98rem; transition:border-color .18s ease,box-shadow .18s ease,background .18s ease; }
+        #area-configuracoes .input-nome-aba:read-only { background:var(--fundo-cinza); font-weight:650; }
+        #area-configuracoes .input-nome-aba:focus { border-color:var(--cor-principal); box-shadow:0 0 0 3px color-mix(in srgb,var(--cor-principal) 12%,transparent); }
+        #area-configuracoes .lista-maquinas-aba { gap:8px; }
+        #area-configuracoes .item-maquina-aba { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:10px; padding:9px; border:1px solid var(--borda); border-radius:12px; background:color-mix(in srgb,var(--fundo-cinza) 62%,var(--superficie)); }
+        #area-configuracoes .item-maquina-aba input { min-width:0; min-height:44px; border-radius:9px; background:var(--superficie-elevada); }
+        #area-configuracoes button { min-height:42px; border-radius:10px; }
+        #area-configuracoes .btn-pequeno { min-height:38px; padding:8px 13px; font-size:.82rem; }
+        #area-configuracoes .btn-perigo { background:linear-gradient(135deg,#ef6b62,#dc3f36); box-shadow:0 3px 10px rgba(220,63,54,.16); }
+        #area-configuracoes .btn-perigo:hover { background:linear-gradient(135deg,#e4554c,#c9332b); box-shadow:0 6px 14px rgba(220,63,54,.22); }
         .config-logo { display:flex; align-items:center; gap:18px; flex-wrap:wrap; padding:18px; margin-bottom:18px; background:var(--superficie); border:1px solid var(--borda); border-radius:14px; box-shadow:var(--sombra); }
         .config-logo-preview { width:92px; height:92px; display:grid; place-items:center; padding:8px; border-radius:14px; background:linear-gradient(145deg,#1C426F,#0B1D34); }
         .config-logo-preview img { width:100%; height:100%; object-fit:contain; }
@@ -806,15 +823,18 @@
 
         .botoes-backup { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; justify-content: center; }
 
-        @media (max-width: 768px) {
-            .btn-menu-mobile { display: flex; }
+        @media (max-width: 768px), (max-height: 500px) and (pointer: coarse) {
+            .btn-menu-mobile { display: flex; top:max(12px, env(safe-area-inset-top, 0px)); left:max(12px, env(safe-area-inset-left, 0px)); }
             .btn-minimizar { display: none; }
+            .toggle-tema { position:fixed; top:max(12px, env(safe-area-inset-top, 0px)); right:max(12px, env(safe-area-inset-right, 0px)); z-index:1001; width:76px; height:38px; margin:0; }
             .menu-lateral { transform: translateX(-100%); width: var(--largura-menu); min-width: var(--largura-menu); }
             .menu-lateral.aberto { transform: translateX(0); }
-            .area-principal { margin-left: 0; padding: 18px 14px; padding-top: 68px; }
+            .menu-lateral .menu-item { box-sizing:border-box; width:calc(100% - 20px); min-height:56px; margin:4px 10px; padding:12px 14px; justify-content:flex-start; }
+            .menu-lateral .menu-item > .icone { flex:0 0 32px; }
+            .area-principal { margin-left:0; padding:calc(68px + env(safe-area-inset-top, 0px)) max(14px, env(safe-area-inset-right, 0px)) max(20px, env(safe-area-inset-bottom, 0px)) max(14px, env(safe-area-inset-left, 0px)); }
             .cabecalho-pagina {
                 display: block;
-                margin-bottom: 18px;
+                margin-bottom: 16px;
                 padding-bottom: 14px;
                 border-bottom-color: rgba(10, 61, 98, 0.12);
             }
@@ -835,17 +855,24 @@
             .legenda-status {
                 display: grid;
                 grid-template-columns: repeat(2, minmax(0, 1fr));
-                gap: 10px;
-                margin-bottom: 18px;
+                gap: 8px;
+                margin-bottom: 14px;
             }
             .legenda-item {
                 justify-content: flex-start;
-                min-height: 48px;
-                padding: 10px 14px;
-                font-size: 0.95rem;
+                min-height: 46px;
+                padding: 9px 11px;
+                font-size: clamp(.78rem, 3.8vw, .92rem);
                 box-shadow: none;
             }
-            .painel-controles { flex-direction: column; align-items: stretch; }
+            .painel-controles { flex-direction:column; align-items:stretch; padding:14px; gap:12px; border-radius:14px; }
+            #area-configuracoes > .painel-controles { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; padding:12px; }
+            #area-configuracoes > .painel-controles button { width:100%; min-width:0; padding:10px 8px; font-size:.82rem; }
+            #area-configuracoes .bloco-aba-config { padding:14px; border-radius:14px; }
+            #area-configuracoes .cabecalho-aba-config { gap:8px; }
+            #area-configuracoes .item-maquina-aba { gap:8px; padding:7px; }
+            #area-configuracoes .item-maquina-aba button,
+            #area-configuracoes .cabecalho-aba-config .btn-perigo { width:auto; }
             .campo-filtro { min-width: 100%; }
             button { width: 100%; justify-content: center; }
             #conteudo-tabela { margin-left: -2px; margin-right: -2px; }
@@ -855,8 +882,9 @@
             .grupo-campos-modal { grid-template-columns: 1fr; }
             .relatorio-grade { grid-template-columns:1fr; }
             .relatorio-periodo .campo-filtro { flex:1 1 100%; min-width:100%; }
-            .area-grafico-maquinas { padding: 12px 10px 20px; }
-            #graficoMaquinas { height: 200px !important; }
+            .area-grafico-maquinas { padding:14px 12px 18px; margin-bottom:16px; border-radius:16px; box-shadow:0 10px 28px rgba(7,42,69,.16); }
+            .area-grafico-maquinas h3 { margin-bottom:10px; font-size:.98rem; }
+            #graficoMaquinas { height:190px !important; }
             .menu-lateral.minimizado .menu-item > span:not(.icone),
             .menu-lateral.minimizado .menu-relatorio > span:not(.icone),
             .menu-lateral.minimizado .menu-turnos > span:not(.icone) {
@@ -1159,6 +1187,10 @@
         let graficoMaquinas = null;
         let idSituacaoAtual = null;
 
+        function menuMobileAtivo() {
+            return window.matchMedia('(max-width: 768px), (max-height: 500px) and (pointer: coarse)').matches;
+        }
+
         function abrirFecharMenu() {
             const menu = document.getElementById('menu-lateral');
             const aberto = menu.classList.toggle('aberto');
@@ -1172,14 +1204,14 @@
         }
 
         document.addEventListener('pointerdown', evento => {
-            if (!window.matchMedia('(max-width: 768px)').matches) return;
+            if (!menuMobileAtivo()) return;
             const alvo = evento.target;
             if (!(alvo instanceof Element) || alvo.closest('#menu-lateral') || alvo.closest('.btn-menu-mobile')) return;
             if (document.getElementById('menu-lateral').classList.contains('aberto')) fecharMenuMobile();
         });
 
         document.addEventListener('keydown', evento => {
-            if (evento.key === 'Escape' && window.matchMedia('(max-width: 768px)').matches && document.getElementById('menu-lateral').classList.contains('aberto')) fecharMenuMobile();
+            if (evento.key === 'Escape' && menuMobileAtivo() && document.getElementById('menu-lateral').classList.contains('aberto')) fecharMenuMobile();
         });
 
         function alternarMinimizarMenu() {
@@ -1647,7 +1679,7 @@
             document.getElementById('icone-turnos').innerHTML = iconeLucide('clock');
 
             try {
-                if (localStorage.getItem('menuMinimizado') === 'true') {
+                if (localStorage.getItem('menuMinimizado') === 'true' && !menuMobileAtivo()) {
                     document.getElementById('menu-lateral').classList.add('minimizado');
                 }
             } catch (erro) {}
