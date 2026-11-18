@@ -967,6 +967,15 @@
         .menu-lateral.minimizado .menu-relatorio > span:not(.icone),
         .menu-lateral.minimizado .menu-turnos > span:not(.icone) { background:var(--menu-glass-hover); border-color:rgba(255,255,255,.18); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); box-shadow:inset 0 1px 0 rgba(255,255,255,.13),0 8px 22px rgba(0,0,0,.2); }
         .menu-lateral.minimizado .menu-item.ativo > span:not(.icone) { background:var(--menu-glass-hover); border-color:rgba(255,255,255,.24); }
+        .menu-lateral:not(.minimizado) > .menu-item,
+        .menu-lateral:not(.minimizado) > .menu-relatorio,
+        .menu-lateral:not(.minimizado) > .menu-turnos { flex:0 0 58px; }
+        .menu-lateral.minimizado > .menu-item,
+        .menu-lateral.minimizado > .menu-relatorio,
+        .menu-lateral.minimizado > .menu-turnos { flex:0 0 48px; }
+        .menu-lateral > .cabecalho-menu,
+        .menu-lateral > #lista-abas-menu,
+        .menu-lateral > .menu-rodape { flex-shrink:0; }
     </style>
 </head>
 <body>
