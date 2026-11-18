@@ -2297,11 +2297,10 @@
                 const maqs = ABAS_GRUPOS[nome] || [];
                 const bloco = document.createElement('div');
                 bloco.className = 'bloco-aba-config';
-                const ehPadrao = GRUPOS_PADRAO[nome] !== undefined;
                 bloco.innerHTML = `
                     <div class="cabecalho-aba-config">
-                        <input type="text" class="input-nome-aba" value="${escaparHtml(nome)}" ${ehPadrao ? 'readonly' : ''}>
-                        ${!ehPadrao ? `<button class="btn-perigo btn-pequeno" onclick="excluirGrupoConf(${escaparJsEmHtml(nome)})">Excluir</button>` : ''}
+                        <input type="text" class="input-nome-aba" value="${escaparHtml(nome)}" aria-label="Nome do grupo ${escaparHtml(nome)}" onchange="alterarNomeGrupoConf(${escaparJsEmHtml(nome)}, this.value)">
+                        ${!GRUPOS_PADRAO[nome] ? `<button class="btn-perigo btn-pequeno" onclick="excluirGrupoConf(${escaparJsEmHtml(nome)})">Excluir</button>` : ''}
                     </div>
                     <div class="lista-maquinas-aba" id="maq-${escaparHtml(nome)}"></div>
                     <button class="btn-primario btn-pequeno" onclick="adicionarMaq(${escaparJsEmHtml(nome)})">+ Adicionar Máquina</button>
@@ -2324,6 +2323,33 @@
             if (!nome || ABAS_GRUPOS[nome]) return alert("Nome inválido ou já existe!");
             ABAS_GRUPOS[nome] = [];
             await salvarGrupo(nome, []);
+            atualizarMenuAbas();
+            renderizarConfig();
+        }
+        async function alterarNomeGrupoConf(nomeAtual, novoNome) {
+            const nome = String(novoNome || '').trim();
+            if (!nome) {
+                alert('O nome do grupo não pode ficar vazio.');
+                renderizarConfig();
+                return;
+            }
+            if (nome === nomeAtual) return;
+            if (ABAS_GRUPOS[nome] !== undefined) {
+                alert('Já existe um grupo com esse nome.');
+                renderizarConfig();
+                return;
+            }
+
+            const maquinas = ABAS_GRUPOS[nomeAtual];
+            ABAS_GRUPOS[nome] = maquinas;
+            delete ABAS_GRUPOS[nomeAtual];
+            if (Object.prototype.hasOwnProperty.call(GRUPOS_PADRAO, nomeAtual)) {
+                GRUPOS_PADRAO[nome] = GRUPOS_PADRAO[nomeAtual];
+                delete GRUPOS_PADRAO[nomeAtual];
+            }
+            await salvarGrupo(nome, maquinas);
+            await excluirGrupo(nomeAtual);
+            if (abaAtual === nomeAtual) abaAtual = nome;
             atualizarMenuAbas();
             renderizarConfig();
         }
