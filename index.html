@@ -826,8 +826,12 @@
         #area-configuracoes .input-nome-aba:read-only { background:var(--fundo-cinza); font-weight:650; }
         #area-configuracoes .input-nome-aba:focus { border-color:var(--cor-principal); box-shadow:0 0 0 3px color-mix(in srgb,var(--cor-principal) 12%,transparent); }
         #area-configuracoes .lista-maquinas-aba { gap:8px; }
-        #area-configuracoes .item-maquina-aba { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:10px; padding:9px; border:1px solid var(--borda); border-radius:12px; background:color-mix(in srgb,var(--fundo-cinza) 62%,var(--superficie)); }
+        #area-configuracoes .item-maquina-aba { display:grid; grid-template-columns:minmax(0,1fr) auto auto auto; align-items:center; gap:8px; padding:9px; border:1px solid var(--borda); border-radius:12px; background:color-mix(in srgb,var(--fundo-cinza) 62%,var(--superficie)); }
         #area-configuracoes .item-maquina-aba input { min-width:0; min-height:44px; border-radius:9px; background:var(--superficie-elevada); }
+        #area-configuracoes .ordenacao-maquinas { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:14px 0 10px; color:var(--texto-claro); font-size:.85rem; }
+        #area-configuracoes .ordenacao-maquinas select { width:auto; min-width:190px; min-height:40px; border-radius:9px; }
+        #area-configuracoes .btn-ordem-maquina { min-width:38px; padding:7px 10px; color:var(--texto-escuro); background:var(--superficie-elevada); border:1px solid var(--borda); }
+        #area-configuracoes .btn-ordem-maquina:disabled { opacity:.42; cursor:not-allowed; }
         #area-configuracoes button { min-height:42px; border-radius:10px; }
         #area-configuracoes .btn-pequeno { min-height:38px; padding:8px 13px; font-size:.82rem; }
         #area-configuracoes .btn-perigo { background:linear-gradient(135deg,#ef6b62,#dc3f36); box-shadow:0 3px 10px rgba(220,63,54,.16); }
@@ -896,6 +900,8 @@
             #area-configuracoes .item-maquina-aba { gap:8px; padding:7px; }
             #area-configuracoes .item-maquina-aba button,
             #area-configuracoes .cabecalho-aba-config .btn-perigo { width:auto; }
+            #area-configuracoes .item-maquina-aba { grid-template-columns:minmax(0,1fr) auto auto auto; gap:6px; padding:6px; }
+            #area-configuracoes .btn-ordem-maquina { min-width:34px; padding:6px 8px; }
             .campo-filtro { min-width: 100%; }
             button { width: 100%; justify-content: center; }
             #conteudo-tabela { margin-left: -2px; margin-right: -2px; }
@@ -1675,7 +1681,8 @@
         }
 
         async function salvarGrupo(nome, maquinas) {
-            await firebaseApi.setDoc(documento('grupos', nome), { nome, maquinas });
+            const ordemMaquinas = ORDENACAO_GRUPOS[nome] || 'manual';
+            await firebaseApi.setDoc(documento('grupos', nome), { nome, maquinas, ordemMaquinas });
         }
         async function excluirGrupo(nome) {
             await firebaseApi.deleteDoc(documento('grupos', nome));
@@ -1689,6 +1696,7 @@
                 const nome = String(item.nome || '').trim();
                 if (!nome || nome.toLowerCase() === 'undefined') return;
                 g[nome] = Array.isArray(item.maquinas) ? item.maquinas.filter(maquina => typeof maquina === 'string' && maquina.trim()) : [];
+                ORDENACAO_GRUPOS[nome] = ['manual', 'az', 'za'].includes(item.ordemMaquinas) ? item.ordemMaquinas : 'manual';
             });
             return g;
         }
@@ -1754,7 +1762,7 @@
             "Em máquina": 'rgba(39, 174, 96, 0.9)',
             "Produzido": 'rgba(52, 152, 219, 0.8)'
         };
-        let ABAS_GRUPOS = {}, BANCO_ITENS = [], PROGRAMACOES = [], abaAtual = 'todas';
+        let ABAS_GRUPOS = {}, ORDENACAO_GRUPOS = {}, BANCO_ITENS = [], PROGRAMACOES = [], abaAtual = 'todas';
         let idEdicaoAtual = null;
 
         async function iniciarSistema() {
@@ -2037,7 +2045,7 @@
 
             Object.keys(GRUPOS_PADRAO).filter(nome => nome && nome.trim().toLowerCase() !== 'undefined').forEach(nome => {
                 const item = document.createElement('div');
-                item.className = 'menu-item';
+                item.className = nome === abaAtual ? 'menu-item ativo' : 'menu-item';
                 item.dataset.aba = nome;
                 item.title = nome;
                 item.onclick = evento => carregarAba(nome, evento);
@@ -2050,7 +2058,7 @@
             Object.keys(ABAS_GRUPOS).filter(nome => nome && nome.trim().toLowerCase() !== 'undefined').forEach(nome => {
                 if (!GRUPOS_PADRAO[nome]) {
                     const item = document.createElement('div');
-                    item.className = 'menu-item';
+                    item.className = nome === abaAtual ? 'menu-item ativo' : 'menu-item';
                     item.dataset.aba = nome;
                     item.title = nome;
                     item.onclick = evento => carregarAba(nome, evento);
@@ -2302,6 +2310,15 @@
                         <input type="text" class="input-nome-aba" value="${escaparHtml(nome)}" aria-label="Nome do grupo ${escaparHtml(nome)}" onchange="alterarNomeGrupoConf(${escaparJsEmHtml(nome)}, this.value)">
                         ${!GRUPOS_PADRAO[nome] ? `<button class="btn-perigo btn-pequeno" onclick="excluirGrupoConf(${escaparJsEmHtml(nome)})">Excluir</button>` : ''}
                     </div>
+                    <label class="ordenacao-maquinas">
+                        Ordem das máquinas
+                        <select aria-label="Classificar máquinas do grupo ${escaparHtml(nome)}" onchange="ordenarMaquinasConf(${escaparJsEmHtml(nome)}, this.value)">
+                            <option value="manual" ${(ORDENACAO_GRUPOS[nome] || 'manual') === 'manual' ? 'selected' : ''}>Personalizada</option>
+                            <option value="az" ${ORDENACAO_GRUPOS[nome] === 'az' ? 'selected' : ''}>Nome (A a Z)</option>
+                            <option value="za" ${ORDENACAO_GRUPOS[nome] === 'za' ? 'selected' : ''}>Nome (Z a A)</option>
+                        </select>
+                        <span>Use as setas para ajustar a ordem personalizada.</span>
+                    </label>
                     <div class="lista-maquinas-aba" id="maq-${escaparHtml(nome)}"></div>
                     <button class="btn-primario btn-pequeno" onclick="adicionarMaq(${escaparJsEmHtml(nome)})">+ Adicionar Máquina</button>
                 `;
@@ -2311,7 +2328,9 @@
                     const item = document.createElement('div');
                     item.className = 'item-maquina-aba';
                     item.innerHTML = `
-                        <input type="text" value="${escaparHtml(m)}" onchange="alterarMaq(${escaparJsEmHtml(nome)}, ${i}, this.value)">
+                        <input type="text" value="${escaparHtml(m)}" aria-label="Nome da máquina ${escaparHtml(m)}" onchange="alterarMaq(${escaparJsEmHtml(nome)}, ${i}, this.value)">
+                        <button type="button" class="btn-ordem-maquina" onclick="moverMaquinaConf(${escaparJsEmHtml(nome)}, ${i}, -1)" title="Mover para cima" aria-label="Mover ${escaparHtml(m)} para cima" ${i === 0 ? 'disabled' : ''}>↑</button>
+                        <button type="button" class="btn-ordem-maquina" onclick="moverMaquinaConf(${escaparJsEmHtml(nome)}, ${i}, 1)" title="Mover para baixo" aria-label="Mover ${escaparHtml(m)} para baixo" ${i === maqs.length - 1 ? 'disabled' : ''}>↓</button>
                         <button class="btn-perigo btn-pequeno" onclick="removerMaq(${escaparJsEmHtml(nome)}, ${i})">Excluir</button>
                     `;
                     lista.appendChild(item);
@@ -2347,6 +2366,8 @@
                 GRUPOS_PADRAO[nome] = GRUPOS_PADRAO[nomeAtual];
                 delete GRUPOS_PADRAO[nomeAtual];
             }
+            ORDENACAO_GRUPOS[nome] = ORDENACAO_GRUPOS[nomeAtual] || 'manual';
+            delete ORDENACAO_GRUPOS[nomeAtual];
             await salvarGrupo(nome, maquinas);
             await excluirGrupo(nomeAtual);
             if (abaAtual === nomeAtual) abaAtual = nome;
@@ -2362,18 +2383,99 @@
             renderizarConfig();
         }
         async function adicionarMaq(grupo) {
-            const nome = prompt("Nome da máquina:");
+            const nome = String(prompt("Nome da máquina:") || '').trim();
             if (!nome) return;
-            ABAS_GRUPOS[grupo].push(nome);
-            await salvarGrupo(grupo, ABAS_GRUPOS[grupo]);
+            if (Object.values(ABAS_GRUPOS).flat().some(maquina => maquina.trim().toLocaleLowerCase('pt-BR') === nome.toLocaleLowerCase('pt-BR'))) {
+                alert('Já existe uma máquina com esse nome.');
+                return;
+            }
+            const listaAtualizada = [...(ABAS_GRUPOS[grupo] || []), nome];
+            try {
+                await salvarGrupo(grupo, listaAtualizada);
+            } catch (erro) {
+                console.error('Falha ao salvar a máquina:', erro);
+                alert('Não foi possível salvar a máquina no banco de dados. Verifique sua conexão e tente novamente.');
+                return;
+            }
+            ABAS_GRUPOS[grupo] = listaAtualizada;
             atualizarSelectMaquinas();
+            atualizarMenuAbas();
             renderizarConfig();
         }
         async function alterarMaq(grupo, idx, novo) {
-            if (!novo) return alert("Nome inválido!");
-            ABAS_GRUPOS[grupo][idx] = novo;
-            await salvarGrupo(grupo, ABAS_GRUPOS[grupo]);
+            const nome = String(novo || '').trim();
+            const listaAtual = ABAS_GRUPOS[grupo];
+            if (!nome || !listaAtual || idx < 0 || idx >= listaAtual.length) {
+                alert('Nome da máquina inválido.');
+                renderizarConfig();
+                return;
+            }
+            if (listaAtual[idx] === nome) return;
+            const nomeNormalizado = nome.toLocaleLowerCase('pt-BR');
+            const duplicada = Object.entries(ABAS_GRUPOS).some(([nomeGrupo, maquinas]) => maquinas.some((maquina, indice) =>
+                !(nomeGrupo === grupo && indice === idx) && maquina.trim().toLocaleLowerCase('pt-BR') === nomeNormalizado
+            ));
+            if (duplicada) {
+                alert('Já existe uma máquina com esse nome.');
+                renderizarConfig();
+                return;
+            }
+            const listaAtualizada = [...listaAtual];
+            listaAtualizada[idx] = nome;
+            try {
+                await salvarGrupo(grupo, listaAtualizada);
+            } catch (erro) {
+                console.error('Falha ao salvar o nome da máquina:', erro);
+                alert('Não foi possível salvar o nome da máquina no banco de dados. Verifique sua conexão e tente novamente.');
+                renderizarConfig();
+                return;
+            }
+            ABAS_GRUPOS[grupo] = listaAtualizada;
             atualizarSelectMaquinas();
+            atualizarMenuAbas();
+            renderizarConfig();
+        }
+        async function ordenarMaquinasConf(grupo, ordem) {
+            if (!['manual', 'az', 'za'].includes(ordem) || !ABAS_GRUPOS[grupo]) return;
+            const listaAnterior = [...ABAS_GRUPOS[grupo]];
+            const ordemAnterior = ORDENACAO_GRUPOS[grupo] || 'manual';
+            const listaOrdenada = [...listaAnterior];
+            if (ordem === 'az') listaOrdenada.sort((a, b) => a.localeCompare(b, 'pt-BR', { numeric: true, sensitivity: 'base' }));
+            if (ordem === 'za') listaOrdenada.sort((a, b) => b.localeCompare(a, 'pt-BR', { numeric: true, sensitivity: 'base' }));
+            ORDENACAO_GRUPOS[grupo] = ordem;
+            ABAS_GRUPOS[grupo] = listaOrdenada;
+            try {
+                await salvarGrupo(grupo, listaOrdenada);
+            } catch (erro) {
+                ABAS_GRUPOS[grupo] = listaAnterior;
+                ORDENACAO_GRUPOS[grupo] = ordemAnterior;
+                console.error('Falha ao salvar a ordem das máquinas:', erro);
+                alert('Não foi possível salvar a ordem das máquinas no banco de dados.');
+            }
+            atualizarSelectMaquinas();
+            atualizarMenuAbas();
+            renderizarConfig();
+        }
+        async function moverMaquinaConf(grupo, idx, direcao) {
+            const listaAnterior = ABAS_GRUPOS[grupo];
+            const destino = idx + direcao;
+            if (!listaAnterior || destino < 0 || destino >= listaAnterior.length) return;
+            const listaAtualizada = [...listaAnterior];
+            [listaAtualizada[idx], listaAtualizada[destino]] = [listaAtualizada[destino], listaAtualizada[idx]];
+            const ordemAnterior = ORDENACAO_GRUPOS[grupo] || 'manual';
+            ABAS_GRUPOS[grupo] = listaAtualizada;
+            ORDENACAO_GRUPOS[grupo] = 'manual';
+            try {
+                await salvarGrupo(grupo, listaAtualizada);
+            } catch (erro) {
+                ABAS_GRUPOS[grupo] = listaAnterior;
+                ORDENACAO_GRUPOS[grupo] = ordemAnterior;
+                console.error('Falha ao salvar a ordem personalizada:', erro);
+                alert('Não foi possível salvar a ordem personalizada das máquinas.');
+            }
+            atualizarSelectMaquinas();
+            atualizarMenuAbas();
+            renderizarConfig();
         }
 
         function buscarConflitoEmMaquina(maquina, idIgnorado = null) {
@@ -2395,9 +2497,19 @@
 
         async function removerMaq(grupo, idx) {
             if (!confirm("Remover máquina?")) return;
-            ABAS_GRUPOS[grupo].splice(idx,1);
-            await salvarGrupo(grupo, ABAS_GRUPOS[grupo]);
+            const listaAnterior = ABAS_GRUPOS[grupo];
+            const listaAtualizada = listaAnterior.filter((_, indice) => indice !== idx);
+            try {
+                await salvarGrupo(grupo, listaAtualizada);
+            } catch (erro) {
+                console.error('Falha ao remover a máquina:', erro);
+                alert('Não foi possível remover a máquina do banco de dados.');
+                return;
+            }
+            ABAS_GRUPOS[grupo] = listaAtualizada;
             atualizarSelectMaquinas();
+            atualizarMenuAbas();
+            renderizarConfig();
         }
 
         function abrirModalProgramacao() {
