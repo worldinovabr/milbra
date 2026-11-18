@@ -233,6 +233,10 @@
         .menu-lateral.minimizado .menu-turnos { justify-content:center;padding:8px 10px; min-height:48px; margin:4px 8px; border-color:transparent; }
         .menu-lateral.minimizado .menu-turnos .icone { width:36px;height:36px;border-radius:11px; }
         .menu-lateral.minimizado .menu-relatorio:hover > span:not(.icone), .menu-lateral.minimizado .menu-turnos:hover > span:not(.icone), .menu-lateral.minimizado .menu-relatorio:focus-visible > span:not(.icone), .menu-lateral.minimizado .menu-turnos:focus-visible > span:not(.icone) { opacity:1;visibility:visible;transform:translateY(-50%) translateX(0); }
+        .menu-lateral.minimizado .menu-item > span:not(.icone),
+        .menu-lateral.minimizado .menu-relatorio > span:not(.icone),
+        .menu-lateral.minimizado .menu-turnos > span:not(.icone) { display:flex; align-items:center; min-height:58px; padding:8px 14px; border:1px solid rgba(255,255,255,.08); border-radius:10px; background:rgba(255,255,255,.09); color:#fff; font-size:.85rem; line-height:1.25; box-sizing:border-box; }
+        .menu-lateral.minimizado .menu-item.ativo > span:not(.icone) { background:linear-gradient(110deg,rgba(96,165,250,.25),rgba(96,165,250,.08)); border-color:rgba(147,197,253,.22); }
 
         .menu-rodape {
             margin-top: auto;
@@ -509,6 +513,27 @@
         .grafico-relatorio { position:relative; height:320px; }
         @media(max-width:850px) { .turno-editor { grid-template-columns:repeat(2,minmax(0,1fr)); } .turno-editor button { grid-column:1/-1; } }
         @media(max-width:520px) { .turno-editor { grid-template-columns:1fr; } }
+        #area-turnos .turnos-cabecalho { position:relative; align-items:center; padding:22px 24px; margin-bottom:18px; overflow:hidden; border:1px solid color-mix(in srgb,var(--cor-principal) 18%,var(--borda)); border-radius:18px; background:linear-gradient(120deg,color-mix(in srgb,var(--cor-principal) 9%,var(--superficie)),var(--superficie) 72%); box-shadow:0 12px 30px rgba(15,23,42,.06); }
+        #area-turnos .turnos-cabecalho::after { content:''; position:absolute; width:150px; height:150px; right:150px; top:-105px; border-radius:50%; background:color-mix(in srgb,var(--cor-principal) 8%,transparent); pointer-events:none; }
+        #area-turnos .turnos-cabecalho h2 { margin:0 0 6px; color:var(--cor-principal); font-size:clamp(1.35rem,2.2vw,1.75rem); letter-spacing:-.025em; }
+        #area-turnos .turnos-cabecalho p { color:var(--texto-claro); line-height:1.5; }
+        #area-turnos .turnos-cabecalho button { position:relative; z-index:1; min-height:46px; padding:11px 16px; border-radius:11px; box-shadow:0 6px 16px rgba(10,61,98,.16); }
+        #area-turnos .turno-atual { position:relative; padding:15px 18px 15px 22px; margin-bottom:16px; overflow:hidden; border:1px solid color-mix(in srgb,#0ea5e9 20%,var(--borda)); border-radius:14px; background:linear-gradient(115deg,color-mix(in srgb,#0ea5e9 10%,var(--superficie)),var(--superficie)); box-shadow:0 6px 18px rgba(15,23,42,.045); line-height:1.5; }
+        #area-turnos .turno-atual::before { content:''; position:absolute; inset:0 auto 0 0; width:4px; background:linear-gradient(180deg,#38bdf8,#2563eb); }
+        #area-turnos .turno-atual strong { color:var(--cor-principal); }
+        #lista-config-turnos { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr)); gap:14px; margin-bottom:16px; }
+        #area-turnos .turno-editor { grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; padding:18px; margin:0; border-color:var(--borda); border-radius:16px; background:var(--superficie); box-shadow:0 8px 24px rgba(15,23,42,.055); transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease; }
+        #area-turnos .turno-editor:focus-within { border-color:color-mix(in srgb,var(--cor-principal) 38%,var(--borda)); box-shadow:0 10px 28px rgba(15,23,42,.08),0 0 0 3px color-mix(in srgb,var(--cor-principal) 8%,transparent); }
+        #area-turnos .turno-editor .campo-filtro { gap:6px; }
+        #area-turnos .turno-editor .campo-filtro label { font-size:.76rem; font-weight:700; letter-spacing:.015em; }
+        #area-turnos .turno-editor input { min-height:46px; border-radius:10px; }
+        #area-turnos .turno-editor button { grid-column:1/-1; justify-self:end; min-height:40px; padding:8px 14px; border-radius:10px; }
+        #area-turnos > .btn-sucesso { min-height:46px; padding:11px 18px; border-radius:11px; box-shadow:0 6px 16px rgba(39,174,96,.18); }
+        @media(max-width:520px) {
+            #area-turnos .turnos-cabecalho { padding:17px 15px; border-radius:15px; }
+            #area-turnos .turno-editor { grid-template-columns:1fr; gap:11px; padding:14px; border-radius:14px; }
+            #area-turnos .turno-editor button { justify-self:stretch; width:100%; }
+        }
         .relatorio-vazio { padding:24px; text-align:center; color:var(--texto-claro); border-radius:10px; background:var(--fundo-cinza); }
         @media print {
             body { display:block; background:#fff; color:#111827; }
@@ -901,6 +926,20 @@
             .menu-lateral.minimizado .menu-turnos:hover > span:not(.icone),
             .menu-lateral.minimizado .menu-relatorio:focus-visible > span:not(.icone),
             .menu-lateral.minimizado .menu-turnos:focus-visible > span:not(.icone) { transform:none; }
+        }
+
+        @media (orientation: landscape) and (max-height: 500px) and (pointer: coarse) {
+            .area-principal { padding-top:calc(62px + env(safe-area-inset-top, 0px)); }
+            .cabecalho-pagina { display:flex; align-items:center; gap:12px; margin-bottom:12px; padding-bottom:10px; }
+            .cabecalho-pagina h1 { font-size:clamp(1.35rem,4vw,1.8rem); }
+            .cabecalho-pagina p { font-size:.88rem; }
+            .legenda-status { grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-bottom:12px; }
+            .legenda-item { justify-content:center; min-width:0; min-height:42px; padding:7px 8px; font-size:clamp(.72rem,1.8vw,.85rem); }
+            .area-grafico-maquinas { padding:12px 12px 14px; margin-bottom:12px; }
+            #graficoMaquinas { height:155px !important; }
+            #area-dados .painel-controles { display:grid; grid-template-columns:minmax(150px,1.2fr) repeat(4,minmax(0,1fr)); align-items:end; gap:8px; padding:12px; }
+            #area-dados .painel-controles .campo-filtro { min-width:0; }
+            #area-dados .painel-controles > button { width:100%; min-width:0; min-height:44px; padding:8px; white-space:normal; line-height:1.15; font-size:.82rem; }
         }
     </style>
 </head>
