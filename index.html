@@ -285,15 +285,25 @@
         }
 
         .cabecalho-pagina {
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid var(--borda);
+            position:relative;
+            isolation:isolate;
+            overflow:hidden;
+            margin-bottom:22px;
+            padding:20px 22px 18px;
+            border:1px solid color-mix(in srgb,var(--cor-principal) 12%,var(--borda));
+            border-radius:18px;
+            background:linear-gradient(125deg,color-mix(in srgb,var(--cor-principal) 7%,var(--superficie)),color-mix(in srgb,var(--superficie) 96%,#dbeafe));
+            box-shadow:0 10px 28px rgba(10,61,98,.07),inset 0 1px 0 rgba(255,255,255,.72);
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             flex-wrap: wrap;
             gap: 15px;
+            transition:background .25s ease,border-color .25s ease,box-shadow .25s ease;
         }
+        .cabecalho-pagina::before { content:''; position:absolute; z-index:-1; width:240px; height:240px; top:-160px; right:7%; border-radius:50%; background:color-mix(in srgb,var(--cor-principal) 10%,transparent); filter:blur(2px); pointer-events:none; }
+        .cabecalho-pagina > * { position:relative; z-index:1; }
+        body.tema-escuro .cabecalho-pagina { border-color:rgba(148,163,184,.18); background:linear-gradient(125deg,rgba(56,189,248,.10),color-mix(in srgb,var(--superficie) 96%,#1e3a5f)); box-shadow:0 10px 28px rgba(0,0,0,.16),inset 0 1px 0 rgba(255,255,255,.05); }
         .cabecalho-pagina h1 { font-size: 2rem; font-weight: 700; color: var(--cor-principal); margin-bottom: 5px; }
         .cabecalho-pagina p { color: var(--texto-claro); font-size: 1rem; }
         .toggle-tema {
@@ -834,6 +844,9 @@
         #area-configuracoes .btn-editar-nome:hover { background:color-mix(in srgb,var(--cor-principal) 8%,var(--superficie-elevada)); }
         #area-configuracoes .btn-editar-nome svg { width:18px; height:18px; }
         #area-configuracoes .btn-editar-nome.salvar { color:#16834a; }
+        #area-configuracoes .btn-excluir-icone { display:grid; place-items:center; flex:0 0 40px; width:40px; min-width:40px; height:40px; min-height:40px; padding:0; border:1px solid rgba(220,63,54,.2); border-radius:10px; background:rgba(220,63,54,.08); color:#dc3f36; }
+        #area-configuracoes .btn-excluir-icone:hover { background:rgba(220,63,54,.16); }
+        #area-configuracoes .btn-excluir-icone svg { width:18px; height:18px; }
         #area-configuracoes .ordenacao-maquinas { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:14px 0 10px; color:var(--texto-claro); font-size:.85rem; }
         #area-configuracoes .ordenacao-maquinas select { width:auto; min-width:190px; min-height:40px; border-radius:9px; }
         #area-configuracoes .btn-ordem-maquina { min-width:38px; padding:7px 10px; color:var(--texto-escuro); background:var(--superficie-elevada); border:1px solid var(--borda); }
@@ -868,8 +881,7 @@
             .cabecalho-pagina {
                 display: block;
                 margin-bottom: 16px;
-                padding-bottom: 14px;
-                border-bottom-color: rgba(10, 61, 98, 0.12);
+                padding:16px 16px 14px;
             }
             .cabecalho-pagina h1 {
                 font-size: clamp(1.45rem, 7vw, 2.1rem);
@@ -1682,6 +1694,7 @@
         };
         const IDS_GRUPOS = Object.fromEntries(Object.keys(GRUPOS_PADRAO).map(nome => [nome, nome]));
         const IDS_GRUPOS_PADRAO = { ...IDS_GRUPOS };
+        const GRUPOS_PADRAO_EXCLUIDOS = new Set();
 
         const FIREBASE_SDK_URL = 'https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js';
         const FIRESTORE_SDK_URL = 'https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js';
@@ -1732,8 +1745,18 @@
         }
 
         async function carregarGruposPadrao() {
+            const configRef = documento('grupos', 'config-grupos');
+            const config = await firebaseApi.getDoc(configRef);
+            const excluidos = config.exists() && Array.isArray(config.data().gruposPadraoExcluidos)
+                ? config.data().gruposPadraoExcluidos : [];
+            excluidos.forEach(id => GRUPOS_PADRAO_EXCLUIDOS.add(id));
             await Promise.all(Object.entries(GRUPOS_PADRAO).map(async ([nome, maqs]) => {
-                const ref = documento('grupos', IDS_GRUPOS[nome] || nome);
+                const idPersistente = IDS_GRUPOS[nome] || nome;
+                if (GRUPOS_PADRAO_EXCLUIDOS.has(idPersistente)) {
+                    delete GRUPOS_PADRAO[nome];
+                    return;
+                }
+                const ref = documento('grupos', idPersistente);
                 const existente = await firebaseApi.getDoc(ref);
                 if (!existente.exists()) {
                     await firebaseApi.setDoc(ref, { nome, maquinas: maqs });
@@ -1762,6 +1785,7 @@
                 const nome = String(item.nome || '').trim();
                 if (!nome || nome.toLowerCase() === 'undefined') return;
                 const idPersistente = decodeURIComponent(doc.id);
+                if (GRUPOS_PADRAO_EXCLUIDOS.has(idPersistente)) return;
                 IDS_GRUPOS[nome] = idPersistente;
                 const nomePadraoOriginal = Object.keys(IDS_GRUPOS_PADRAO).find(nomePadrao => IDS_GRUPOS_PADRAO[nomePadrao] === idPersistente);
                 if (nomePadraoOriginal && nome !== nomePadraoOriginal && GRUPOS_PADRAO[nomePadraoOriginal]) {
@@ -2442,7 +2466,7 @@
                             <input type="text" class="input-nome-aba" value="${escaparHtml(nome)}" aria-label="Nome do grupo ${escaparHtml(nome)}" readonly onkeydown="tratarTeclaEdicaoNomeConf(event, this)">
                             <button type="button" class="btn-editar-nome" onclick="alternarEdicaoNomeGrupoConf(this, ${escaparJsEmHtml(nome)})" title="Editar nome do grupo" aria-label="Editar nome do grupo ${escaparHtml(nome)}">${iconeLucide('edit')}</button>
                         </div>
-                        ${!GRUPOS_PADRAO[nome] ? `<button class="btn-perigo btn-pequeno" onclick="excluirGrupoConf(${escaparJsEmHtml(nome)})">Excluir</button>` : ''}
+                        <button type="button" class="btn-excluir-icone" onclick="excluirGrupoConf(${escaparJsEmHtml(nome)})" title="Excluir grupo ${escaparHtml(nome)}" aria-label="Excluir grupo ${escaparHtml(nome)}">${iconeLucide('trash')}</button>
                     </div>
                     <label class="ordenacao-maquinas">
                         Ordem das máquinas
@@ -2468,7 +2492,7 @@
                         </div>
                         <button type="button" class="btn-ordem-maquina" onclick="moverMaquinaConf(${escaparJsEmHtml(nome)}, ${i}, -1)" title="Mover para cima" aria-label="Mover ${escaparHtml(m)} para cima" ${i === 0 ? 'disabled' : ''}>↑</button>
                         <button type="button" class="btn-ordem-maquina" onclick="moverMaquinaConf(${escaparJsEmHtml(nome)}, ${i}, 1)" title="Mover para baixo" aria-label="Mover ${escaparHtml(m)} para baixo" ${i === maqs.length - 1 ? 'disabled' : ''}>↓</button>
-                        <button type="button" class="btn-perigo btn-pequeno" onclick="removerMaq(${escaparJsEmHtml(nome)}, ${i})" title="Excluir máquina ${escaparHtml(m)}" aria-label="Excluir máquina ${escaparHtml(m)}">Excluir</button>
+                        <button type="button" class="btn-excluir-icone" onclick="removerMaq(${escaparJsEmHtml(nome)}, ${i})" title="Excluir máquina ${escaparHtml(m)}" aria-label="Excluir máquina ${escaparHtml(m)}">${iconeLucide('trash')}</button>
                     `;
                     lista.appendChild(item);
                 });
@@ -2531,10 +2555,33 @@
             renderizarConfig();
         }
         async function excluirGrupoConf(nome) {
-            if (GRUPOS_PADRAO[nome]) return alert("Esse grupo padrão não pode ser excluído!");
-            if (!confirm(`Excluir grupo "${nome}"?`)) return;
+            if (!confirm(`Excluir o grupo "${nome}" e todas as máquinas cadastradas nele?`)) return;
+            const idPersistente = IDS_GRUPOS[nome] || nome;
+            const ehPadrao = Object.values(IDS_GRUPOS_PADRAO).includes(idPersistente);
+            try {
+                if (ehPadrao) {
+                    const configRef = documento('grupos', 'config-grupos');
+                    const configAtual = await firebaseApi.getDoc(configRef);
+                    const excluidos = configAtual.exists() && Array.isArray(configAtual.data().gruposPadraoExcluidos)
+                        ? configAtual.data().gruposPadraoExcluidos : [];
+                    const lote = firebaseApi.writeBatch(firestore);
+                    lote.set(configRef, { tipo:'config', gruposPadraoExcluidos:[...new Set([...excluidos, idPersistente])] }, { merge:true });
+                    lote.delete(documento('grupos', idPersistente));
+                    await lote.commit();
+                    GRUPOS_PADRAO_EXCLUIDOS.add(idPersistente);
+                } else {
+                    await excluirGrupo(nome);
+                }
+            } catch (erro) {
+                console.error('Falha ao excluir o grupo:', erro);
+                alert('Não foi possível excluir o grupo do banco de dados.');
+                return;
+            }
             delete ABAS_GRUPOS[nome];
-            await excluirGrupo(nome);
+            delete GRUPOS_PADRAO[nome];
+            delete IDS_GRUPOS[nome];
+            delete ORDENACAO_GRUPOS[nome];
+            if (abaAtual === nome) abaAtual = 'todas';
             atualizarMenuAbas();
             renderizarConfig();
         }
