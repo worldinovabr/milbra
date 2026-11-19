@@ -1745,6 +1745,10 @@
             const ordemMaquinas = ORDENACAO_GRUPOS[nome] || 'manual';
             await firebaseApi.setDoc(documento('grupos', IDS_GRUPOS[nome] || nome), { nome, maquinas, ordemMaquinas });
         }
+        async function atualizarMaquinasGrupo(nome, maquinas) {
+            const ref = documento('grupos', IDS_GRUPOS[nome] || nome);
+            await firebaseApi.updateDoc(ref, { maquinas });
+        }
         async function excluirGrupo(nome) {
             await firebaseApi.deleteDoc(documento('grupos', IDS_GRUPOS[nome] || nome));
             delete IDS_GRUPOS[nome];
@@ -2575,7 +2579,7 @@
             const listaAtualizada = [...listaAtual];
             listaAtualizada[idx] = nome;
             try {
-                await salvarGrupo(grupo, listaAtualizada);
+                await atualizarMaquinasGrupo(grupo, listaAtualizada);
             } catch (erro) {
                 console.error('Falha ao salvar o nome da máquina:', erro);
                 alert('Não foi possível salvar o nome da máquina no banco de dados. Verifique sua conexão e tente novamente.');
