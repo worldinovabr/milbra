@@ -850,7 +850,7 @@
 
         .botoes-backup { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; justify-content: center; }
 
-        @media (max-width: 768px), (max-height: 500px) and (pointer: coarse) {
+        @media (max-width: 768px), (pointer: coarse) and (max-width: 1180px) {
             .btn-menu-mobile { display: flex; top:max(12px, env(safe-area-inset-top, 0px)); left:max(12px, env(safe-area-inset-left, 0px)); }
             .btn-minimizar { display: none; }
             .toggle-tema { position:fixed; top:max(12px, env(safe-area-inset-top, 0px)); right:max(12px, env(safe-area-inset-right, 0px)); z-index:1001; width:76px; height:38px; margin:0; }
@@ -944,6 +944,19 @@
             #area-dados .painel-controles { display:grid; grid-template-columns:minmax(150px,1.2fr) repeat(4,minmax(0,1fr)); align-items:end; gap:8px; padding:12px; }
             #area-dados .painel-controles .campo-filtro { min-width:0; }
             #area-dados .painel-controles > button { width:100%; min-width:0; min-height:44px; padding:8px; white-space:normal; line-height:1.15; font-size:.82rem; }
+        }
+
+        @media (orientation: landscape) and (pointer: coarse) and (min-height: 501px) and (max-width: 1180px) {
+            .area-principal { padding-top:calc(62px + env(safe-area-inset-top, 0px)); }
+            .cabecalho-pagina { display:flex; align-items:center; gap:12px; margin-bottom:14px; padding-bottom:10px; }
+            .cabecalho-pagina h1 { font-size:clamp(1.4rem,3.4vw,2rem); }
+            .cabecalho-pagina p { font-size:.9rem; }
+            .legenda-status { grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-bottom:12px; }
+            .legenda-item { justify-content:center; min-width:0; min-height:42px; padding:7px 8px; font-size:clamp(.72rem,1.6vw,.88rem); }
+            .area-grafico-maquinas { padding:14px; margin-bottom:14px; }
+            #graficoMaquinas { height:190px !important; }
+            #area-dados .painel-controles { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+            #area-dados .painel-controles > button { grid-column:1/-1; }
         }
 
         .menu-lateral:not(.minimizado) .menu-item,
@@ -1283,8 +1296,44 @@
         let idSituacaoAtual = null;
 
         function menuMobileAtivo() {
-            return window.matchMedia('(max-width: 768px), (max-height: 500px) and (pointer: coarse)').matches;
+            return window.matchMedia('(max-width: 768px), (pointer: coarse) and (max-width: 1180px)').matches;
         }
+
+        let modoMobileAnterior = null;
+        let temporizadorAtualizacaoLayout = null;
+
+        function sincronizarLayoutDispositivo() {
+            const menu = document.getElementById('menu-lateral');
+            if (!menu) return;
+            const mobile = menuMobileAtivo();
+            if (mobile !== modoMobileAnterior) {
+                if (mobile) {
+                    menu.classList.remove('minimizado');
+                    fecharMenuMobile();
+                } else {
+                    menu.classList.remove('aberto', 'fechado');
+                    try { menu.classList.toggle('minimizado', localStorage.getItem('menuMinimizado') === 'true'); } catch (erro) {}
+                }
+                modoMobileAnterior = mobile;
+            }
+            requestAnimationFrame(() => {
+                graficoMaquinas?.resize?.();
+                graficoRelatorioTurnos?.resize?.();
+            });
+        }
+
+        function agendarSincronizacaoLayout() {
+            clearTimeout(temporizadorAtualizacaoLayout);
+            temporizadorAtualizacaoLayout = setTimeout(sincronizarLayoutDispositivo, 90);
+        }
+
+        window.addEventListener('resize', agendarSincronizacaoLayout, { passive: true });
+        window.addEventListener('orientationchange', () => {
+            if (menuMobileAtivo()) fecharMenuMobile();
+            agendarSincronizacaoLayout();
+        }, { passive: true });
+        window.visualViewport?.addEventListener('resize', agendarSincronizacaoLayout, { passive: true });
+        sincronizarLayoutDispositivo();
 
         function abrirFecharMenu() {
             const menu = document.getElementById('menu-lateral');
@@ -1621,6 +1670,8 @@
             "Solda Ponto": ["SP-1", "SP-2", "SP-3", "SP-4", "SP-5", "SP-6", "SP-7"],
             "Máquinas de Dobra": ["PH-16", "PH-20.1", "PH-20.2", "PH-25.1", "PH-25.2", "PH-40.1", "PH-40.2", "PH-45.1", "PH-45.2", "PH-50.1", "PH-50.2", "PH-60.1", "PH-60.2"]
         };
+        const IDS_GRUPOS = Object.fromEntries(Object.keys(GRUPOS_PADRAO).map(nome => [nome, nome]));
+        const IDS_GRUPOS_PADRAO = { ...IDS_GRUPOS };
 
         const FIREBASE_SDK_URL = 'https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js';
         const FIRESTORE_SDK_URL = 'https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js';
@@ -1672,7 +1723,7 @@
 
         async function carregarGruposPadrao() {
             await Promise.all(Object.entries(GRUPOS_PADRAO).map(async ([nome, maqs]) => {
-                const ref = documento('grupos', nome);
+                const ref = documento('grupos', IDS_GRUPOS[nome] || nome);
                 const existente = await firebaseApi.getDoc(ref);
                 if (!existente.exists()) {
                     await firebaseApi.setDoc(ref, { nome, maquinas: maqs });
@@ -1682,10 +1733,11 @@
 
         async function salvarGrupo(nome, maquinas) {
             const ordemMaquinas = ORDENACAO_GRUPOS[nome] || 'manual';
-            await firebaseApi.setDoc(documento('grupos', nome), { nome, maquinas, ordemMaquinas });
+            await firebaseApi.setDoc(documento('grupos', IDS_GRUPOS[nome] || nome), { nome, maquinas, ordemMaquinas });
         }
         async function excluirGrupo(nome) {
-            await firebaseApi.deleteDoc(documento('grupos', nome));
+            await firebaseApi.deleteDoc(documento('grupos', IDS_GRUPOS[nome] || nome));
+            delete IDS_GRUPOS[nome];
         }
         async function buscarTodosGrupos() {
             const snapshot = await firebaseApi.getDocs(colecao('grupos'));
@@ -1695,6 +1747,13 @@
                 if (item.tipo || ['config-turnos','config-logo'].includes(doc.id)) return;
                 const nome = String(item.nome || '').trim();
                 if (!nome || nome.toLowerCase() === 'undefined') return;
+                const idPersistente = decodeURIComponent(doc.id);
+                IDS_GRUPOS[nome] = idPersistente;
+                const nomePadraoOriginal = Object.keys(IDS_GRUPOS_PADRAO).find(nomePadrao => IDS_GRUPOS_PADRAO[nomePadrao] === idPersistente);
+                if (nomePadraoOriginal && nome !== nomePadraoOriginal && GRUPOS_PADRAO[nomePadraoOriginal]) {
+                    GRUPOS_PADRAO[nome] = GRUPOS_PADRAO[nomePadraoOriginal];
+                    delete GRUPOS_PADRAO[nomePadraoOriginal];
+                }
                 g[nome] = Array.isArray(item.maquinas) ? item.maquinas.filter(maquina => typeof maquina === 'string' && maquina.trim()) : [];
                 ORDENACAO_GRUPOS[nome] = ['manual', 'az', 'za'].includes(item.ordemMaquinas) ? item.ordemMaquinas : 'manual';
             });
@@ -2360,16 +2419,35 @@
             }
 
             const maquinas = ABAS_GRUPOS[nomeAtual];
+            const idPersistente = IDS_GRUPOS[nomeAtual] || nomeAtual;
             ABAS_GRUPOS[nome] = maquinas;
             delete ABAS_GRUPOS[nomeAtual];
             if (Object.prototype.hasOwnProperty.call(GRUPOS_PADRAO, nomeAtual)) {
                 GRUPOS_PADRAO[nome] = GRUPOS_PADRAO[nomeAtual];
                 delete GRUPOS_PADRAO[nomeAtual];
             }
+            IDS_GRUPOS[nome] = idPersistente;
+            delete IDS_GRUPOS[nomeAtual];
             ORDENACAO_GRUPOS[nome] = ORDENACAO_GRUPOS[nomeAtual] || 'manual';
             delete ORDENACAO_GRUPOS[nomeAtual];
-            await salvarGrupo(nome, maquinas);
-            await excluirGrupo(nomeAtual);
+            try {
+                await salvarGrupo(nome, maquinas);
+            } catch (erro) {
+                ABAS_GRUPOS[nomeAtual] = maquinas;
+                delete ABAS_GRUPOS[nome];
+                if (Object.prototype.hasOwnProperty.call(GRUPOS_PADRAO, nome)) {
+                    GRUPOS_PADRAO[nomeAtual] = GRUPOS_PADRAO[nome];
+                    delete GRUPOS_PADRAO[nome];
+                }
+                IDS_GRUPOS[nomeAtual] = idPersistente;
+                delete IDS_GRUPOS[nome];
+                ORDENACAO_GRUPOS[nomeAtual] = ORDENACAO_GRUPOS[nome] || 'manual';
+                delete ORDENACAO_GRUPOS[nome];
+                console.error('Falha ao salvar o nome do grupo:', erro);
+                alert('Não foi possível salvar o nome do grupo no banco de dados.');
+                renderizarConfig();
+                return;
+            }
             if (abaAtual === nomeAtual) abaAtual = nome;
             atualizarMenuAbas();
             renderizarConfig();
