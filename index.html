@@ -2468,7 +2468,7 @@
                         </div>
                         <button type="button" class="btn-ordem-maquina" onclick="moverMaquinaConf(${escaparJsEmHtml(nome)}, ${i}, -1)" title="Mover para cima" aria-label="Mover ${escaparHtml(m)} para cima" ${i === 0 ? 'disabled' : ''}>↑</button>
                         <button type="button" class="btn-ordem-maquina" onclick="moverMaquinaConf(${escaparJsEmHtml(nome)}, ${i}, 1)" title="Mover para baixo" aria-label="Mover ${escaparHtml(m)} para baixo" ${i === maqs.length - 1 ? 'disabled' : ''}>↓</button>
-                        <button class="btn-perigo btn-pequeno" onclick="removerMaq(${escaparJsEmHtml(nome)}, ${i})">Excluir</button>
+                        <button type="button" class="btn-perigo btn-pequeno" onclick="removerMaq(${escaparJsEmHtml(nome)}, ${i})" title="Excluir máquina ${escaparHtml(m)}" aria-label="Excluir máquina ${escaparHtml(m)}">Excluir</button>
                     `;
                     lista.appendChild(item);
                 });
@@ -2654,9 +2654,10 @@
         async function removerMaq(grupo, idx) {
             if (!confirm("Remover máquina?")) return;
             const listaAnterior = ABAS_GRUPOS[grupo];
+            if (!Array.isArray(listaAnterior) || idx < 0 || idx >= listaAnterior.length) return;
             const listaAtualizada = listaAnterior.filter((_, indice) => indice !== idx);
             try {
-                await salvarGrupo(grupo, listaAtualizada);
+                await atualizarMaquinasGrupo(grupo, listaAtualizada);
             } catch (erro) {
                 console.error('Falha ao remover a máquina:', erro);
                 alert('Não foi possível remover a máquina do banco de dados.');
