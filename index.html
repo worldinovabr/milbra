@@ -822,12 +822,18 @@
         #area-configuracoes .bloco-aba-config { position:relative; padding:20px; border:1px solid var(--borda); border-radius:16px; box-shadow:0 8px 24px rgba(15,23,42,.055); transition:border-color .18s ease,box-shadow .18s ease; }
         #area-configuracoes .bloco-aba-config:focus-within { border-color:color-mix(in srgb,var(--cor-principal) 42%,var(--borda)); box-shadow:0 10px 28px rgba(15,23,42,.08),0 0 0 3px color-mix(in srgb,var(--cor-principal) 9%,transparent); }
         #area-configuracoes .cabecalho-aba-config { align-items:center; padding-bottom:14px; border-bottom:1px solid var(--borda); }
+        #area-configuracoes .campo-nome-config { display:flex; align-items:center; gap:8px; flex:1 1 220px; min-width:0; }
         #area-configuracoes .input-nome-aba { flex:1 1 220px; width:auto; max-width:none; min-width:0; padding:11px 13px; border:1px solid var(--borda); border-radius:10px; background:var(--superficie-elevada); color:var(--texto-escuro); font-size:.98rem; transition:border-color .18s ease,box-shadow .18s ease,background .18s ease; }
         #area-configuracoes .input-nome-aba:read-only { background:var(--fundo-cinza); font-weight:650; }
         #area-configuracoes .input-nome-aba:focus { border-color:var(--cor-principal); box-shadow:0 0 0 3px color-mix(in srgb,var(--cor-principal) 12%,transparent); }
         #area-configuracoes .lista-maquinas-aba { gap:8px; }
-        #area-configuracoes .item-maquina-aba { display:grid; grid-template-columns:minmax(0,1fr) auto auto auto; align-items:center; gap:8px; padding:9px; border:1px solid var(--borda); border-radius:12px; background:color-mix(in srgb,var(--fundo-cinza) 62%,var(--superficie)); }
+        #area-configuracoes .item-maquina-aba { display:grid; grid-template-columns:minmax(0,1fr) auto auto auto auto; align-items:center; gap:8px; padding:9px; border:1px solid var(--borda); border-radius:12px; background:color-mix(in srgb,var(--fundo-cinza) 62%,var(--superficie)); }
         #area-configuracoes .item-maquina-aba input { min-width:0; min-height:44px; border-radius:9px; background:var(--superficie-elevada); }
+        #area-configuracoes .item-maquina-aba .campo-nome-config { width:100%; }
+        #area-configuracoes .btn-editar-nome { display:grid; place-items:center; flex:0 0 40px; width:40px; min-width:40px; height:40px; min-height:40px; padding:0; border:1px solid var(--borda); border-radius:10px; background:var(--superficie-elevada); color:var(--cor-principal); }
+        #area-configuracoes .btn-editar-nome:hover { background:color-mix(in srgb,var(--cor-principal) 8%,var(--superficie-elevada)); }
+        #area-configuracoes .btn-editar-nome svg { width:18px; height:18px; }
+        #area-configuracoes .btn-editar-nome.salvar { color:#16834a; }
         #area-configuracoes .ordenacao-maquinas { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:14px 0 10px; color:var(--texto-claro); font-size:.85rem; }
         #area-configuracoes .ordenacao-maquinas select { width:auto; min-width:190px; min-height:40px; border-radius:9px; }
         #area-configuracoes .btn-ordem-maquina { min-width:38px; padding:7px 10px; color:var(--texto-escuro); background:var(--superficie-elevada); border:1px solid var(--borda); }
@@ -900,7 +906,7 @@
             #area-configuracoes .item-maquina-aba { gap:8px; padding:7px; }
             #area-configuracoes .item-maquina-aba button,
             #area-configuracoes .cabecalho-aba-config .btn-perigo { width:auto; }
-            #area-configuracoes .item-maquina-aba { grid-template-columns:minmax(0,1fr) auto auto auto; gap:6px; padding:6px; }
+            #area-configuracoes .item-maquina-aba { grid-template-columns:minmax(0,1fr) auto auto auto auto; gap:6px; padding:6px; }
             #area-configuracoes .btn-ordem-maquina { min-width:34px; padding:6px 8px; }
             .campo-filtro { min-width: 100%; }
             button { width: 100%; justify-content: center; }
@@ -1610,6 +1616,7 @@
         const ICONES_LUCIDE = {
             layoutDashboard: '<rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect>',
             imagePlus: '<rect x="3" y="3" width="18" height="18" rx="3"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="m21 15-5-5L5 21"></path><path d="M16 5v6M13 8h6"></path>',
+            check: '<path d="m5 12 4 4L19 6"></path>',
             settings: '<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.51a2 2 0 0 1 1-1.72l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle>',
             barChart: '<path d="M3 3v18h18"></path><path d="M18 17V9"></path><path d="M13 17V5"></path><path d="M8 17v-3"></path>',
             play: '<polygon points="6 3 20 12 6 21 6 3"></polygon>',
@@ -2359,6 +2366,64 @@
         }
 
         function imprimirRelatorio() { window.print(); }
+        function prepararCampoNomeConf(botao) {
+            const input = botao.parentElement.querySelector('input');
+            if (!input) return null;
+            if (input.readOnly) {
+                input.dataset.valorOriginal = input.value;
+                input.readOnly = false;
+                botao.innerHTML = iconeLucide('check');
+                botao.classList.add('salvar');
+                botao.title = 'Salvar nome';
+                botao.setAttribute('aria-label', 'Salvar nome');
+                input.focus();
+                input.select();
+                return { input, salvar: false };
+            }
+            return { input, salvar: true };
+        }
+        function restaurarCampoNomeConf(input) {
+            const botao = input.parentElement.querySelector('.btn-editar-nome');
+            input.value = input.dataset.valorOriginal ?? input.value;
+            input.readOnly = true;
+            if (botao) {
+                botao.innerHTML = iconeLucide('edit');
+                botao.classList.remove('salvar');
+                botao.title = 'Editar nome';
+                botao.setAttribute('aria-label', 'Editar nome');
+            }
+        }
+        async function alternarEdicaoNomeGrupoConf(botao, nomeAtual) {
+            const estado = prepararCampoNomeConf(botao);
+            if (!estado?.salvar) return;
+            if (estado.input.value.trim() === nomeAtual) {
+                restaurarCampoNomeConf(estado.input);
+                return;
+            }
+            botao.disabled = true;
+            await alterarNomeGrupoConf(nomeAtual, estado.input.value);
+            botao.disabled = false;
+        }
+        async function alternarEdicaoNomeMaquinaConf(botao, grupo, indice) {
+            const estado = prepararCampoNomeConf(botao);
+            if (!estado?.salvar) return;
+            if (estado.input.value.trim() === estado.input.dataset.valorOriginal) {
+                restaurarCampoNomeConf(estado.input);
+                return;
+            }
+            botao.disabled = true;
+            await alterarMaq(grupo, indice, estado.input.value);
+            botao.disabled = false;
+        }
+        function tratarTeclaEdicaoNomeConf(evento, input) {
+            if (evento.key === 'Enter' && !input.readOnly) {
+                evento.preventDefault();
+                input.parentElement.querySelector('.btn-editar-nome')?.click();
+            } else if (evento.key === 'Escape' && !input.readOnly) {
+                evento.preventDefault();
+                restaurarCampoNomeConf(input);
+            }
+        }
         function renderizarConfig() {
             const container = document.getElementById('conteudo-config');
             container.innerHTML = '';
@@ -2369,7 +2434,10 @@
                 bloco.className = 'bloco-aba-config';
                 bloco.innerHTML = `
                     <div class="cabecalho-aba-config">
-                        <input type="text" class="input-nome-aba" value="${escaparHtml(nome)}" aria-label="Nome do grupo ${escaparHtml(nome)}" onchange="alterarNomeGrupoConf(${escaparJsEmHtml(nome)}, this.value)">
+                        <div class="campo-nome-config">
+                            <input type="text" class="input-nome-aba" value="${escaparHtml(nome)}" aria-label="Nome do grupo ${escaparHtml(nome)}" readonly onkeydown="tratarTeclaEdicaoNomeConf(event, this)">
+                            <button type="button" class="btn-editar-nome" onclick="alternarEdicaoNomeGrupoConf(this, ${escaparJsEmHtml(nome)})" title="Editar nome do grupo" aria-label="Editar nome do grupo ${escaparHtml(nome)}">${iconeLucide('edit')}</button>
+                        </div>
                         ${!GRUPOS_PADRAO[nome] ? `<button class="btn-perigo btn-pequeno" onclick="excluirGrupoConf(${escaparJsEmHtml(nome)})">Excluir</button>` : ''}
                     </div>
                     <label class="ordenacao-maquinas">
@@ -2390,7 +2458,10 @@
                     const item = document.createElement('div');
                     item.className = 'item-maquina-aba';
                     item.innerHTML = `
-                        <input type="text" value="${escaparHtml(m)}" aria-label="Nome da máquina ${escaparHtml(m)}" onchange="alterarMaq(${escaparJsEmHtml(nome)}, ${i}, this.value)">
+                        <div class="campo-nome-config">
+                            <input type="text" value="${escaparHtml(m)}" aria-label="Nome da máquina ${escaparHtml(m)}" readonly onkeydown="tratarTeclaEdicaoNomeConf(event, this)">
+                            <button type="button" class="btn-editar-nome" onclick="alternarEdicaoNomeMaquinaConf(this, ${escaparJsEmHtml(nome)}, ${i})" title="Editar nome da máquina" aria-label="Editar máquina ${escaparHtml(m)}">${iconeLucide('edit')}</button>
+                        </div>
                         <button type="button" class="btn-ordem-maquina" onclick="moverMaquinaConf(${escaparJsEmHtml(nome)}, ${i}, -1)" title="Mover para cima" aria-label="Mover ${escaparHtml(m)} para cima" ${i === 0 ? 'disabled' : ''}>↑</button>
                         <button type="button" class="btn-ordem-maquina" onclick="moverMaquinaConf(${escaparJsEmHtml(nome)}, ${i}, 1)" title="Mover para baixo" aria-label="Mover ${escaparHtml(m)} para baixo" ${i === maqs.length - 1 ? 'disabled' : ''}>↓</button>
                         <button class="btn-perigo btn-pequeno" onclick="removerMaq(${escaparJsEmHtml(nome)}, ${i})">Excluir</button>
