@@ -510,26 +510,25 @@
         .relatorio-lista { display:grid; gap:9px; }
         .relatorio-linha { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:10px 12px; border-radius:9px; background:var(--fundo-cinza); }
         .relatorio-linha span { color:var(--texto-claro); }
-        .relatorio-tabela-wrap { width:100%; overflow-x:auto; border:1px solid color-mix(in srgb,var(--borda) 78%,transparent); border-radius:13px; background:var(--superficie); box-shadow:0 8px 22px rgba(15,23,42,.045); }
-        .relatorio-tabela { width:100%; min-width:1450px; table-layout:fixed; border-collapse:separate; border-spacing:0; font-size:.84rem; }
-        .relatorio-tabela th,.relatorio-tabela td { padding:12px 13px; text-align:left; border-bottom:1px solid var(--borda); vertical-align:middle; }
+        .relatorio-tabela-wrap { width:100%; max-width:100%; overflow-x:auto; overscroll-behavior-x:contain; scrollbar-gutter:stable; border:1px solid color-mix(in srgb,var(--borda) 78%,transparent); border-radius:13px; background:var(--superficie); box-shadow:0 8px 22px rgba(15,23,42,.045); }
+        .relatorio-tabela { width:100%; min-width:1780px; table-layout:fixed; border-collapse:separate; border-spacing:0; font-size:.84rem; }
+        .relatorio-tabela th,.relatorio-tabela td { padding:13px 16px; text-align:left; border-bottom:1px solid var(--borda); vertical-align:middle; }
         .relatorio-tabela th,.relatorio-tabela td { white-space:nowrap; }
-        .relatorio-tabela th:nth-child(1) { width:118px; }
-        .relatorio-tabela th:nth-child(2) { width:92px; }
-        .relatorio-tabela th:nth-child(3) { width:94px; }
-        .relatorio-tabela th:nth-child(4) { width:245px; }
-        .relatorio-tabela th:nth-child(5) { width:115px; }
-        .relatorio-tabela th:nth-child(6) { width:180px; }
-        .relatorio-tabela th:nth-child(7) { width:275px; }
-        .relatorio-tabela th:nth-child(8) { width:130px; }
-        .relatorio-tabela th:nth-child(9) { width:145px; }
-        .relatorio-tabela th:nth-child(10) { width:135px; }
+        .relatorio-tabela th:nth-child(1) { width:130px; }
+        .relatorio-tabela th:nth-child(2) { width:110px; }
+        .relatorio-tabela th:nth-child(3) { width:105px; }
+        .relatorio-tabela th:nth-child(4) { width:285px; }
+        .relatorio-tabela th:nth-child(5) { width:130px; }
+        .relatorio-tabela th:nth-child(6) { width:205px; }
+        .relatorio-tabela th:nth-child(7) { width:315px; }
+        .relatorio-tabela th:nth-child(8) { width:150px; }
+        .relatorio-tabela th:nth-child(9) { width:160px; }
         .relatorio-tabela thead th { position:sticky; top:0; z-index:1; color:var(--texto-claro); background:var(--fundo-cinza); font-size:.69rem; font-weight:700; text-transform:uppercase; letter-spacing:.055em; border-bottom:1px solid var(--borda); }
         .relatorio-tabela tbody tr { background:var(--superficie); transition:background .16s ease; }
         .relatorio-tabela tbody tr:nth-child(even) { background:color-mix(in srgb,var(--fundo-cinza) 58%,var(--superficie)); }
         .relatorio-tabela tbody tr:hover { background:color-mix(in srgb,var(--cor-principal) 8%,var(--superficie)); }
         .relatorio-tabela tbody td { overflow-wrap:normal; }
-        .relatorio-tabela tbody td:nth-child(7) { white-space:normal; }
+        .relatorio-tabela tbody td:nth-child(7) { white-space:nowrap; }
         .relatorio-tabela td small { display:block; margin-top:3px; color:var(--texto-claro); }
         .relatorio-tabela th { color:var(--texto-claro); font-size:.72rem; text-transform:uppercase; letter-spacing:.045em; }
         .relatorio-tabela tfoot th,.relatorio-tabela tfoot td { font-weight:800; color:var(--texto-escuro); background:var(--fundo-cinza); border-top:2px solid var(--borda); }
@@ -563,7 +562,7 @@
         .relatorio-vazio { padding:24px; text-align:center; color:var(--texto-claro); border-radius:10px; background:var(--fundo-cinza); }
         @media (max-width:768px) {
             .relatorio-bloco-linha-tempo { padding:14px; }
-            .relatorio-tabela-wrap { overflow:visible; border:0; border-radius:0; }
+            .relatorio-tabela-wrap { overflow:visible; border:0; border-radius:0; box-shadow:none; }
             .relatorio-tabela { min-width:0; table-layout:auto; border-collapse:separate; border-spacing:0 10px; font-size:.86rem; }
             .relatorio-tabela thead { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
             .relatorio-tabela tbody { display:grid; gap:10px; }
