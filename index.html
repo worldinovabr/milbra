@@ -510,22 +510,26 @@
         .relatorio-lista { display:grid; gap:9px; }
         .relatorio-linha { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:10px 12px; border-radius:9px; background:var(--fundo-cinza); }
         .relatorio-linha span { color:var(--texto-claro); }
-        .relatorio-tabela-wrap { width:100%; overflow-x:auto; border:1px solid var(--borda); border-radius:10px; }
-        .relatorio-tabela { width:100%; min-width:1120px; table-layout:fixed; border-collapse:collapse; font-size:.84rem; }
-        .relatorio-tabela th,.relatorio-tabela td { padding:11px 10px; text-align:left; border-bottom:1px solid var(--borda); vertical-align:top; }
-        .relatorio-tabela th { white-space:nowrap; }
-        .relatorio-tabela td { overflow-wrap:anywhere; }
-        .relatorio-tabela td:first-child,.relatorio-tabela td:nth-child(2),.relatorio-tabela td:nth-child(4),.relatorio-tabela td:nth-child(7),.relatorio-tabela td:nth-child(8) { white-space:nowrap; }
-        .relatorio-tabela th:nth-child(1) { width:145px; }
-        .relatorio-tabela th:nth-child(2) { width:90px; }
-        .relatorio-tabela th:nth-child(3) { width:230px; }
-        .relatorio-tabela th:nth-child(4) { width:105px; }
-        .relatorio-tabela th:nth-child(5) { width:170px; }
-        .relatorio-tabela th:nth-child(6) { width:245px; }
-        .relatorio-tabela th:nth-child(7) { width:125px; }
+        .relatorio-tabela-wrap { width:100%; overflow-x:auto; border:1px solid color-mix(in srgb,var(--borda) 78%,transparent); border-radius:13px; background:var(--superficie); box-shadow:0 8px 22px rgba(15,23,42,.045); }
+        .relatorio-tabela { width:100%; min-width:1450px; table-layout:fixed; border-collapse:separate; border-spacing:0; font-size:.84rem; }
+        .relatorio-tabela th,.relatorio-tabela td { padding:12px 13px; text-align:left; border-bottom:1px solid var(--borda); vertical-align:middle; }
+        .relatorio-tabela th,.relatorio-tabela td { white-space:nowrap; }
+        .relatorio-tabela th:nth-child(1) { width:118px; }
+        .relatorio-tabela th:nth-child(2) { width:92px; }
+        .relatorio-tabela th:nth-child(3) { width:94px; }
+        .relatorio-tabela th:nth-child(4) { width:245px; }
+        .relatorio-tabela th:nth-child(5) { width:115px; }
+        .relatorio-tabela th:nth-child(6) { width:180px; }
+        .relatorio-tabela th:nth-child(7) { width:275px; }
         .relatorio-tabela th:nth-child(8) { width:130px; }
-        .relatorio-tabela tbody tr:nth-child(even) { background:color-mix(in srgb,var(--fundo-cinza) 55%,var(--superficie)); }
-        .relatorio-tabela tbody tr:hover { background:color-mix(in srgb,var(--cor-principal) 7%,var(--superficie)); }
+        .relatorio-tabela th:nth-child(9) { width:145px; }
+        .relatorio-tabela th:nth-child(10) { width:135px; }
+        .relatorio-tabela thead th { position:sticky; top:0; z-index:1; color:var(--texto-claro); background:var(--fundo-cinza); font-size:.69rem; font-weight:700; text-transform:uppercase; letter-spacing:.055em; border-bottom:1px solid var(--borda); }
+        .relatorio-tabela tbody tr { background:var(--superficie); transition:background .16s ease; }
+        .relatorio-tabela tbody tr:nth-child(even) { background:color-mix(in srgb,var(--fundo-cinza) 58%,var(--superficie)); }
+        .relatorio-tabela tbody tr:hover { background:color-mix(in srgb,var(--cor-principal) 8%,var(--superficie)); }
+        .relatorio-tabela tbody td { overflow-wrap:normal; }
+        .relatorio-tabela tbody td:nth-child(7) { white-space:normal; }
         .relatorio-tabela td small { display:block; margin-top:3px; color:var(--texto-claro); }
         .relatorio-tabela th { color:var(--texto-claro); font-size:.72rem; text-transform:uppercase; letter-spacing:.045em; }
         .relatorio-tabela tfoot th,.relatorio-tabela tfoot td { font-weight:800; color:var(--texto-escuro); background:var(--fundo-cinza); border-top:2px solid var(--borda); }
@@ -567,9 +571,9 @@
             .relatorio-tabela tbody tr:nth-child(even),.relatorio-tabela tbody tr:hover { background:var(--superficie); }
             .relatorio-tabela tbody td { min-width:0; padding:9px 0; border-bottom:1px solid var(--borda); white-space:normal; overflow-wrap:anywhere; }
             .relatorio-tabela tbody td::before { content:attr(data-label); display:block; margin-bottom:4px; color:var(--texto-claro); font-size:.66rem; font-weight:700; letter-spacing:.045em; line-height:1.25; text-transform:uppercase; }
-            .relatorio-tabela tbody td:nth-child(1),.relatorio-tabela tbody td:nth-child(2),.relatorio-tabela tbody td:nth-child(4),.relatorio-tabela tbody td:nth-child(7),.relatorio-tabela tbody td:nth-child(8) { white-space:normal; }
-            .relatorio-tabela tbody td:nth-child(3),.relatorio-tabela tbody td:nth-child(6) { grid-column:1/-1; }
-            .relatorio-tabela tbody td:nth-child(8) { border-bottom:0; }
+            .relatorio-tabela tbody td { white-space:normal; }
+            .relatorio-tabela tbody td:nth-child(4),.relatorio-tabela tbody td:nth-child(7) { grid-column:1/-1; }
+            .relatorio-tabela tbody td:nth-child(10) { border-bottom:0; }
             .relatorio-tabela tfoot { display:grid; margin-top:8px; padding:12px; border:1px solid var(--borda); border-radius:12px; background:var(--fundo-cinza); }
             .relatorio-tabela tfoot tr { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; }
             .relatorio-tabela tfoot th,.relatorio-tabela tfoot td { padding:0; border:0; background:transparent; }
@@ -2396,7 +2400,7 @@
             const porTurno={};
             finalizacoes.forEach(e=>{const nome=e.turnoNome||'Sem turno registrado';porTurno[nome]=(porTurno[nome]||0)+Number(e.qtdExecutada??e.producao.qtdExecutada??0);});
             const periodo=inicioValor||fimValor?`${inicioValor?new Date(`${inicioValor}T00:00:00`).toLocaleDateString('pt-BR'):'In\u00edcio aberto'} a ${fimValor?new Date(`${fimValor}T00:00:00`).toLocaleDateString('pt-BR'):'Hoje'}`:'Todo o per\u00edodo';
-            const tbody=eventos.slice(0,200).map(e=>{const qtd=e.tipo==='fim'?Number(e.qtdExecutada??e.producao.qtdExecutada??0):null;return `<tr><td data-label="Data e hora">${formatarDataHora(e.em)}</td><td data-label="Máquina">${escaparHtml(e.producao.maquina||'N/A')}</td><td data-label="Item">${escaparHtml(e.producao.nome||'N/A')}</td><td data-label="Turno">${e.turnoId?escaparHtml(e.turnoNome||'N/A'):'N/A'}</td><td data-label="Responsável pelo turno">${e.turnoId?escaparHtml(e.responsavelTurno||'N/A'):'N/A'}</td><td data-label="Evento / situação">${escaparHtml(e.titulo||e.tipo)}</td><td data-label="Inspetora">${escaparHtml(e.inspetora||'N/A')}</td><td data-label="Qtd. executada">${qtd===null?'&mdash;':qtd.toLocaleString('pt-BR')}</td></tr>`}).join('');
+            const tbody=eventos.slice(0,200).map(e=>{const qtd=e.tipo==='fim'?Number(e.qtdExecutada??e.producao.qtdExecutada??0):null;const dataEvento=new Date(e.em);const dataTexto=Number.isNaN(dataEvento.getTime())?'—':dataEvento.toLocaleDateString('pt-BR');const horaTexto=Number.isNaN(dataEvento.getTime())?'—':dataEvento.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});return `<tr><td data-label="Data">${dataTexto}</td><td data-label="Horário">${horaTexto}</td><td data-label="Máquina">${escaparHtml(e.producao.maquina||'N/A')}</td><td data-label="Item">${escaparHtml(e.producao.nome||'N/A')}</td><td data-label="Turno">${e.turnoId?escaparHtml(e.turnoNome||'N/A'):'N/A'}</td><td data-label="Responsável pelo turno">${e.turnoId?escaparHtml(e.responsavelTurno||'N/A'):'N/A'}</td><td data-label="Evento / situação">${escaparHtml(e.titulo||e.tipo)}</td><td data-label="Inspetora">${escaparHtml(e.inspetora||'N/A')}</td><td data-label="Qtd. executada">${qtd===null?'&mdash;':qtd.toLocaleString('pt-BR')}</td></tr>`}).join('');
             const listaSituacoes=topSituacoes.map(([nome,total])=>`<div class="relatorio-linha"><span>${escaparHtml(nome)}</span><strong>${total}</strong></div>`).join('')||'<div class="relatorio-vazio">Sem altera\u00e7\u00f5es de situa\u00e7\u00e3o no per\u00edodo.</div>';
             const listaMaquinas=Object.entries(porMaquina).sort((a,b)=>b[1]-a[1]).map(([nome,total])=>`<div class="relatorio-linha"><span>${escaparHtml(nome)}</span><strong>${total.toLocaleString('pt-BR')} un.</strong></div>`).join('')||'<div class="relatorio-vazio">Sem volumes finalizados no per\u00edodo.</div>';
             const listaTurnos=Object.entries(porTurno).sort((a,b)=>b[1]-a[1]).map(([nome,total])=>`<div class="relatorio-linha"><span>${escaparHtml(nome)}</span><strong>${total.toLocaleString('pt-BR')} un.</strong></div>`).join('')||'<div class="relatorio-vazio">Sem finaliza\u00e7\u00f5es com turno registrado.</div>';
@@ -2422,7 +2426,7 @@
                     <section class="relatorio-bloco"><h3>Produ\u00e7\u00e3o por turno</h3><div class="relatorio-lista">${listaTurnos}</div></section>
                     <section class="relatorio-bloco"><h3>Situa\u00e7\u00f5es e pontos de aten\u00e7\u00e3o</h3><div class="relatorio-lista">${listaSituacoes}</div><small style="display:block;margin-top:10px;color:var(--texto-claro)">Registros antigos anteriores ao controle por turno podem aparecer sem identifica\u00e7\u00e3o de turno.</small></section>
                 </div>
-                <section class="relatorio-bloco relatorio-bloco-linha-tempo" style="margin-top:16px"><h3>Linha do tempo detalhada</h3>${tbody?`<div class="relatorio-tabela-wrap"><table class="relatorio-tabela"><thead><tr><th>Data e hora</th><th>M\u00e1quina</th><th>Item</th><th>Turno</th><th>Respons\u00e1vel pelo turno</th><th>Evento / Situa\u00e7\u00e3o</th><th>Inspetora</th><th>Qtd. executada</th></tr></thead><tbody>${tbody}</tbody><tfoot><tr><th colspan="7">${turnoId?'TOTAL PRODUZIDO NO TURNO':'TOTAL PRODUZIDO NO PERÍODO'} (${finalizacoes.length} finalizações)</th><td>${unidades.toLocaleString('pt-BR')} un.</td></tr></tfoot></table></div>${eventos.length>200?`<p>Exibindo 200 de ${eventos.length} eventos.</p>`:''}`:'<div class="relatorio-vazio">Nenhum evento registrado no per\u00edodo selecionado.</div>'}</section>`;
+                <section class="relatorio-bloco relatorio-bloco-linha-tempo" style="margin-top:16px"><h3>Linha do tempo detalhada</h3>${tbody?`<div class="relatorio-tabela-wrap"><table class="relatorio-tabela"><thead><tr><th>Data</th><th>Horário</th><th>Máquina</th><th>Item</th><th>Turno</th><th>Responsável pelo turno</th><th>Evento / Situação</th><th>Inspetora</th><th>Qtd. executada</th></tr></thead><tbody>${tbody}</tbody><tfoot><tr><th colspan="8">${turnoId?'TOTAL PRODUZIDO NO TURNO':'TOTAL PRODUZIDO NO PERÍODO'} (${finalizacoes.length} finalizações)</th><td>${unidades.toLocaleString('pt-BR')} un.</td></tr></tfoot></table></div>${eventos.length>200?`<p>Exibindo 200 de ${eventos.length} eventos.</p>`:''}`:'<div class="relatorio-vazio">Nenhum evento registrado no per\u00edodo selecionado.</div>'}</section>`;
         }
 
         function imprimirRelatorio() { window.print(); }
